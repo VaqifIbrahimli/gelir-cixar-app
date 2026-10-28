@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Gəlir-Çıxar launcher glyph: an up arrow (income) and a down arrow
+     (expense). 108dp adaptive canvas; artwork stays inside the 66dp safe zone. -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Income: up arrow -->
+    <path
+        android:pathData="M42,72 L42,36 M30,48 L42,36 L54,48"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="7"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+    <!-- Expense: down arrow -->
+    <path
+        android:pathData="M66,36 L66,72 M54,60 L66,72 L78,60"
+        android:strokeColor="#FFFFFF"
+        android:strokeWidth="7"
+        android:strokeLineCap="round"
+        android:strokeLineJoin="round" />
+</vector>
