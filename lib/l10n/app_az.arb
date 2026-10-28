@@ -1,0 +1,778 @@
+{
+  "@@locale": "az",
+  "appTitle": "Gəlir-Çıxar",
+  "navHome": "Ana səhifə",
+  "navTransactions": "Əməliyyatlar",
+  "navReports": "Hesabatlar",
+  "navBudgets": "Büdcələr",
+  "navSettings": "Ayarlar",
+  "genericError": "Xəta baş verdi",
+  "cancel": "Ləğv et",
+  "save": "Saxla",
+  "delete": "Sil",
+  "close": "Bağla",
+  "confirm": "Təsdiqlə",
+  "clear": "Təmizlə",
+  "more": "Daha çox",
+  "undo": "Geri al",
+  "all": "Hamısı",
+  "seeAll": "Hamısı",
+  "total": "Ümumi",
+  "today": "Bu gün",
+  "yesterday": "Dünən",
+  "income": "Gəlir",
+  "expense": "Xərc",
+  "net": "Net",
+  "txTypeIncome": "Gəlir",
+  "txTypeExpense": "Xərc",
+  "txTypeTransfer": "Transfer",
+  "uncategorized": "Kateqoriyasız",
+  "totalBalance": "Ümumi balans",
+  "showBalance": "Balansı göstər",
+  "hideBalance": "Balansı gizlət",
+  "balanceHidden": "Balans gizlədilib",
+  "negativeBalance": "Mənfi balans",
+  "thisMonth": "Bu ay: {month}",
+  "@thisMonth": {
+    "placeholders": {
+      "month": {
+        "type": "String"
+      }
+    }
+  },
+  "recentTransactions": "Son əməliyyatlar",
+  "accounts": "Hesablar",
+  "account": "Hesab",
+  "addAccount": "Hesab əlavə et",
+  "newAccount": "Yeni hesab",
+  "editAccount": "Hesabı redaktə et",
+  "accountNotFound": "Hesab tapılmadı",
+  "accountType": "Hesabın növü",
+  "accountTypeCash": "Nağd",
+  "accountTypeCard": "Kart",
+  "accountTypeBank": "Bank hesabı",
+  "accountTypeSavings": "Əmanət",
+  "currency": "Valyuta",
+  "currencyLockedHint": "Əməliyyatı olan hesabın valyutası dəyişdirilə bilməz.",
+  "initialBalance": "Başlanğıc balans",
+  "color": "Rəng",
+  "colorN": "Rəng {n}",
+  "@colorN": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "name": "Ad",
+  "nameRequired": "Ad daxil edin",
+  "archive": "Arxivlə",
+  "unarchive": "Arxivdən çıxar",
+  "archived": "arxivdə",
+  "archivedCount": "Arxivlənmiş ({count})",
+  "@archivedCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteAccountTitle": "Hesab silinsin?",
+  "deleteAccountBody": "Bu hesab birdəfəlik silinəcək.",
+  "deleteAccountUsedBody": "Bu hesabda əməliyyatlar var, ona görə silinmir, arxivlənəcək. Tarixçə saxlanılır.",
+  "accountDeleted": "Hesab silindi",
+  "accountArchived": "Hesab arxivləndi",
+  "emptyAccountsTitle": "Hesab əlavə edin",
+  "categories": "Kateqoriyalar",
+  "category": "Kateqoriya",
+  "newCategory": "Yeni kateqoriya",
+  "editCategory": "Kateqoriyanı redaktə et",
+  "categoryNotFound": "Kateqoriya tapılmadı",
+  "nameAz": "Ad (Azərbaycanca)",
+  "nameEn": "Ad (İngiliscə)",
+  "nameEnHint": "Boş qalsa, azərbaycanca ad göstərilir",
+  "icon": "İkon",
+  "transactionCount": "{count, plural, =0{Əməliyyat yoxdur} other{{count} əməliyyat}}",
+  "@transactionCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "deleteCategoryTitle": "Kateqoriya silinsin?",
+  "deleteCategoryBody": "Bu kateqoriya birdəfəlik silinəcək.",
+  "deleteCategoryUsedBody": "Bu kateqoriya istifadə olunur, ona görə silinmir, arxivlənəcək.",
+  "categoryDeleted": "Kateqoriya silindi",
+  "categoryArchived": "Kateqoriya arxivləndi",
+  "emptyCategoriesTitle": "Kateqoriya yoxdur",
+  "addTransaction": "Əməliyyat əlavə et",
+  "newTransaction": "Yeni əməliyyat",
+  "editTransaction": "Əməliyyatı redaktə et",
+  "transactionNotFound": "Əməliyyat tapılmadı",
+  "emptyTransactionsTitle": "Hələ əməliyyat yoxdur",
+  "emptyTransactionsBody": "İlk gəlir və ya xərcinizi əlavə edin.",
+  "emptyFilteredTitle": "Uyğun nəticə tapılmadı",
+  "resetFilters": "Filtrləri sıfırla",
+  "search": "Axtar",
+  "closeSearch": "Axtarışı bağla",
+  "searchNotes": "Qeydlərdə axtar",
+  "allAccounts": "Bütün hesablar",
+  "allCategories": "Bütün kateqoriyalar",
+  "dateRange": "Tarix",
+  "date": "Tarix",
+  "note": "Qeyd",
+  "addNote": "Qeyd əlavə et",
+  "noteHint": "Məsələn: Bravo market",
+  "fromAccount": "Haradan",
+  "toAccount": "Haraya",
+  "amountSent": "Göndərilən",
+  "amountReceived": "Alınan",
+  "transactionDeleted": "Əməliyyat silindi",
+  "deleteTransactionTitle": "Əməliyyat silinsin?",
+  "deleteTransactionBody": "Bu əməliyyat silinəcək.",
+  "enterAmount": "Məbləğ daxil edin",
+  "invalidAmount": "Yanlış məbləğ",
+  "enterReceivedAmount": "Alınan məbləği daxil edin",
+  "selectAccount": "Hesab seçin",
+  "selectToAccount": "Hədəf hesabı seçin",
+  "sameAccountError": "Hesablar fərqli olmalıdır",
+  "selectCategory": "Kateqoriya seçin",
+  "backspace": "Sil",
+  "backspaceHint": "Basıb saxlayın: hamısını sil",
+  "plus": "Üstəgəl",
+  "plusHint": "Basıb saxlayın: vurma (×)",
+  "minus": "Çıx",
+  "minusHint": "Basıb saxlayın: bölmə (÷)",
+  "decimalPoint": "Onluq ayırıcı",
+  "equals": "Bərabərdir",
+  "enterPin": "PIN kodu daxil edin",
+  "enterCurrentPin": "Hazırkı PIN kodu daxil edin",
+  "createPin": "Yeni PIN kod yaradın",
+  "confirmPin": "PIN kodu təkrar daxil edin",
+  "pinLengthHint": "4–6 rəqəm, sonra ✓ basın",
+  "pinMismatch": "PIN kodlar uyğun gəlmir. Yenidən cəhd edin.",
+  "pinSetupIntro": "Məlumatlarınızı qorumaq üçün PIN kod təyin edin. Kilidi sonra Ayarlarda söndürə bilərsiniz.",
+  "pinDigitsEntered": "{entered} / {total} rəqəm daxil edilib",
+  "@pinDigitsEntered": {
+    "placeholders": {
+      "entered": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "wrongPinAttemptsLeft": "{count, plural, =0{Yanlış PIN} other{Yanlış PIN. {count} cəhd qalıb}}",
+  "@wrongPinAttemptsLeft": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "lockedOutFor": "Çox sayda yanlış cəhd. {seconds} saniyə gözləyin.",
+  "@lockedOutFor": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "useFingerprint": "Barmaq izi ilə aç",
+  "biometricReason": "Gəlir-Çıxar-ı açmaq üçün təsdiqləyin",
+  "biometricEnableReason": "Barmaq izi ilə açılışı aktivləşdirmək üçün təsdiqləyin",
+  "biometricUnavailable": "Bu cihazda barmaq izi qeydiyyatda deyil və ya dəstəklənmir",
+  "settingsGeneral": "Ümumi",
+  "settingsSecurity": "Təhlükəsizlik",
+  "settingsData": "Məlumat",
+  "settingsAbout": "Haqqında",
+  "language": "Dil",
+  "theme": "Tema",
+  "themeSystem": "Sistem",
+  "themeLight": "Açıq",
+  "themeDark": "Tünd",
+  "baseCurrency": "Əsas valyuta",
+  "appLock": "Tətbiq kilidi",
+  "appLockSubtitle": "Açılışda PIN kod tələb et",
+  "changePin": "PIN kodu dəyiş",
+  "fingerprint": "Barmaq izi",
+  "fingerprintSubtitle": "PIN əvəzinə barmaq izi ilə aç",
+  "about": "Tətbiq haqqında",
+  "aboutBody": "Şəxsi gəlir və xərclərin oflayn izlənməsi. Bütün məlumatlar yalnız bu cihazda saxlanılır.",
+  "versionN": "Versiya {version}",
+  "@versionN": {
+    "placeholders": {
+      "version": {
+        "type": "String"
+      }
+    }
+  },
+  "addBudget": "Büdcə əlavə et",
+  "editBudget": "Büdcəni redaktə et",
+  "deleteBudgetTitle": "Büdcə silinsin?",
+  "budgetLimit": "Aylıq limit",
+  "budgetTotal": "Ümumi büdcə",
+  "budgetSummary": "Büdcə xülasəsi",
+  "budgetRemaining": "Qalıb: {amount}",
+  "@budgetRemaining": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "budgetOverBy": "Aşıb: {amount}",
+  "@budgetOverBy": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "budgetStateWarning": "xəbərdarlıq",
+  "budgetStateOver": "limit aşıldı",
+  "budgetSemantics": "{name} büdcəsi, {percent} faiz istifadə olunub",
+  "@budgetSemantics": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      },
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "budgetDailyAllowance": "Gündəlik limit: {amount} (qalan {days} gün)",
+  "@budgetDailyAllowance": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      },
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "budgetsNearLimit": "{count, plural, =1{1 kateqoriya limitə yaxındır və ya aşıb} other{{count} kateqoriya limitə yaxındır və ya aşıb}}",
+  "@budgetsNearLimit": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "budgetsCopyLastMonth": "Keçən ayın büdcələrini köçür",
+  "budgetsCopied": "{count, plural, =1{1 büdcə köçürüldü} other{{count} büdcə köçürüldü}}",
+  "@budgetsCopied": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "budgetsCopyNone": "Köçürüləcək büdcə yoxdur",
+  "budgetAllCategoriesUsed": "Bütün xərc kateqoriyalarının bu ay üçün büdcəsi var.",
+  "emptyBudgetsTitle": "Büdcə qurulmayıb",
+  "emptyBudgetsBody": "Kateqoriyalar üçün aylıq limit təyin edin və xərclərinizi izləyin.",
+  "positiveAmountRequired": "Müsbət məbləğ daxil edin",
+  "previousMonth": "Əvvəlki ay",
+  "nextMonth": "Növbəti ay",
+  "budgetAlertWarningTitle": "{name}: büdcə limitinə yaxınlaşır",
+  "@budgetAlertWarningTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "budgetAlertWarningBody": "Limitin {percent}%-i istifadə olunub ({amounts})",
+  "@budgetAlertWarningBody": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      },
+      "amounts": {
+        "type": "String"
+      }
+    }
+  },
+  "budgetAlertOverTitle": "{name}: büdcə limiti aşıldı",
+  "@budgetAlertOverTitle": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "budgetAlertOverBody": "Xərclənib: {amounts}",
+  "@budgetAlertOverBody": {
+    "placeholders": {
+      "amounts": {
+        "type": "String"
+      }
+    }
+  },
+  "notificationChannelName": "Büdcə xəbərdarlıqları",
+  "notificationChannelDescription": "Büdcə limitinin 80% və 100%-nə çatdıqda",
+  "budgetNotifications": "Büdcə bildirişləri",
+  "budgetNotificationsSubtitle": "Limitin 80% və 100%-ində bildiriş göndər",
+  "notificationsDenied": "Bildiriş icazəsi verilmədi. Onu sistem ayarlarından aça bilərsiniz.",
+  "periodThisMonth": "Bu ay",
+  "periodLastMonth": "Keçən ay",
+  "periodThisYear": "Bu il",
+  "periodCustom": "Xüsusi",
+  "emptyReportsTitle": "Bu dövr üçün məlumat yoxdur",
+  "otherCategories": "Digər",
+  "reportsByMonth": "Aylar üzrə",
+  "monthsN": "{count} ay",
+  "@monthsN": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "averageMonthlyExpense": "Orta aylıq xərc: {amount}",
+  "@averageMonthlyExpense": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "balanceTrend": "Balansın dinamikası",
+  "balanceTrendHint": "Ay sonuna ümumi balans (gəlir və xərclər əsasında, AZN).",
+  "exchangeRates": "Valyuta məzənnələri",
+  "exchangeRatesSubtitle": "USD, EUR, RUB, TRY → AZN",
+  "exchangeRatesHint": "1 vahid xarici valyutanın neçə manat olduğunu daxil edin. Bütün cəmlər bu məzənnələrlə hesablanır.",
+  "rateLabel": "{code} məzənnəsi",
+  "@rateLabel": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "ratePositive": "Müsbət ədəd daxil edin (məs. 1,70)",
+  "ratesSaved": "Məzənnələr yadda saxlanıldı",
+  "blockScreenshots": "Ekran görüntüsünü qadağan et",
+  "blockScreenshotsSubtitle": "Ekran şəkli və son tətbiqlərdə önizləmə bağlanır",
+  "export": "İxrac",
+  "exportSubtitle": "CSV, Excel və ya PDF",
+  "exportFormat": "Format",
+  "exportPeriod": "Dövr",
+  "exportAction": "İxrac et və paylaş",
+  "exportHint": "Fayl müvəqqəti qovluqda yaradılır və paylaşma pəncərəsi açılır.",
+  "exportNothing": "Seçilmiş dövrdə əməliyyat yoxdur",
+  "exportFailed": "İxrac alınmadı",
+  "exportShareTitle": "Hesabatı paylaş",
+  "exportPdfTitle": "Gəlir-Çıxar hesabatı",
+  "exportGenerated": "Yaradılıb",
+  "exportColDate": "Tarix",
+  "exportColType": "Növ",
+  "exportColAmount": "Məbləğ",
+  "exportColAmountAzn": "Məbləğ (AZN)",
+  "exportColToAmount": "Alınan məbləğ",
+  "backupCreate": "Ehtiyat nüsxə yarat",
+  "backupCreateSubtitle": "Bütün məlumatlar JSON faylına",
+  "backupShareSubject": "Gəlir-Çıxar ehtiyat nüsxəsi",
+  "backupFailed": "Ehtiyat nüsxə yaradılmadı",
+  "backupRestore": "Ehtiyat nüsxədən bərpa et",
+  "backupRestoreSubtitle": "Cari məlumatlar əvəz olunacaq",
+  "backupRestoreConfirmTitle": "Məlumatlar əvəz olunsun?",
+  "backupRestoreConfirmBody": "Bütün cari hesablar, kateqoriyalar, əməliyyatlar və büdcələr \"{file}\" faylındakı məlumatlarla əvəz olunacaq. Bunu geri qaytarmaq olmaz.",
+  "@backupRestoreConfirmBody": {
+    "placeholders": {
+      "file": {
+        "type": "String"
+      }
+    }
+  },
+  "backupRestoreConfirmAction": "Bərpa et",
+  "backupRestored": "Bərpa olundu: {transactions} əməliyyat, {accounts} hesab",
+  "@backupRestored": {
+    "placeholders": {
+      "transactions": {
+        "type": "int"
+      },
+      "accounts": {
+        "type": "int"
+      }
+    }
+  },
+  "backupReadFailed": "Fayl oxunmadı",
+  "backupInvalidFile": "Bu fayl Gəlir-Çıxar ehtiyat nüsxəsi deyil",
+  "backupNewerVersion": "Ehtiyat nüsxə tətbiqin daha yeni versiyası ilə yaradılıb. Tətbiqi yeniləyin.",
+  "backupInvalidData": "Ehtiyat nüsxədəki məlumatlar zədəlidir. Heç nə dəyişdirilmədi.",
+  "backupTooLarge": "Fayl çox böyükdür (maksimum 32 MB). Heç nə dəyişdirilmədi.",
+  "txTypeToHolding": "Kənar yerə",
+  "txTypeFromHolding": "Kənar yerdən",
+  "edit": "Redaktə et",
+  "notSet": "Təyin edilməyib",
+  "holdings": "Kənar yerlər",
+  "holdingsSubtitle": "Evdə, borcda, depozitdə, qızılda saxlanan pul",
+  "holdingsTotal": "Kənarda",
+  "holdingsElsewhere": "Kənarda",
+  "netWorth": "Ümumi sərvət",
+  "addHolding": "Kənar yer əlavə et",
+  "editHolding": "Kənar yeri redaktə et",
+  "holdingNotFound": "Kənar yer tapılmadı",
+  "holdingOpen": "Kənar yeri aç",
+  "emptyHoldingsTitle": "Kənar yer yoxdur",
+  "emptyHoldingsBody": "Evdəki nağd pulu, yaxınınızdakı pulu, əmanəti və qızılı burada izləyin. Xərclənə bilən balansa daxil olmur, ümumi sərvətə daxildir.",
+  "holdingPlace": "Yer",
+  "holdingPlaceHomeCash": "Evdə nağd",
+  "holdingPlacePerson": "Yaxın adamda",
+  "holdingPlaceBankDeposit": "Bank əmanəti",
+  "holdingPlaceGold": "Qızıl, qiymətli əşya",
+  "holdingPlaceOther": "Digər",
+  "holdingNameHint": "Məs: Sandıq",
+  "holdingInitialAmount": "Hazırkı məbləğ",
+  "holdingCurrencyLocked": "Tarixçəsi olan kənar yerin valyutası dəyişdirilə bilməz.",
+  "holdingInterestRate": "İllik faiz",
+  "holdingInterestInvalid": "0 ilə 100 arasında faiz daxil edin",
+  "holdingInterestValue": "İllik {rate}%",
+  "@holdingInterestValue": {
+    "placeholders": {
+      "rate": {
+        "type": "String"
+      }
+    }
+  },
+  "holdingMaturityDate": "Bitmə tarixi",
+  "holdingMaturityValue": "Bitmə: {date}",
+  "@holdingMaturityValue": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "holdingAdjust": "Məbləği dəyiş",
+  "holdingEntryAdd": "Əlavə et",
+  "holdingEntryWithdraw": "Götür",
+  "holdingEntrySetValue": "Dəyəri yenilə",
+  "holdingNewValue": "Yeni dəyər",
+  "holdingEntryFromAccount": "hesabdan köçürmə",
+  "holdingErrorNegative": "Bu dəyişiklik məbləği sıfırdan aşağı salar",
+  "holdingHistory": "Tarixçə",
+  "holdingNoEntries": "Hələ qeyd yoxdur",
+  "holdingMove": "Hesabla köçür",
+  "holdingMoveIn": "Hesabdan bura",
+  "holdingMoveOut": "Buradan hesaba",
+  "holdingMoveAccountAmount": "Hesabda məbləğ ({code})",
+  "@holdingMoveAccountAmount": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "holdingMoveHoldingAmount": "Kənar yerdə məbləğ ({code})",
+  "@holdingMoveHoldingAmount": {
+    "placeholders": {
+      "code": {
+        "type": "String"
+      }
+    }
+  },
+  "holdingMoveHint": "Köçürmə gəlir və ya xərc sayılmır, büdcələrə təsir etmir.",
+  "holdingMoveEditElsewhere": "Bu köçürmə Kənar yerlər bölməsindən idarə olunur",
+  "deleteHoldingTitle": "Kənar yer silinsin?",
+  "deleteHoldingBody": "Kənar yer və bütün tarixçəsi birdəfəlik silinəcək.",
+  "deleteHoldingUsedBody": "Bu kənar yerə hesablardan köçürmələr var, ona görə silinmir, arxivlənəcək.",
+  "holdingDeleted": "Kənar yer silindi",
+  "holdingArchived": "Kənar yer arxivləndi",
+  "deleteHoldingEntryTitle": "Qeyd silinsin?",
+  "deleteHoldingEntryLinkedBody": "Bu qeyd hesabdan köçürmə ilə yaradılıb. Hesabdakı əməliyyat da silinəcək.",
+  "exportHoldingsSection": "Kənar yerlər (cari vəziyyət)",
+  "autoRates": "Avtomatik məzənnə (AMB)",
+  "autoRatesSubtitle": "Mərkəzi Bankın rəsmi məzənnələri, gündə ən çox 2 dəfə",
+  "ratesRefresh": "Yenilə",
+  "ratesRefreshed": "Məzənnələr yeniləndi",
+  "ratesNeverUpdated": "Hələ yenilənməyib",
+  "ratesLastUpdated": "Yeniləndi: {when}",
+  "@ratesLastUpdated": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "ratesBulletinDate": "AMB tarixi: {date}",
+  "@ratesBulletinDate": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "ratesErrorOffline": "İnternet bağlantısı yoxdur. Sonra yenidən cəhd edin.",
+  "ratesErrorServer": "AMB serveri cavab vermədi",
+  "ratesErrorParse": "AMB məlumatı oxunmadı və ya şübhəlidir. Köhnə məzənnələr saxlanıldı.",
+  "ratesPrivacyNote": "Yalnız cbar.az saytından ictimai məzənnə faylı yüklənir. Heç bir şəxsi məlumat göndərilmir.",
+  "rateSourceCbar": "AMB",
+  "rateSourceManual": "Əl ilə",
+  "rateSourceDefault": "Standart",
+  "rateAutoValue": "AMB: {value}",
+  "@rateAutoValue": {
+    "placeholders": {
+      "value": {
+        "type": "String"
+      }
+    }
+  },
+  "rateResetToAuto": "Avtomatik dəyərə qaytar",
+  "greetingMorning": "Sabahınız xeyir",
+  "greetingAfternoon": "Günortanız xeyir",
+  "greetingEvening": "Axşamınız xeyir",
+  "greetingNight": "Salam",
+  "spendableBalance": "Xərclənə bilən balans",
+  "thisWeek": "Bu həftə",
+  "vsLastWeekLess": "Keçən həftədən {percent}% az",
+  "@vsLastWeekLess": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "vsLastWeekMore": "Keçən həftədən {percent}% çox",
+  "@vsLastWeekMore": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "createBudget": "Büdcə yarat",
+  "depositEndsIn": "{days, plural, =0{Əmanətin müddəti bu gün bitir} other{Əmanətin müddəti {days} gün sonra bitir}}",
+  "@depositEndsIn": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "depositMatured": "Müddəti bitib",
+  "daysLeft": "{days, plural, =0{bu gün bitir} other{{days} gün qalıb}}",
+  "@daysLeft": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "ratesUpdatedAt": "Məzənnələr yeniləndi · {time}",
+  "@ratesUpdatedAt": {
+    "placeholders": {
+      "time": {
+        "type": "String"
+      }
+    }
+  },
+  "ratesOfflineUsingLast": "Oflayn: son məzənnələr istifadə olunur ({date})",
+  "@ratesOfflineUsingLast": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "onboardingSkip": "Keç",
+  "onboardingNext": "Davam et",
+  "onboardingStart": "Başla",
+  "onboardingPageOf": "Səhifə {page} / {total}",
+  "@onboardingPageOf": {
+    "placeholders": {
+      "page": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "onb1Title": "Gəlir və xərcini bir yerdə gör",
+  "onb1Body": "Hər əməliyyatı saniyələr içində qeyd et. İnternet lazım deyil.",
+  "onb2Title": "Büdcə qur, limitdən xəbərdar ol",
+  "onb2Body": "Limitin 80%-nə çatanda xəbərdarlıq edirik.",
+  "onb3Title": "Bütün sərvətini izlə",
+  "onb3Body": "Evdəki nağd pul, əmanət, qızıl: hamısı «Ümumi sərvət»də.",
+  "chooseLanguage": "Tətbiqin dili",
+  "baseCurrencyAzn": "Əsas valyuta: Azərbaycan manatı",
+  "aznName": "Azərbaycan manatı",
+  "baseCurrencyBody": "Bütün cəmlər AZN-də göstərilir. USD/EUR hesablar məzənnə ilə çevrilir.",
+  "protectWithPin": "Tətbiqi PIN ilə qoru",
+  "protectWithPinBody": "Telefonunuz başqasının əlinə keçsə belə maliyyə məlumatlarınız gizli qalır.",
+  "setPin": "PIN qur",
+  "later": "Sonra",
+  "pinIsSet": "PIN quruldu",
+  "autoRatesOnboardingTitle": "Məzənnələri avtomatik yenilə",
+  "appearance": "Görünüş",
+  "themeColour": "Rəng seçin",
+  "wallpaperColour": "Divar kağızı rəngləri",
+  "wallpaperColourBody": "Android 12+ divar kağızından rəng götürür",
+  "wallpaperColourActive": "Divar kağızı rəngi aktivdir",
+  "preview": "Önizləmə",
+  "seedSelected": "{name}, seçilib",
+  "@seedSelected": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "settingsNotifications": "Bildirişlər",
+  "ratesSection": "Məzənnələr",
+  "autoRatesShort": "Avtomatik yenilə",
+  "autoRatesSource": "Mənbə: AMB (cbar.az)",
+  "ratesUpdating": "Yenilənir…",
+  "ratesUpdatingShort": "Yenilənir",
+  "ratesLastUpdatedShort": "Son yenilənmə: {when}",
+  "@ratesLastUpdatedShort": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "ratesStaleSuffix": "(köhnəlib)",
+  "ratesOfflineSince": "Oflayn. Son məzənnələr: {when}",
+  "@ratesOfflineSince": {
+    "placeholders": {
+      "when": {
+        "type": "String"
+      }
+    }
+  },
+  "ratesNotUpdated": "Yenilənmədi",
+  "ratesNotUpdatedSince": "Yenilənmədi. Son məzənnələr: {date}",
+  "@ratesNotUpdatedSince": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "ratesNeverFetchedOffline": "Hələ yüklənməyib. Əl ilə daxil edilən məzənnələr istifadə olunur.",
+  "retry": "Yenidən cəhd et",
+  "ratesUnitHeader": "1 vahid = ? AZN",
+  "manualOverrideNote": "Əl ilə daxil edilən məzənnə avtomatik yenilənmədə dəyişmir.",
+  "resetToCbar": "AMB məzənnəsinə qaytar",
+  "holdingsShareOfNetWorth": "Ümumi sərvətin {percent}%-i",
+  "@holdingsShareOfNetWorth": {
+    "placeholders": {
+      "percent": {
+        "type": "int"
+      }
+    }
+  },
+  "holdingsPlaceCount": "{count, plural, =1{1 yer} other{{count} yer}}",
+  "@holdingsPlaceCount": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "holdingsZeroGroup": "Sıfır qalıqlılar ({count})",
+  "@holdingsZeroGroup": {
+    "placeholders": {
+      "count": {
+        "type": "int"
+      }
+    }
+  },
+  "updatedToday": "bu gün yeniləndi",
+  "updatedDaysAgo": "{days, plural, =1{1 gün əvvəl yeniləndi} other{{days} gün əvvəl yeniləndi}}",
+  "@updatedDaysAgo": {
+    "placeholders": {
+      "days": {
+        "type": "int"
+      }
+    }
+  },
+  "holdingDeleteConfirm": "«{name}» silinsin?",
+  "@holdingDeleteConfirm": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "holdingCurrentAmount": "indiki {amount}",
+  "@holdingCurrentAmount": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "holdingNewBalance": "Yeni qalıq: {amount}",
+  "@holdingNewBalance": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "holdingDifference": "Fərq: {amount}",
+  "@holdingDifference": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "withdrawTooMuch": "Qalıqdan çox götürmək olmaz",
+  "linkFromAccount": "Hesabdan köçür",
+  "linkToAccount": "Hesaba köçür",
+  "holdingUpdateValue": "Dəyəri yenilə",
+  "holdingValueShort": "Dəyər",
+  "estimatedInterest": "Təxmini gəlir",
+  "range3m": "3A",
+  "range6m": "6A",
+  "range1y": "1İ",
+  "chartNeedsTwoPoints": "Qrafik üçün ən azı 2 qeyd lazımdır",
+  "holdingAdded": "Əlavə edildi",
+  "holdingWithdrawn": "Götürüldü",
+  "holdingValueSet": "Dəyər yeniləndi",
+  "holdingBefore": "əvvəl {amount}",
+  "@holdingBefore": {
+    "placeholders": {
+      "amount": {
+        "type": "String"
+      }
+    }
+  },
+  "fromAccountName": "{name} hesabından",
+  "@fromAccountName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "toAccountName": "{name} hesabına",
+  "@toAccountName": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "holdingNameHintPerson": "Məs: Anamda",
+  "holdingNameHintDeposit": "Məs: Kapital 12 ay",
+  "holdingNameHintGold": "Məs: Qızıl üzük",
+  "holdingFromAccount": "Məbləği hesabdan köçür",
+  "holdingCurrencyLockedHelper": "Tarixçə olduğu üçün valyuta dəyişmir",
+  "maturityAfterToday": "Bitmə tarixi bu gündən sonra olmalıdır",
+  "holdingMoveChip": "Kənar yer",
+  "rateJumpTitle": "Məzənnə kəskin dəyişib",
+  "rateJumpBody": "AMB-dən gələn bu məzənnələr əvvəlkindən 50%-dən çox fərqlənir. Tətbiq edilsin?",
+  "rateJumpKeep": "Köhnəni saxla",
+  "rateJumpApply": "Tətbiq et"
+}
