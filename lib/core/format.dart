@@ -120,8 +120,20 @@ abstract final class Fmt {
   static String dayHeader(DateTime d, String lang) =>
       DateFormat('d MMMM, EEE', lang).format(d);
 
-  static String time(DateTime d, String lang) =>
-      DateFormat.Hm(lang).format(d);
+  /// Always 24-hour "HH:mm" in both languages (DESIGN.md §18.4).
+  static String time(DateTime d, String lang) => DateFormat('HH:mm', lang).format(d);
+
+  /// "28 okt" in the current year of [now], else "28 okt 2025".
+  static String shortDate(DateTime d, String lang, [DateTime? now]) {
+    final DateTime n = now ?? DateTime.now();
+    return DateFormat(d.year == n.year ? 'd MMM' : 'd MMM y', lang).format(d);
+  }
+
+  /// "31 okt 2026, 08:16".
+  static String dateTime(DateTime d, String lang) => '${DateFormat('d MMM y', lang).format(d)}, ${time(d, lang)}';
+
+  /// "Cümə, 31 oktyabr 2026".
+  static String longDate(DateTime d, String lang) => _cap(DateFormat('EEEE, d MMMM y', lang).format(d));
 
   static bool sameDay(DateTime a, DateTime b) =>
       a.year == b.year && a.month == b.month && a.day == b.day;

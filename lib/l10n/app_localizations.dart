@@ -2455,6 +2455,684 @@ abstract class AppLocalizations {
   /// In az, this message translates to:
   /// **'Tətbiq et'**
   String get rateJumpApply;
+
+  /// No description provided for @lockTimeoutTitle.
+  ///
+  /// In az, this message translates to:
+  /// **'Avtomatik kilid'**
+  String get lockTimeoutTitle;
+
+  /// No description provided for @lockTimeoutHint.
+  ///
+  /// In az, this message translates to:
+  /// **'Tətbiq arxa fonda bu qədər qaldıqdan sonra PIN tələb olunur.'**
+  String get lockTimeoutHint;
+
+  /// No description provided for @lockTimeoutImmediately.
+  ///
+  /// In az, this message translates to:
+  /// **'Dərhal'**
+  String get lockTimeoutImmediately;
+
+  /// No description provided for @lockTimeoutSeconds.
+  ///
+  /// In az, this message translates to:
+  /// **'{seconds} saniyə sonra'**
+  String lockTimeoutSeconds(int seconds);
+
+  /// No description provided for @lockTimeoutMinutes.
+  ///
+  /// In az, this message translates to:
+  /// **'{minutes} dəqiqə sonra'**
+  String lockTimeoutMinutes(int minutes);
+
+  /// No description provided for @lockTimeoutHours.
+  ///
+  /// In az, this message translates to:
+  /// **'{hours} saat sonra'**
+  String lockTimeoutHours(int hours);
+
+  /// No description provided for @lockTimeoutReauthReason.
+  ///
+  /// In az, this message translates to:
+  /// **'Avtomatik kilid vaxtını dəyişmək üçün təsdiqləyin'**
+  String get lockTimeoutReauthReason;
+
+  /// No description provided for @lockBiometricEnrollmentChanged.
+  ///
+  /// In az, this message translates to:
+  /// **'Telefona yeni barmaq izi əlavə edilib. Təhlükəsizlik üçün PIN daxil edin.'**
+  String get lockBiometricEnrollmentChanged;
+
+  /// No description provided for @lockRecoveryTitle.
+  ///
+  /// In az, this message translates to:
+  /// **'PIN məlumatı itib'**
+  String get lockRecoveryTitle;
+
+  /// No description provided for @lockRecoveryBody.
+  ///
+  /// In az, this message translates to:
+  /// **'Telefonun təhlükəsiz yaddaşı sıfırlandığı üçün tətbiqin PIN kodu silinib. Məlumatlarınız yerindədir. Davam etmək üçün telefonun öz kilidi (PIN, naxış və ya barmaq izi) ilə təsdiqləyin, sonra yeni PIN təyin edin.'**
+  String get lockRecoveryBody;
+
+  /// No description provided for @lockRecoveryConfirmButton.
+  ///
+  /// In az, this message translates to:
+  /// **'Telefon kilidi ilə təsdiqlə'**
+  String get lockRecoveryConfirmButton;
+
+  /// No description provided for @lockRecoveryReason.
+  ///
+  /// In az, this message translates to:
+  /// **'Gəlir-Çıxar-a girişi bərpa etmək üçün təsdiqləyin'**
+  String get lockRecoveryReason;
+
+  /// No description provided for @lockRecoveryAuthFailed.
+  ///
+  /// In az, this message translates to:
+  /// **'Təsdiq alınmadı. Yenidən cəhd edin.'**
+  String get lockRecoveryAuthFailed;
+
+  /// No description provided for @lockRecoveryInsecureBody.
+  ///
+  /// In az, this message translates to:
+  /// **'Bu telefonda ekran kilidi (PIN, naxış və ya parol) qurulmayıb, ona görə də kimliyinizi telefon vasitəsilə təsdiqləmək mümkün deyil. Yeni PIN təyin etməklə girişi bərpa edə bilərsiniz.'**
+  String get lockRecoveryInsecureBody;
+
+  /// No description provided for @lockRecoveryRestoreButton.
+  ///
+  /// In az, this message translates to:
+  /// **'Məlumatlarıma girişi bərpa et'**
+  String get lockRecoveryRestoreButton;
+
+  /// No description provided for @lockRecoveryWarningTitle.
+  ///
+  /// In az, this message translates to:
+  /// **'Diqqət'**
+  String get lockRecoveryWarningTitle;
+
+  /// No description provided for @lockRecoveryWarningBody.
+  ///
+  /// In az, this message translates to:
+  /// **'Telefonu əlində tutan hər kəs bu addımla yeni PIN təyin edib məlumatlarınızı görə bilər. Bunu yalnız telefon sizindirsə edin. Telefonda ekran kilidi qurmağınız tövsiyə olunur.'**
+  String get lockRecoveryWarningBody;
+
+  /// No description provided for @lockRecoveryWarningConfirm.
+  ///
+  /// In az, this message translates to:
+  /// **'Bərpa et'**
+  String get lockRecoveryWarningConfirm;
+
+  /// No description provided for @thisMonthShort.
+  ///
+  /// In az, this message translates to:
+  /// **'Bu ay'**
+  String get thisMonthShort;
+
+  /// No description provided for @cardPosition.
+  ///
+  /// In az, this message translates to:
+  /// **'Kart {n} / {total}'**
+  String cardPosition(int n, int total);
+
+  /// No description provided for @cardEndingIn.
+  ///
+  /// In az, this message translates to:
+  /// **'kart sonu {last4}'**
+  String cardEndingIn(String last4);
+
+  /// No description provided for @bonusBadge.
+  ///
+  /// In az, this message translates to:
+  /// **'Bonus {pct}%'**
+  String bonusBadge(int pct);
+
+  /// No description provided for @negativeShort.
+  ///
+  /// In az, this message translates to:
+  /// **'Mənfi'**
+  String get negativeShort;
+
+  /// No description provided for @cardDesign.
+  ///
+  /// In az, this message translates to:
+  /// **'Kart dizaynı'**
+  String get cardDesign;
+
+  /// No description provided for @cardChangeDesign.
+  ///
+  /// In az, this message translates to:
+  /// **'Kart dizaynını dəyiş'**
+  String get cardChangeDesign;
+
+  /// No description provided for @cardDesignPhoto.
+  ///
+  /// In az, this message translates to:
+  /// **'Şəkil'**
+  String get cardDesignPhoto;
+
+  /// No description provided for @cardChoosePhoto.
+  ///
+  /// In az, this message translates to:
+  /// **'Şəkil seç'**
+  String get cardChoosePhoto;
+
+  /// No description provided for @cardChangePhoto.
+  ///
+  /// In az, this message translates to:
+  /// **'Şəkli dəyiş'**
+  String get cardChangePhoto;
+
+  /// No description provided for @cardRemovePhoto.
+  ///
+  /// In az, this message translates to:
+  /// **'Şəkli sil'**
+  String get cardRemovePhoto;
+
+  /// No description provided for @cardPhotoMissing.
+  ///
+  /// In az, this message translates to:
+  /// **'Şəkil tapılmadı'**
+  String get cardPhotoMissing;
+
+  /// No description provided for @cardPhotoFailed.
+  ///
+  /// In az, this message translates to:
+  /// **'Şəkli açmaq mümkün olmadı'**
+  String get cardPhotoFailed;
+
+  /// No description provided for @cardLast4Label.
+  ///
+  /// In az, this message translates to:
+  /// **'Kartın son 4 rəqəmi'**
+  String get cardLast4Label;
+
+  /// No description provided for @cardLast4Helper.
+  ///
+  /// In az, this message translates to:
+  /// **'Yalnız son 4 rəqəm. Tam kart nömrəsini heç vaxt daxil etməyin.'**
+  String get cardLast4Helper;
+
+  /// No description provided for @cardLast4Invalid.
+  ///
+  /// In az, this message translates to:
+  /// **'Düz 4 rəqəm daxil edin'**
+  String get cardLast4Invalid;
+
+  /// No description provided for @selectedItem.
+  ///
+  /// In az, this message translates to:
+  /// **'{name}, seçilib'**
+  String selectedItem(String name);
+
+  /// No description provided for @accountTypeBonus.
+  ///
+  /// In az, this message translates to:
+  /// **'Bonus'**
+  String get accountTypeBonus;
+
+  /// No description provided for @bonusRate.
+  ///
+  /// In az, this message translates to:
+  /// **'Köçürmə dərəcəsi (%)'**
+  String get bonusRate;
+
+  /// No description provided for @bonusRateHelper.
+  ///
+  /// In az, this message translates to:
+  /// **'Bonusdan başqa hesaba köçürəndə çatan faiz'**
+  String get bonusRateHelper;
+
+  /// No description provided for @bonusRateInvalid.
+  ///
+  /// In az, this message translates to:
+  /// **'1 ilə 100 arasında tam ədəd'**
+  String get bonusRateInvalid;
+
+  /// No description provided for @makeTransfer.
+  ///
+  /// In az, this message translates to:
+  /// **'Köçürmə et'**
+  String get makeTransfer;
+
+  /// No description provided for @time.
+  ///
+  /// In az, this message translates to:
+  /// **'Saat'**
+  String get time;
+
+  /// No description provided for @addedAt.
+  ///
+  /// In az, this message translates to:
+  /// **'Əlavə edilib: {dt}'**
+  String addedAt(String dt);
+
+  /// No description provided for @editedAt.
+  ///
+  /// In az, this message translates to:
+  /// **'Dəyişdirilib: {dt}'**
+  String editedAt(String dt);
+
+  /// No description provided for @duplicate.
+  ///
+  /// In az, this message translates to:
+  /// **'Təkrarla'**
+  String get duplicate;
+
+  /// No description provided for @transportMode.
+  ///
+  /// In az, this message translates to:
+  /// **'Növ'**
+  String get transportMode;
+
+  /// No description provided for @transportBus.
+  ///
+  /// In az, this message translates to:
+  /// **'Avtobus'**
+  String get transportBus;
+
+  /// No description provided for @transportMetro.
+  ///
+  /// In az, this message translates to:
+  /// **'Metro'**
+  String get transportMetro;
+
+  /// No description provided for @transportTaxi.
+  ///
+  /// In az, this message translates to:
+  /// **'Taksi'**
+  String get transportTaxi;
+
+  /// No description provided for @transportTrain.
+  ///
+  /// In az, this message translates to:
+  /// **'Elektrik qatarı'**
+  String get transportTrain;
+
+  /// No description provided for @transportFuel.
+  ///
+  /// In az, this message translates to:
+  /// **'Yanacaq'**
+  String get transportFuel;
+
+  /// No description provided for @transportParking.
+  ///
+  /// In az, this message translates to:
+  /// **'Parkinq'**
+  String get transportParking;
+
+  /// No description provided for @transportBakuCard.
+  ///
+  /// In az, this message translates to:
+  /// **'BakıKart artırma'**
+  String get transportBakuCard;
+
+  /// No description provided for @busRoute.
+  ///
+  /// In az, this message translates to:
+  /// **'Marşrut'**
+  String get busRoute;
+
+  /// No description provided for @chooseRoute.
+  ///
+  /// In az, this message translates to:
+  /// **'Marşrut seçin'**
+  String get chooseRoute;
+
+  /// No description provided for @searchRoutes.
+  ///
+  /// In az, this message translates to:
+  /// **'Marşrut axtar: kod və ya dayanacaq'**
+  String get searchRoutes;
+
+  /// No description provided for @recentRoutes.
+  ///
+  /// In az, this message translates to:
+  /// **'Son istifadə olunanlar'**
+  String get recentRoutes;
+
+  /// No description provided for @allRoutes.
+  ///
+  /// In az, this message translates to:
+  /// **'Bütün marşrutlar'**
+  String get allRoutes;
+
+  /// No description provided for @noRouteFound.
+  ///
+  /// In az, this message translates to:
+  /// **'Marşrut tapılmadı'**
+  String get noRouteFound;
+
+  /// No description provided for @trips.
+  ///
+  /// In az, this message translates to:
+  /// **'Gediş sayı'**
+  String get trips;
+
+  /// No description provided for @tripsCount.
+  ///
+  /// In az, this message translates to:
+  /// **'{n} gediş'**
+  String tripsCount(int n);
+
+  /// No description provided for @fareHint.
+  ///
+  /// In az, this message translates to:
+  /// **'Tarif: {fare} × {n}'**
+  String fareHint(String fare, int n);
+
+  /// No description provided for @fareManual.
+  ///
+  /// In az, this message translates to:
+  /// **'Məbləğ əl ilə dəyişdirilib'**
+  String get fareManual;
+
+  /// No description provided for @resetToFare.
+  ///
+  /// In az, this message translates to:
+  /// **'Tarifə qaytar'**
+  String get resetToFare;
+
+  /// No description provided for @fareUncertain.
+  ///
+  /// In az, this message translates to:
+  /// **'tarif dəqiq deyil'**
+  String get fareUncertain;
+
+  /// No description provided for @metroStation.
+  ///
+  /// In az, this message translates to:
+  /// **'Stansiya (istəyə görə)'**
+  String get metroStation;
+
+  /// No description provided for @chooseStation.
+  ///
+  /// In az, this message translates to:
+  /// **'Stansiya seçin'**
+  String get chooseStation;
+
+  /// No description provided for @bakuCardDoubleCountHint.
+  ///
+  /// In az, this message translates to:
+  /// **'Artırmanı xərc kimi qeyd edirsinizsə, gedişləri ayrıca qeyd etməyin: xərc iki dəfə sayılar.'**
+  String get bakuCardDoubleCountHint;
+
+  /// No description provided for @transportFares.
+  ///
+  /// In az, this message translates to:
+  /// **'Nəqliyyat tarifləri'**
+  String get transportFares;
+
+  /// No description provided for @transportFaresSubtitle.
+  ///
+  /// In az, this message translates to:
+  /// **'Avtobus, metro və qatar tarifləri'**
+  String get transportFaresSubtitle;
+
+  /// No description provided for @addOwnRoute.
+  ///
+  /// In az, this message translates to:
+  /// **'Öz marşrutumu əlavə et'**
+  String get addOwnRoute;
+
+  /// No description provided for @editOwnRoute.
+  ///
+  /// In az, this message translates to:
+  /// **'Marşrutu dəyiş'**
+  String get editOwnRoute;
+
+  /// No description provided for @routeCode.
+  ///
+  /// In az, this message translates to:
+  /// **'Marşrut nömrəsi'**
+  String get routeCode;
+
+  /// No description provided for @routeFrom.
+  ///
+  /// In az, this message translates to:
+  /// **'Haradan'**
+  String get routeFrom;
+
+  /// No description provided for @routeTo.
+  ///
+  /// In az, this message translates to:
+  /// **'Haraya'**
+  String get routeTo;
+
+  /// No description provided for @fare.
+  ///
+  /// In az, this message translates to:
+  /// **'Tarif'**
+  String get fare;
+
+  /// No description provided for @routeCodeExists.
+  ///
+  /// In az, this message translates to:
+  /// **'Bu nömrə artıq var'**
+  String get routeCodeExists;
+
+  /// No description provided for @routeCodeInvalid.
+  ///
+  /// In az, this message translates to:
+  /// **'1–6 simvol: hərf, rəqəm və ya \"-\"'**
+  String get routeCodeInvalid;
+
+  /// No description provided for @fieldRequired.
+  ///
+  /// In az, this message translates to:
+  /// **'Doldurun'**
+  String get fieldRequired;
+
+  /// No description provided for @fareInvalid.
+  ///
+  /// In az, this message translates to:
+  /// **'0,01 ilə 99,99 arasında'**
+  String get fareInvalid;
+
+  /// No description provided for @fareNotSet.
+  ///
+  /// In az, this message translates to:
+  /// **'Təyin edilməyib'**
+  String get fareNotSet;
+
+  /// No description provided for @myRoute.
+  ///
+  /// In az, this message translates to:
+  /// **'Mənim'**
+  String get myRoute;
+
+  /// No description provided for @fareEdited.
+  ///
+  /// In az, this message translates to:
+  /// **'Dəyişdirilib'**
+  String get fareEdited;
+
+  /// No description provided for @resetFare.
+  ///
+  /// In az, this message translates to:
+  /// **'Standart tarifə qaytar'**
+  String get resetFare;
+
+  /// No description provided for @faresVerifiedAt.
+  ///
+  /// In az, this message translates to:
+  /// **'Tariflər {date} tarixində yoxlanılıb. Dəyişibsə, burada düzəldin.'**
+  String faresVerifiedAt(String date);
+
+  /// No description provided for @faresVerifiedShort.
+  ///
+  /// In az, this message translates to:
+  /// **'Yoxlanılıb: {date}'**
+  String faresVerifiedShort(String date);
+
+  /// No description provided for @faresSources.
+  ///
+  /// In az, this message translates to:
+  /// **'Mənbələr'**
+  String get faresSources;
+
+  /// No description provided for @metroAndTrain.
+  ///
+  /// In az, this message translates to:
+  /// **'Metro və qatar'**
+  String get metroAndTrain;
+
+  /// No description provided for @transferSent.
+  ///
+  /// In az, this message translates to:
+  /// **'Göndərilən {a}'**
+  String transferSent(String a);
+
+  /// No description provided for @transferArrives.
+  ///
+  /// In az, this message translates to:
+  /// **'Çatan {a} ({pct}%)'**
+  String transferArrives(String a, int pct);
+
+  /// No description provided for @bonusLoss.
+  ///
+  /// In az, this message translates to:
+  /// **'Bonus itkisi: {a}'**
+  String bonusLoss(String a);
+
+  /// No description provided for @bonusLossLabel.
+  ///
+  /// In az, this message translates to:
+  /// **'Bonus itkisi'**
+  String get bonusLossLabel;
+
+  /// No description provided for @bonusLossExplain.
+  ///
+  /// In az, this message translates to:
+  /// **'Bonus hesabından köçürəndə məbləğin yalnız {pct}%-i çatır.'**
+  String bonusLossExplain(int pct);
+
+  /// No description provided for @bonusReceivedEdit.
+  ///
+  /// In az, this message translates to:
+  /// **'Çatan məbləğ'**
+  String get bonusReceivedEdit;
+
+  /// No description provided for @bonusReceivedTooBig.
+  ///
+  /// In az, this message translates to:
+  /// **'Çatan məbləğ göndəriləndən çox ola bilməz'**
+  String get bonusReceivedTooBig;
+
+  /// No description provided for @bonusSameCurrencyOnly.
+  ///
+  /// In az, this message translates to:
+  /// **'Bonus hesabından yalnız eyni valyutada olan hesaba köçürmək olar'**
+  String get bonusSameCurrencyOnly;
+
+  /// No description provided for @sentSubtitle.
+  ///
+  /// In az, this message translates to:
+  /// **'{a} göndərildi'**
+  String sentSubtitle(String a);
+
+  /// No description provided for @pairDeleted.
+  ///
+  /// In az, this message translates to:
+  /// **'Köçürmə və bonus itkisi birlikdə silindi'**
+  String get pairDeleted;
+
+  /// No description provided for @systemCategoryLocked.
+  ///
+  /// In az, this message translates to:
+  /// **'Sistem kateqoriyasıdır: silmək və arxivləmək olmaz'**
+  String get systemCategoryLocked;
+
+  /// No description provided for @transportCategory.
+  ///
+  /// In az, this message translates to:
+  /// **'Nəqliyyat kateqoriyası'**
+  String get transportCategory;
+
+  /// No description provided for @transportCategoryBody.
+  ///
+  /// In az, this message translates to:
+  /// **'Əlavə edəndə avtobus, metro və digər növləri seçmək olar'**
+  String get transportCategoryBody;
+
+  /// No description provided for @budgetsEnabled.
+  ///
+  /// In az, this message translates to:
+  /// **'Büdcələr'**
+  String get budgetsEnabled;
+
+  /// No description provided for @budgetsEnabledBody.
+  ///
+  /// In az, this message translates to:
+  /// **'Büdcə bölməsini, Ana səhifə kartını və xəbərdarlıqları göstər'**
+  String get budgetsEnabledBody;
+
+  /// No description provided for @budgetsHidden.
+  ///
+  /// In az, this message translates to:
+  /// **'Büdcələr gizlədildi. Məlumatlarınız silinmir.'**
+  String get budgetsHidden;
+
+  /// No description provided for @pressBackAgainToExit.
+  ///
+  /// In az, this message translates to:
+  /// **'Çıxmaq üçün yenidən geri toxunun'**
+  String get pressBackAgainToExit;
+
+  /// No description provided for @reportTransport.
+  ///
+  /// In az, this message translates to:
+  /// **'Nəqliyyat'**
+  String get reportTransport;
+
+  /// No description provided for @reportByMode.
+  ///
+  /// In az, this message translates to:
+  /// **'Növlər üzrə'**
+  String get reportByMode;
+
+  /// No description provided for @reportTopRoutes.
+  ///
+  /// In az, this message translates to:
+  /// **'Ən çox istifadə olunan marşrutlar'**
+  String get reportTopRoutes;
+
+  /// No description provided for @timeOfDay.
+  ///
+  /// In az, this message translates to:
+  /// **'Saat aralığı'**
+  String get timeOfDay;
+
+  /// No description provided for @timeFrom.
+  ///
+  /// In az, this message translates to:
+  /// **'Başlanğıc saatı'**
+  String get timeFrom;
+
+  /// No description provided for @timeTo.
+  ///
+  /// In az, this message translates to:
+  /// **'Son saat'**
+  String get timeTo;
+
+  /// No description provided for @backupImagesSkipped.
+  ///
+  /// In az, this message translates to:
+  /// **'{n} kart şəkli 1 MB-dan böyük olduğu üçün ehtiyat nüsxəyə düşmədi'**
+  String backupImagesSkipped(int n);
+
+  /// No description provided for @accountCardSemantics.
+  ///
+  /// In az, this message translates to:
+  /// **'{type}, {name}, {balance}'**
+  String accountCardSemantics(String type, String name, String balance);
+
+  /// No description provided for @exportColTransportMode.
+  ///
+  /// In az, this message translates to:
+  /// **'Nəqliyyat növü'**
+  String get exportColTransportMode;
 }
 
 class _AppLocalizationsDelegate

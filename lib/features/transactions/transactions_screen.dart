@@ -10,8 +10,8 @@ import '../../core/widgets.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
 import '../settings/settings_controller.dart';
-import '../holdings/holding_sheets.dart' show holdingErrorText;
 import 'tx_filter_controller.dart';
+import 'widgets/tx_detail_sheet.dart';
 import 'widgets/tx_tile.dart';
 
 class TransactionsScreen extends ConsumerStatefulWidget {
@@ -63,7 +63,7 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
     _DayRow? header;
     int headerIndex = -1;
     int net = 0;
-    for (final TxDetails t in items) {
+    for (final TxDetails t in groupBonusPairs(items)) {
       if (_dismissed.contains(t.tx.id)) continue;
       final DateTime d = DateTime(t.tx.date.year, t.tx.date.month, t.tx.date.day);
       if (header == null || header.day != d) {
@@ -76,47 +76,35 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
       final int v = rates.toBase(t.tx.amount, t.account.currency);
       if (t.tx.type == TxType.income) net += v;
       if (t.tx.type == TxType.expense) net -= v;
+      final TxDetails? loss = t.linkedLoss;
+      if (loss != null) net -= rates.toBase(loss.tx.amount, loss.account.currency);
       rows.add(_TxRow(t));
     }
     if (header != null) rows[headerIndex] = _DayRow(header.day, net);
     return rows;
   }
 
+  /// Swipe-delete; a bonus transfer takes its loss row with it, and undo
+  /// restores both (DESIGN.md §18.6.3).
   Future<void> _delete(TxDetails item) async {
-    final AppLocalizations l = AppLocalizations.of(context);
-    final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
-    final TransactionRepository repo = ref.read(transactionRepositoryProvider);
+    final int id = item.tx.id;
     AppHaptics.confirm();
-    _swiped.add(item.tx.id);
-    setState(() => _dismissed.add(item.tx.id));
-    final List<HoldingEntry> linked;
-    try {
-      linked = await repo.delete(item.tx.id);
-    } on HoldingAmountException catch (e) {
-      // Deleting this move would take its holding below zero: bring it back.
-      _swiped.remove(item.tx.id);
-      if (mounted) setState(() => _dismissed.remove(item.tx.id));
-      messenger.showSnackBar(SnackBar(content: Text(holdingErrorText(l, e.reason))));
-      return;
-    }
-    messenger.hideCurrentSnackBar();
-    messenger.showSnackBar(
-      SnackBar(
-        content: Text(l.transactionDeleted),
-        action: SnackBarAction(
-          label: l.undo,
-          onPressed: () async {
-            try {
-              await repo.restore(item.tx, entries: linked);
-            } on HoldingAmountException catch (e) {
-              messenger.showSnackBar(SnackBar(content: Text(holdingErrorText(l, e.reason))));
-              return;
-            }
-            _swiped.remove(item.tx.id);
-            if (mounted) setState(() => _dismissed.remove(item.tx.id));
-          },
-        ),
-      ),
+    _swiped.add(id);
+    setState(() => _dismissed.add(id));
+    await deleteTransactionWithUndo(
+      ref: ref,
+      messenger: ScaffoldMessenger.of(context),
+      l: AppLocalizations.of(context),
+      id: id,
+      onFailed: () {
+        // Deleting this move would take its holding below zero: bring it back.
+        _swiped.remove(id);
+        if (mounted) setState(() => _dismissed.remove(id));
+      },
+      onRestored: () {
+        _swiped.remove(id);
+        if (mounted) setState(() => _dismissed.remove(id));
+      },
     );
   }
 
@@ -196,6 +184,12 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                 int expense = 0;
                 for (final TxDetails t in all) {
                   if (_dismissed.contains(t.tx.id)) continue;
+                  // The loss of a swiped bonus pair goes with it.
+                  if (t.tx.linkGroupId != null &&
+                      all.any((TxDetails x) =>
+                          _dismissed.contains(x.tx.id) && x.tx.linkGroupId == t.tx.linkGroupId)) {
+                    continue;
+                  }
                   final int v = rates.toBase(t.tx.amount, t.account.currency);
                   if (t.tx.type == TxType.income) income += v;
                   if (t.tx.type == TxType.expense) expense += v;
@@ -238,12 +232,16 @@ class _TransactionsScreenState extends ConsumerState<TransactionsScreen> {
                                   child: TxTile(
                                     item: item,
                                     showTime: true,
-                                    onTap: () => context.push(Routes.editTransaction(item.tx.id)),
+                                    onTap: () => showTxDetailSheet(context, item),
                                   ),
                                 ),
                             },
                           ),
-                          const SliverToBoxAdapter(child: SizedBox(height: 96)),
+                          SliverToBoxAdapter(
+                            child: SizedBox(
+                              height: AppNav.contentInset(context) + MediaQuery.viewInsetsOf(context).bottom,
+                            ),
+                          ),
                         ],
                       ),
                     ),
@@ -381,6 +379,7 @@ class _FilterBar extends ConsumerWidget {
         accounts.where((Account a) => a.id == f.accountId).firstOrNull;
     final TxCategory? category =
         categories.where((TxCategory c) => c.id == f.categoryId).firstOrNull;
+    final bool transportCategory = category?.isTransport ?? false;
 
     Widget typeChip(String label, TxType? t) => Padding(
           padding: const EdgeInsets.only(right: AppSpacing.sm),
@@ -455,6 +454,50 @@ class _FilterBar extends ConsumerWidget {
       if (r != null) ctl.setWindow(DateWindow.days(r.start, r.end));
     }
 
+    // 24-hour pickers for the time-of-day window (may wrap midnight).
+    Future<void> pickTimes() async {
+      Future<TimeOfDay?> pick(int minutes, String help) => showTimePicker(
+            context: context,
+            helpText: help,
+            initialTime: TimeOfDay(hour: minutes ~/ 60, minute: minutes % 60),
+            initialEntryMode: TimePickerEntryMode.dial,
+            builder: (BuildContext ctx, Widget? child) => MediaQuery(
+              data: MediaQuery.of(ctx).copyWith(alwaysUse24HourFormat: true),
+              child: child!,
+            ),
+          );
+      final TimeOfDay? from = await pick(f.timeOfDay?.from ?? 22 * 60, l.timeFrom);
+      if (from == null || !context.mounted) return;
+      final TimeOfDay? to = await pick(f.timeOfDay?.to ?? 6 * 60, l.timeTo);
+      if (to == null) return;
+      ctl.setTimeOfDay(TimeOfDayRange(from.hour * 60 + from.minute, to.hour * 60 + to.minute));
+    }
+
+    String hm(int m) => '${(m ~/ 60).toString().padLeft(2, '0')}:${(m % 60).toString().padLeft(2, '0')}';
+    final String? timeLabel =
+        f.timeOfDay == null ? null : '${hm(f.timeOfDay!.from)}–${hm(f.timeOfDay!.to)}';
+
+    Future<void> pickRoute() async {
+      final TransportMode mode = f.transportMode ?? TransportMode.bus;
+      final List<String> codes = List<String>.of(
+        await ref.read(transactionRepositoryProvider).watchRecentRoutes(mode, limit: 500).first,
+      )..sort(compareRouteCodes);
+      if (!context.mounted) return;
+      final int? i = await showModalBottomSheet<int>(
+        context: context,
+        isScrollControlled: true,
+        builder: (BuildContext ctx) => _PickerSheet(
+          title: l.busRoute,
+          allLabel: l.allRoutes,
+          entries: <(int, String, Widget?)>[
+            for (int k = 0; k < codes.length; k++) (k, codes[k], null),
+          ],
+          selected: f.routeCode == null ? null : codes.indexOf(f.routeCode!),
+        ),
+      );
+      if (i != null) ctl.setRoute(i < 0 ? null : codes[i]);
+    }
+
     String? dateLabel;
     if (f.window != null) {
       final DateTime last = f.window!.end.subtract(const Duration(days: 1));
@@ -503,11 +546,48 @@ class _FilterBar extends ConsumerWidget {
                 onClear: () => ctl.setWindow(null),
                 clearTooltip: l.clear,
               ),
+              _DropChip(
+                label: timeLabel ?? l.timeOfDay,
+                active: f.timeOfDay != null,
+                onTap: pickTimes,
+                onClear: () => ctl.setTimeOfDay(null),
+                clearTooltip: l.clear,
+              ),
               if (f.isActive)
                 TextButton(onPressed: ctl.reset, child: Text(l.resetFilters)),
             ],
           ),
         ),
+        // Transport category filter active: a second row offers the modes
+        // (DESIGN.md §18.5.5) and, for bus / metro, the route.
+        if (transportCategory || f.transportMode != null)
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            padding: const EdgeInsets.symmetric(horizontal: AppSpacing.lg),
+            child: Row(
+              children: <Widget>[
+                for (final TransportMode m in TransportMode.values)
+                  Padding(
+                    padding: const EdgeInsets.only(right: AppSpacing.sm),
+                    child: FilterChip(
+                      avatar: Icon(TransportModeStyle.forMode(m).icon, size: 18),
+                      label: Text(transportModeLabel(l, m)),
+                      selected: f.transportMode == m,
+                      showCheckmark: false,
+                      onSelected: (bool on) => ctl.setTransportMode(on ? m : null),
+                    ),
+                  ),
+                if (f.transportMode == TransportMode.bus || f.transportMode == TransportMode.metro)
+                  _DropChip(
+                    label: f.routeCode ?? l.busRoute,
+                    active: f.routeCode != null,
+                    onTap: pickRoute,
+                    onClear: () => ctl.setRoute(null),
+                    clearTooltip: l.clear,
+                  ),
+              ],
+            ),
+          ),
       ],
     );
   }

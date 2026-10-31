@@ -20,6 +20,14 @@ class TxFilterController extends Notifier<TxFilter> {
 
   void setQuery(String q) => state = state.copyWith(query: q);
 
+  /// A route belongs to one mode, so changing the mode drops it.
+  void setTransportMode(TransportMode? m) =>
+      state = state.copyWith(transportMode: () => m, routeCode: () => null);
+
+  void setRoute(String? code) => state = state.copyWith(routeCode: () => code);
+
+  void setTimeOfDay(TimeOfDayRange? r) => state = state.copyWith(timeOfDay: () => r);
+
   /// Replaces the whole filter (e.g. drill-down from Reports).
   void apply(TxFilter f) => state = f;
 

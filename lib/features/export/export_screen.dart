@@ -9,6 +9,7 @@ import '../../core/share_files.dart';
 import '../../core/theme.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
+import '../lock/system_dialog_guard.dart';
 import '../settings/settings_controller.dart';
 import 'export_service.dart';
 
@@ -96,11 +97,13 @@ class _ExportScreenState extends ConsumerState<ExportScreen> {
         ExportFormat.xlsx => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
         ExportFormat.pdf => 'application/pdf',
       };
-      await SharePlus.instance.share(ShareParams(
-        files: <XFile>[XFile(file.path, mimeType: mime)],
-        subject: l.exportPdfTitle,
-        title: l.exportShareTitle,
-      ));
+      final String path = file.path;
+      // The share sheet is a system dialog: keep the auto-lock quiet.
+      await SystemDialogGuard.run(() => SharePlus.instance.share(ShareParams(
+            files: <XFile>[XFile(path, mimeType: mime)],
+            subject: l.exportPdfTitle,
+            title: l.exportShareTitle,
+          )));
     } on Exception catch (_) {
       messenger.showSnackBar(SnackBar(content: Text(l.exportFailed)));
     } finally {

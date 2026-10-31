@@ -151,6 +151,9 @@ void main() {
         az.exportColAmountAzn,
         az.toAccount,
         az.exportColToAmount,
+        az.time,
+        az.exportColTransportMode,
+        az.busRoute,
         az.note,
       ]);
       expect(rows.first.first, 'Tarix');
@@ -177,7 +180,7 @@ void main() {
       expect(raw, contains('"Dollar, kart"'));
       expect(raw, contains(',Nağd,'), reason: 'plain fields are not quoted');
       for (final List<String> r in rows) {
-        expect(r, hasLength(10));
+        expect(r, hasLength(13));
       }
     });
   });

@@ -11,6 +11,7 @@ import '../../core/share_files.dart';
 import '../../core/widgets.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
+import '../lock/system_dialog_guard.dart';
 
 /// Writes a JSON backup to the private cache, opens the share sheet and
 /// deletes the file again.
@@ -20,17 +21,23 @@ Future<void> createBackup(BuildContext context, WidgetRef ref) async {
   File? file;
   try {
     final String version = await _version(ref);
-    final String json = await ref.read(backupServiceProvider).exportJson(appVersion: version);
+    final BackupExport export = await ref.read(backupServiceProvider).export(appVersion: version);
+    final String json = export.json;
+    if (export.skippedImages > 0) {
+      messenger.showSnackBar(SnackBar(content: Text(l.backupImagesSkipped(export.skippedImages))));
+    }
     final DateTime now = DateTime.now();
     final String stamp = '${monthKey(now).replaceAll('-', '')}'
         '${now.day.toString().padLeft(2, '0')}_'
         '${now.hour.toString().padLeft(2, '0')}${now.minute.toString().padLeft(2, '0')}';
     file = await ShareFiles.write('gelir_cixar_backup_$stamp.json', utf8.encode(json));
-    await SharePlus.instance.share(ShareParams(
-      files: <XFile>[XFile(file.path, mimeType: 'application/json')],
-      subject: l.backupShareSubject,
-      title: l.backupCreate,
-    ));
+    final File shared = file;
+    // The share sheet is a system dialog: keep the auto-lock quiet.
+    await SystemDialogGuard.run(() => SharePlus.instance.share(ShareParams(
+          files: <XFile>[XFile(shared.path, mimeType: 'application/json')],
+          subject: l.backupShareSubject,
+          title: l.backupCreate,
+        )));
   } on Exception {
     messenger.showSnackBar(SnackBar(content: Text(l.backupFailed)));
   } finally {
@@ -51,7 +58,8 @@ Future<void> restoreBackup(BuildContext context, WidgetRef ref) async {
   final AppLocalizations l = AppLocalizations.of(context);
   final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
 
-  final PlatformFile? picked = await FilePicker.pickFile(dialogTitle: l.backupRestore);
+  final PlatformFile? picked =
+      await SystemDialogGuard.run(() => FilePicker.pickFile(dialogTitle: l.backupRestore));
   if (picked == null || !context.mounted) return;
 
   final String content;

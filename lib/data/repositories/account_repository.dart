@@ -73,6 +73,10 @@ FROM accounts a
     required String currency,
     required int initialBalance,
     required int colorIndex,
+    String? cardDesignId,
+    String? cardImagePath,
+    String? cardLast4,
+    int bonusRatePercent = 50,
   }) =>
       _db.into(_db.accounts).insert(
             AccountsCompanion.insert(
@@ -81,8 +85,21 @@ FROM accounts a
               currency: currency,
               initialBalance: Value(initialBalance),
               colorIndex: Value(colorIndex),
+              cardDesignId: Value(cardDesignId ?? AppDatabase.defaultDesignByType[type.name] ?? 'teal'),
+              cardImagePath: Value(cardImagePath),
+              cardLast4: Value(_last4(cardLast4)),
+              bonusRatePercent: Value(bonusRatePercent.clamp(1, 100)),
             ),
           );
+
+  static final RegExp _fourDigits = RegExp(r'^\d{4}$');
+
+  /// Only ever exactly 4 digits (never a full card number).
+  static String? _last4(String? v) {
+    if (v == null || v.isEmpty) return null;
+    if (!_fourDigits.hasMatch(v)) throw ArgumentError('cardLast4 must be 4 digits');
+    return v;
+  }
 
   /// Saves edits. The currency is locked once the account has transactions
   /// (the editor greys it out): amounts and the toAmount of transfers and
@@ -92,7 +109,10 @@ FROM accounts a
         if (old != null && old.currency != a.currency && await isUsed(a.id)) {
           throw StateError('account currency is locked once used');
         }
-        await _db.update(_db.accounts).replace(a);
+        await _db.update(_db.accounts).replace(a.copyWith(
+              cardLast4: Value(_last4(a.cardLast4)),
+              bonusRatePercent: a.bonusRatePercent.clamp(1, 100),
+            ));
       });
 
   Future<void> setArchived(int id, bool archived) =>

@@ -1,0 +1,2275 @@
+{
+  "version": 1,
+  "city": "Bakı",
+  "verifiedAt": "2026-10-31",
+  "currency": "AZN",
+  "defaultBusFare": 0.6,
+  "bus": [
+    {
+      "code": "1",
+      "from": "Neftçilər m/st",
+      "to": "28 May m/st",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "2",
+      "from": "Dərnəgül m/st",
+      "to": "Avtovağzal NMM",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "3",
+      "from": "Dərnəgül m/st",
+      "to": "Badamdar qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "4",
+      "from": "Montin yaş. mas.",
+      "to": "Bakı Ağ şəhər yaş.mas.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "5",
+      "from": "20-ci Sahə dairəsi",
+      "to": "Nəriman Nərimanov m/st.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "6",
+      "from": "Azadlıq pr. m/st",
+      "to": "20-ci Sahə yaş.mas.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "7A",
+      "from": "Bakı Beynəlxalq Avtovağzal Kompleksi",
+      "to": "Gəncə pr.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "7B",
+      "from": "Koroğlu NMM",
+      "to": "Yasamal yaşayış kompleksi (MİDA)",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "9",
+      "from": "Nəriman Nərimanov m/st.",
+      "to": "Yasamal yaşayış kompleksi (MİDA)",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Xaliq Faiqoğlu MMC",
+      "uncertain": false
+    },
+    {
+      "code": "10",
+      "from": "Yasamal yaşayış kompleksi (MİDA)",
+      "to": "Bakı Ağ şəhər yaş.mas.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "11",
+      "from": "Dəmiryol vağzalı",
+      "to": "İbrahim Əbilov küç.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "12",
+      "from": "Vərəm dispanseri",
+      "to": "Cavanşir küç.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Vətən.Az-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "13",
+      "from": "Koroğlu NMM",
+      "to": "Avtovağzal NMM",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "14",
+      "from": "Avtovağzal NMM",
+      "to": "28 May m/st",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "15",
+      "from": "Koroğlu NMM",
+      "to": "Keşlə qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "General - Auto - Company firması",
+      "uncertain": false
+    },
+    {
+      "code": "17",
+      "from": "11 saylı məktəb",
+      "to": "Yeni Yasamal yaş.massivi",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "18",
+      "from": "Nizami bağı",
+      "to": "9-cu mikrorayon",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Xaliq Faiqoğlu MMC",
+      "uncertain": false
+    },
+    {
+      "code": "20",
+      "from": "Qaraçuxur qəsəbəsi",
+      "to": "Tibb universiteti",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "21",
+      "from": "Əhmədli m/st",
+      "to": "28 May m/st",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "22",
+      "from": "Sabunçu qəs.",
+      "to": "NZS yaş.mas.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Kənan-2000 şirkəti",
+      "uncertain": false
+    },
+    {
+      "code": "24",
+      "from": "Qaraçuxur qəs.",
+      "to": "11 saylı məktəb",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "26",
+      "from": "8 saylı şəhər poliklinikası",
+      "to": "9-cu mkr",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Vətən firması",
+      "uncertain": false
+    },
+    {
+      "code": "29",
+      "from": "Avtovağzal NMM",
+      "to": "Badamdar qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "MENLOQQ MMC",
+      "uncertain": false
+    },
+    {
+      "code": "30",
+      "from": "28 May m/st",
+      "to": "C.Naxçıvanski küç.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "31",
+      "from": "Nizami bağı",
+      "to": "Badamdar qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Fidan MMC",
+      "uncertain": false
+    },
+    {
+      "code": "32",
+      "from": "28 May m/st",
+      "to": "Cəmşid Naxçıvanski küç.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "33",
+      "from": "Dərnəgül m/st",
+      "to": "28 Mall ticarət mərkəzi",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "35",
+      "from": "Suraxanı rayonu",
+      "to": "Ramiz Quliyev küçəsi",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "36",
+      "from": "Yeni Günəşli qəs.",
+      "to": "Ulduz m/st",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Vətən.Az-Trans MMC",
+      "uncertain": true
+    },
+    {
+      "code": "37",
+      "from": "Nizami bağı",
+      "to": "Avtovağzal NMM",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Xaliq Faiqoğlu MMC",
+      "uncertain": false
+    },
+    {
+      "code": "38",
+      "from": "Keşlə qəs.",
+      "to": "Tibb Universiteti",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "General - Auto - Company firması",
+      "uncertain": false
+    },
+    {
+      "code": "39",
+      "from": "Yeni Yasamal yaş. mass.",
+      "to": "İstiqlaliyyət küç. (Nizami bağı)",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Kral Transport MMC",
+      "uncertain": false
+    },
+    {
+      "code": "40",
+      "from": "Sabunçu qəs.",
+      "to": "Günəşli qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "41",
+      "from": "Azadlıq pr. m/st",
+      "to": "Binəqədi qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Xaliq Faiqoğlu MMC",
+      "uncertain": false
+    },
+    {
+      "code": "42",
+      "from": "Əhmədli m/st",
+      "to": "Kazımağa Kərimov küç.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Kral Transport MMC",
+      "uncertain": false
+    },
+    {
+      "code": "44",
+      "from": "Neftçilər m/st",
+      "to": "Murtuza Muxtarov adına park",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "45",
+      "from": "M.Ə.Rəsulzadə qəs.",
+      "to": "Nəsimi m/st",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Xaliq Faiqoğlu MMC",
+      "uncertain": false
+    },
+    {
+      "code": "46",
+      "from": "28 May m/st",
+      "to": "Günəşli qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "49",
+      "from": "28 May m/st",
+      "to": "Sabunçu qəs. (68 № məktəb)",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "50",
+      "from": "Neftçilər m/st",
+      "to": "Yeni Günəşli qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Vətən.Az-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "51",
+      "from": "M.Abbasov küç.",
+      "to": "Polad Həşimov k.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BUS TRANS MMC",
+      "uncertain": false
+    },
+    {
+      "code": "52",
+      "from": "Xarici İşlər Nazirliyi",
+      "to": "M.Kazımovski küç.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Xaliq Faiqoğlu MMC",
+      "uncertain": false
+    },
+    {
+      "code": "53",
+      "from": "Elmlər Akademiyası m.st.",
+      "to": "Bayıl parkı",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Transkontrol MMC",
+      "uncertain": false
+    },
+    {
+      "code": "54",
+      "from": "Xalqlar Dostluğu m.st.",
+      "to": "Sabunçu qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Grand Bus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "55",
+      "from": "Yeni Günəşli qəs.",
+      "to": "Sabunçu qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "M.S.S.Company MMC",
+      "uncertain": false
+    },
+    {
+      "code": "56",
+      "from": "Bayıl yaş.mas.",
+      "to": "20-ci Sahə y.m",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Xan Nəqliyyat MMC",
+      "uncertain": false
+    },
+    {
+      "code": "57",
+      "from": "Bakıxanov qəs.",
+      "to": "C.Hacıəliyev küç.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "60",
+      "from": "Polad Həşimov k.",
+      "to": "Koroğlu m/st",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "61",
+      "from": "Azadlıq pr.",
+      "to": "9-cu mkr",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Xaliq Faiqoğlu MMC",
+      "uncertain": false
+    },
+    {
+      "code": "62",
+      "from": "Sabunçu qəs.",
+      "to": "N.Tusi küç.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "64",
+      "from": "Neftçilər m/st",
+      "to": "Yeni Günəşli qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "General - Auto - Company firması",
+      "uncertain": false
+    },
+    {
+      "code": "65",
+      "from": "9-cu mkr",
+      "to": "Azneft dairəsi",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Xaliq Faiqoğlu MMC",
+      "uncertain": false
+    },
+    {
+      "code": "66",
+      "from": "Əmircan qəs.",
+      "to": "Neftçilər m/st",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "67",
+      "from": "Çernyayevski küç.",
+      "to": "Biləcəri qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "MENLOQQ MMC",
+      "uncertain": false
+    },
+    {
+      "code": "70",
+      "from": "AzərSu Tikinti Xəstəxanası",
+      "to": "Sabunçu qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Kənan-2000 şirkəti",
+      "uncertain": false
+    },
+    {
+      "code": "71",
+      "from": "Koroğlu NMM",
+      "to": "Azadlıq pr. m/st",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "MENLOQQ MMC",
+      "uncertain": false
+    },
+    {
+      "code": "72",
+      "from": "Sədərək t/m",
+      "to": "Köhnə Günəşli qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "76",
+      "from": "Neftçilər m/st",
+      "to": "Bakıxanov qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Şidli-A.İ. şirkəti",
+      "uncertain": false
+    },
+    {
+      "code": "77",
+      "from": "M.F.Axundov adına bağ",
+      "to": "Yeni Yasamal y/m",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Orucov Malik Ələkbər oğlu",
+      "uncertain": false
+    },
+    {
+      "code": "78",
+      "from": "Azər Manafov küçəsi",
+      "to": "Bakıxanov qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Şidli-A.İ. şirkəti",
+      "uncertain": false
+    },
+    {
+      "code": "79",
+      "from": "Mərkəzi Bank",
+      "to": "M.Ə.Rəsulzadə qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Xaliq Faiqoğlu MMC",
+      "uncertain": false
+    },
+    {
+      "code": "81",
+      "from": "Köhnə Günəşli qəs.",
+      "to": "Qaraçuxur qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "83",
+      "from": "Təbriz küç.",
+      "to": "Biləcəri qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "MENLOQQ MMC",
+      "uncertain": false
+    },
+    {
+      "code": "85",
+      "from": "9-cu mkr",
+      "to": "Mərkəzi Bank",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Xaliq Faiqoğlu MMC",
+      "uncertain": false
+    },
+    {
+      "code": "88",
+      "from": "Dərnəgül m/st",
+      "to": "20-ci Sahə dairəsi",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "88A",
+      "from": "Bakı Ağ Şəhər",
+      "to": "Azadlıq prospekti m/st",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "91",
+      "from": "Avtovağzal NMM",
+      "to": "Binəqədi ray.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "92",
+      "from": "Binəqədi ray. (Dairəvi küç)",
+      "to": "Memar Əcəmi m/st",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Üç qardaş şirkəti",
+      "uncertain": false
+    },
+    {
+      "code": "93",
+      "from": "Dərnəgül m/st",
+      "to": "Sabunçu qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Kral Transport MMC",
+      "uncertain": false
+    },
+    {
+      "code": "96",
+      "from": "Xarici İşlər Nazirliyi",
+      "to": "Avtovağzal NMM",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Xaliq Faiqoğlu MMC",
+      "uncertain": false
+    },
+    {
+      "code": "100",
+      "from": "Azadlıq pr. m/st",
+      "to": "Binəqədi şos.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "101",
+      "from": "Mərdəkan qəs.",
+      "to": "Türkan qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "6 Dost MMC",
+      "uncertain": false
+    },
+    {
+      "code": "102",
+      "from": "20 Yanvar m/st (M.Həsənov küç.)",
+      "to": "Xocəsən qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BUS TRANS MMC",
+      "uncertain": false
+    },
+    {
+      "code": "103",
+      "from": "C.Naxçıvanski küç.",
+      "to": "Hövsan qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "MENLOQQ MMC",
+      "uncertain": false
+    },
+    {
+      "code": "104",
+      "from": "H.Aslanov m/st",
+      "to": "Yeni Suraxanı qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BUS TRANS MMC",
+      "uncertain": false
+    },
+    {
+      "code": "105",
+      "from": "C.Naxçıvanski küç.",
+      "to": "Balaxanı qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Bus Service MMC",
+      "uncertain": false
+    },
+    {
+      "code": "106",
+      "from": "Q.Qarayev pr.",
+      "to": "Yeni Suraxanı qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "BUS TRANS MMC",
+      "uncertain": false
+    },
+    {
+      "code": "107",
+      "from": "Koroğlu NMM",
+      "to": "Buzovna qəs.",
+      "fare": 0.65,
+      "fareSource": "route",
+      "operator": "Ayşən LTD MMC",
+      "uncertain": false
+    },
+    {
+      "code": "107A",
+      "from": "Koroğlu NMM",
+      "to": "Maştağa qəs.",
+      "fare": 0.65,
+      "fareSource": "route",
+      "operator": null,
+      "uncertain": false
+    },
+    {
+      "code": "108A",
+      "from": "Fatmayı bağları",
+      "to": "Azadlıq pr. m/st",
+      "fare": 0.65,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "108B",
+      "from": "Azadlıq pr. m/st",
+      "to": "Mehdiabad qəsəbəsi",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "110",
+      "from": "Binə qəs.",
+      "to": "Binə-Sovxoz yaş.mass.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "6 Dost MMC",
+      "uncertain": false
+    },
+    {
+      "code": "111",
+      "from": "Lökbatan qəs.",
+      "to": "Lökbatan qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "BMHMMC",
+      "uncertain": false
+    },
+    {
+      "code": "112",
+      "from": "Şüvəlan qəs.",
+      "to": "Zağulba şos.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BUS TRANS MMC",
+      "uncertain": false
+    },
+    {
+      "code": "113",
+      "from": "Q.Qarayev pr. kənar hərəkət hiss.",
+      "to": "Əmircan qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Transkontrol MMC",
+      "uncertain": false
+    },
+    {
+      "code": "114A",
+      "from": "20 Yanvar m/st",
+      "to": "Pirəkəşkül qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Xaliq Faiqoğlu MMC",
+      "uncertain": false
+    },
+    {
+      "code": "114B",
+      "from": "20 Yanvar m/st",
+      "to": "Müşfiqabad qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Xaliq Faiqoğlu MMC",
+      "uncertain": false
+    },
+    {
+      "code": "118A",
+      "from": "Koroğlu NMM",
+      "to": "Zabrat qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Kənan-2000 şirkəti",
+      "uncertain": false
+    },
+    {
+      "code": "118B",
+      "from": "Koroğlu NMM",
+      "to": "Zabrat qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Grand Bus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "119",
+      "from": "Memar Əcəmi m/st",
+      "to": "Xırdalan şəh.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Xaliq Faiqoğlu MMC",
+      "uncertain": false
+    },
+    {
+      "code": "120",
+      "from": "28 May m/st",
+      "to": "Hövsan yaş.komp.",
+      "fare": 0.7,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "120A",
+      "from": "Sədərək t/m",
+      "to": "Bayıl qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "BMHMMC",
+      "uncertain": false
+    },
+    {
+      "code": "120E",
+      "from": "Hövsan qəs.",
+      "to": "28 May m/st",
+      "fare": 0.9,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "121E",
+      "from": "Hövsan qəs.",
+      "to": "Əhmədli m/st",
+      "fare": 0.8,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "123",
+      "from": "“Azadlıq pr.” m.st.",
+      "to": "Sumqayıt şəh.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "F.RÖVŞƏN İSTEHSALAT MÜƏSSİSƏSİ",
+      "uncertain": false
+    },
+    {
+      "code": "125",
+      "from": "28 May m/st",
+      "to": "Lökbatan qəs.",
+      "fare": 0.7,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "126",
+      "from": "Sədərək t/m",
+      "to": "Şonqar qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BMHMMC",
+      "uncertain": false
+    },
+    {
+      "code": "130",
+      "from": "Lökbatan qəs.",
+      "to": "20 Yanvar m/st",
+      "fare": 0.65,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "131",
+      "from": "Koroğlu NMM",
+      "to": "Maştağa qəs.",
+      "fare": 0.55,
+      "fareSource": "route",
+      "operator": "General - Auto - Company firması",
+      "uncertain": false
+    },
+    {
+      "code": "132",
+      "from": "Əhmədli m/st",
+      "to": "Hövsan qəs.",
+      "fare": 0.55,
+      "fareSource": "route",
+      "operator": "Kral Transport MMC",
+      "uncertain": false
+    },
+    {
+      "code": "133",
+      "from": "Gənclik m/st",
+      "to": "Binəqədi qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "135",
+      "from": "Memar Əcəmi m/st",
+      "to": "Xırdalan şəh.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Xaliq Faiqoğlu MMC",
+      "uncertain": false
+    },
+    {
+      "code": "137",
+      "from": "Firdovsi Vəliyev küçəsi",
+      "to": "Avtovağzal NMM",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Monella MMC",
+      "uncertain": false
+    },
+    {
+      "code": "139",
+      "from": "Koroğlu NMM",
+      "to": "Savalan yaş. mas.",
+      "fare": 0.65,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "140",
+      "from": "Koroğlu NMM",
+      "to": "Şüvəlan qəs.",
+      "fare": 0.7,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "140A",
+      "from": "Xırdalan d/st",
+      "to": "Lökbatan qəs.",
+      "fare": 0.7,
+      "fareSource": "route",
+      "operator": "BMHMMC",
+      "uncertain": false
+    },
+    {
+      "code": "140E",
+      "from": "Koroğlu NMM",
+      "to": "Mərdəkan qəs.",
+      "fare": 0.9,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "141",
+      "from": "C.Naxçıvanski küç.",
+      "to": "Mərdəkan qəs.",
+      "fare": 0.7,
+      "fareSource": "route",
+      "operator": "STATUS AVTO MMC",
+      "uncertain": false
+    },
+    {
+      "code": "141E",
+      "from": "Xaşaxuna bağları",
+      "to": "Koroğlu NMM",
+      "fare": 0.7,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": true
+    },
+    {
+      "code": "142",
+      "from": "Masazır kəndi",
+      "to": "20 Yanvar m/st",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Kənan-2000 şirkəti",
+      "uncertain": false
+    },
+    {
+      "code": "143",
+      "from": "Şüvəlan qəs.",
+      "to": "Mərdəkan qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "6 Dost MMC",
+      "uncertain": false
+    },
+    {
+      "code": "145",
+      "from": "Mehdiabad qəs.",
+      "to": "Ulduz m.st",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "146",
+      "from": "Yeni Suraxanı qəs.",
+      "to": "Şüvəlan qəs.",
+      "fare": 0.55,
+      "fareSource": "route",
+      "operator": "6 Dost MMC",
+      "uncertain": true
+    },
+    {
+      "code": "147",
+      "from": "Azadlıq pr. m/st",
+      "to": "Məmmədli qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "148",
+      "from": "Koroğlu NMM",
+      "to": "Zabrat qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Grand Bus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "149",
+      "from": "Sahil qəs.",
+      "to": "Sahil m/st",
+      "fare": 0.8,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "149E",
+      "from": "Sahil qəs.",
+      "to": "Sahil m/st",
+      "fare": 1.3,
+      "fareSource": "route",
+      "operator": null,
+      "uncertain": true
+    },
+    {
+      "code": "150",
+      "from": "Bilgəh q.",
+      "to": "Koroğlu NMM",
+      "fare": 0.8,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "150A",
+      "from": "Qala qəs.",
+      "to": "Pirallahı qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "6 Dost MMC",
+      "uncertain": false
+    },
+    {
+      "code": "150E",
+      "from": "Koroğlu NMM",
+      "to": "Sea Breeze yaşayış kompleksi",
+      "fare": 0.9,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "155",
+      "from": "Xocəsən qəsəbəsi Sağlamlıq mərkəzi",
+      "to": "Xocəsən qəsəbəsi Yeni yaş.mas.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "BUS TRANS MMC",
+      "uncertain": false
+    },
+    {
+      "code": "156",
+      "from": "Memar Əcəmi m/st",
+      "to": "Hökməli qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": null,
+      "uncertain": false
+    },
+    {
+      "code": "156A",
+      "from": "Memar Əcəmi m/st",
+      "to": "Hökməli qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": null,
+      "uncertain": false
+    },
+    {
+      "code": "157",
+      "from": "Sulutəpə qəs.",
+      "to": "Avtovağzal NMM",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BUS TRANS MMC",
+      "uncertain": false
+    },
+    {
+      "code": "158",
+      "from": "Memar Əcəmi m.st.",
+      "to": "Xocəsən qəsəbəsi",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Qusar Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "159",
+      "from": "20 Yanvar m/st",
+      "to": "Çiçək qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Sahil MMC",
+      "uncertain": false
+    },
+    {
+      "code": "160",
+      "from": "Koroğlu NMM",
+      "to": "Binə qəs.",
+      "fare": 0.7,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "160A",
+      "from": "Binə Atçılıq yaşayış massivi",
+      "to": "Binə qəs.(mərkəz)",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "161",
+      "from": "Suraxanı qəs.",
+      "to": "Hövsan qəs.",
+      "fare": 0.55,
+      "fareSource": "route",
+      "operator": null,
+      "uncertain": true
+    },
+    {
+      "code": "162",
+      "from": "Koroğlu NMM",
+      "to": "Ramana Yeni yaşayış kompleksi",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": null,
+      "uncertain": true
+    },
+    {
+      "code": "163",
+      "from": "Ramana Yeni yaşayış kompleksi",
+      "to": "Koroğlu NMM",
+      "fare": 0.65,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "164",
+      "from": "Lökbatan qəs.",
+      "to": "Ümid qəs.",
+      "fare": 0.7,
+      "fareSource": "route",
+      "operator": "BMHMMC",
+      "uncertain": false
+    },
+    {
+      "code": "165",
+      "from": "Mehdiabad qəs.",
+      "to": "A.M.Şərifzadə küç.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "166",
+      "from": "C.Naxçıvanski küç.",
+      "to": "Ramana qəs.",
+      "fare": 0.55,
+      "fareSource": "route",
+      "operator": "General - Auto - Company firması",
+      "uncertain": false
+    },
+    {
+      "code": "168",
+      "from": "Koroğlu NMM",
+      "to": "Binə Atçılıq yaşayış massivi",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Ayşən LTD MMC",
+      "uncertain": false
+    },
+    {
+      "code": "169",
+      "from": "Koroğlu NMM",
+      "to": "Badamlıq yaşayış massivi",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BUS TRANS MMC",
+      "uncertain": false
+    },
+    {
+      "code": "170",
+      "from": "Binəqədi qəs.",
+      "to": "Memar Əcəmi m/st",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Xaliq Faiqoğlu MMC",
+      "uncertain": false
+    },
+    {
+      "code": "172",
+      "from": "Koroğlu NMM",
+      "to": "Bilgəh qəs.",
+      "fare": 0.65,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "173A",
+      "from": "Koroğlu NMM",
+      "to": "Pirşağı qəs.",
+      "fare": 0.55,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "173B",
+      "from": "Pirşağı bağları",
+      "to": "Koroğlu NMM",
+      "fare": 0.55,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "174",
+      "from": "Sədərək t/m",
+      "to": "Lökbatan qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "BMHMMC",
+      "uncertain": false
+    },
+    {
+      "code": "176",
+      "from": "Sədərək t/m",
+      "to": "Binəqədi qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BMHMMC",
+      "uncertain": false
+    },
+    {
+      "code": "177",
+      "from": "Pirşağı qəsəbəsi",
+      "to": "Maştağa qəs, (Subtropik Sovxozu)",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "179",
+      "from": "Pirşağı qəs.",
+      "to": "Azadlıq pr. m/st",
+      "fare": 0.55,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "180",
+      "from": "Pirallahı qəs.",
+      "to": "Zirə qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "6 Dost MMC",
+      "uncertain": false
+    },
+    {
+      "code": "182",
+      "from": "Mərdəkan qəs.",
+      "to": "Binə qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "6 Dost MMC",
+      "uncertain": false
+    },
+    {
+      "code": "183",
+      "from": "Qum adası yaşayış massivi",
+      "to": "M.Şərifli küç.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "BUS TRANS MMC",
+      "uncertain": false
+    },
+    {
+      "code": "184",
+      "from": "Ulduz m/st",
+      "to": "Yeni Suraxanı qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "General - Auto - Company firması",
+      "uncertain": false
+    },
+    {
+      "code": "185",
+      "from": "Kürdəxanı qəs.",
+      "to": "8 – ci km bazar",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "186",
+      "from": "Albalılıq y/m",
+      "to": "8 – ci km bazar",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Ayşən LTD MMC",
+      "uncertain": false
+    },
+    {
+      "code": "189",
+      "from": "Nardaran qəs.",
+      "to": "Koroğlu NMM",
+      "fare": 0.65,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "190",
+      "from": "Binə qəs.",
+      "to": "Binə qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "191",
+      "from": "Q.Qarayev pr.",
+      "to": "Bahar qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Kənan-2000 şirkəti",
+      "uncertain": false
+    },
+    {
+      "code": "193",
+      "from": "Mirzə Məhəmməd xan küç.",
+      "to": "Lökbatan NMM",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Məmmədova Şahnisə Nəsrəddin qızı",
+      "uncertain": false
+    },
+    {
+      "code": "194",
+      "from": "Lökbatan qəs.",
+      "to": "20 Yanvar m/st",
+      "fare": 0.55,
+      "fareSource": "route",
+      "operator": "BMHMMC",
+      "uncertain": false
+    },
+    {
+      "code": "195",
+      "from": "Ələt qəsəbəsi",
+      "to": "Abşeron ticarət mərkəzi",
+      "fare": 1.1,
+      "fareSource": "route",
+      "operator": "BMHMMC",
+      "uncertain": false
+    },
+    {
+      "code": "195E",
+      "from": "Ələt qəs.",
+      "to": "20-ci Sahə dairəsi",
+      "fare": 1.5,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "197",
+      "from": "293 nömrəli məktəb",
+      "to": "Koroğlu NMM",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Transkontrol MMC",
+      "uncertain": false
+    },
+    {
+      "code": "198",
+      "from": "Koroğlu NMM",
+      "to": "Zabrat qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Grand Bus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "199",
+      "from": "Xırdalan şəh.",
+      "to": "Xətai pr.",
+      "fare": 0.65,
+      "fareSource": "route",
+      "operator": "Xaliq Faiqoğlu MMC",
+      "uncertain": false
+    },
+    {
+      "code": "200",
+      "from": "Hövsan qəs.",
+      "to": "Binə qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Vətən.Az-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "202",
+      "from": "N.Nərimanov m/st",
+      "to": "Biləcəri qəs.",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "203",
+      "from": "Azadlıq pr. m/st",
+      "to": "Biləcəri qəs. (Yeni yaş.sah.)",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "204",
+      "from": "Koroğlu NMM",
+      "to": "Ramana qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Kənan-2000 şirkəti",
+      "uncertain": false
+    },
+    {
+      "code": "205",
+      "from": "Nəsimi m/st",
+      "to": "Abşeron ticarət mərkəzi",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "206",
+      "from": "Lökbatan qəs.",
+      "to": "Elmlər Akademiyası m/st",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "BUS TRANS MMC",
+      "uncertain": false
+    },
+    {
+      "code": "208",
+      "from": "Suraxanı qəs.",
+      "to": "Bakıxanov qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Transkontrol MMC",
+      "uncertain": false
+    },
+    {
+      "code": "209",
+      "from": "Suraxanı qəs.",
+      "to": "Bakıxanov qəs., (Y.Əliyev küç.)",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Transkontrol MMC",
+      "uncertain": false
+    },
+    {
+      "code": "210",
+      "from": "Türkan bağları",
+      "to": "Hövsan qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Vətən.Az-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "211",
+      "from": "Abşeron ticarət mərkəzi",
+      "to": "11 saylı məktəb",
+      "fare": 0.65,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "212",
+      "from": "Quşçuluq yaş,mas.",
+      "to": "Hövsan qəs.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Vətən.Az-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "213",
+      "from": "Suraxanı qəs.",
+      "to": "Q.Qarayev pr.",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "6 Dost MMC",
+      "uncertain": false
+    },
+    {
+      "code": "214",
+      "from": "C.Naxçıvanski küç.",
+      "to": "Ramana qəs. (Şuşa şəhərciyi yaş. mas.)",
+      "fare": 0.65,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "214A",
+      "from": "Ramana qəs. (F.Qayıbov küç.)",
+      "to": "Koroğlu NMM",
+      "fare": 0.65,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "215",
+      "from": "Hövsan qəs., Bazar (İlqar Əhlimanov küç.)",
+      "to": "Türkan qəs.,119 №-li məktəb (Xanlar küç.)",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Vətən.Az-Trans MMC",
+      "uncertain": false
+    },
+    {
+      "code": "216",
+      "from": "Koroğlu NMM",
+      "to": "Balaxanı qəs. (Səfəvilər küç 2)",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "General-Auto-Company firması",
+      "uncertain": false
+    },
+    {
+      "code": "217",
+      "from": "Koroğlu NMM",
+      "to": "Məmmədli kəndi",
+      "fare": 0.65,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "218",
+      "from": "Əhmədli m/st",
+      "to": "Hövsan qəs. (Quşçuluq yaş. mas.)",
+      "fare": 0.8,
+      "fareSource": "route",
+      "operator": null,
+      "uncertain": false
+    },
+    {
+      "code": "340",
+      "from": "Binə qəs. (Əli İsazadə küç.)",
+      "to": "Mərdəkan qəs. (H.Z.Tağıyev küç.)",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "Çinar-Trans MMC",
+      "uncertain": true
+    },
+    {
+      "code": "446",
+      "from": "Zirə qəsəbəsi",
+      "to": "Şağan qəsəbəsi",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "STATUS AVTO MMC",
+      "uncertain": false
+    },
+    {
+      "code": "500",
+      "from": "Sumqayıt şəh. (Heydər Əliyev parkı)",
+      "to": "Seyid Cəfər Pişəvari küç.",
+      "fare": 0.8,
+      "fareSource": "route",
+      "operator": null,
+      "uncertain": false
+    },
+    {
+      "code": "502",
+      "from": "Bakı Beynəlxalq Avtovağzal Kompleksi",
+      "to": "32 saylı tam orta məktəb",
+      "fare": 0.7,
+      "fareSource": "route",
+      "operator": "SN Cavid MMC",
+      "uncertain": false
+    },
+    {
+      "code": "503",
+      "from": "Bakı Beynəlxalq Avtovağzal Kompleksi",
+      "to": "Babək küçəsi 7",
+      "fare": 0.8,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "505",
+      "from": "Abşeron ticarət mərkəzi",
+      "to": "Ceyranbatan qəsəbəsi",
+      "fare": 0.7,
+      "fareSource": "route",
+      "operator": "SAHİL MMC",
+      "uncertain": false
+    },
+    {
+      "code": "506",
+      "from": "Sədərək Ticarət Mərkəzi",
+      "to": "Masazır qəsəbəsi duz gölü",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "F.RÖVŞƏN İSTEHSALAT MÜƏSSİSƏSİ",
+      "uncertain": false
+    },
+    {
+      "code": "508",
+      "from": "Saray qəs.",
+      "to": "20 Yanvar m/st",
+      "fare": 0.65,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "509",
+      "from": "Lökbatan Qəsəbə Mədəniyyət Sarayı",
+      "to": "Sumqayıt avtovağzalı",
+      "fare": 1.0,
+      "fareSource": "route",
+      "operator": "AMAL-D MƏHDUD MƏSULİYYƏTLİ CƏMİYYƏTİ",
+      "uncertain": false
+    },
+    {
+      "code": "511",
+      "from": "Bakı Beynəlxalq Avtovağzal Kompleksi",
+      "to": "Aşağı Güzdək qəsəbəsi",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "GÜZDƏK NƏQLİYYAT MMC",
+      "uncertain": false
+    },
+    {
+      "code": "515",
+      "from": "Bakı Beynəlxalq Avtovağzal Kompleksi",
+      "to": "Niyazi Əsgərov küçəsi 44",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "F.RÖVŞƏN İSTEHSALAT MÜƏSSİSƏSİ",
+      "uncertain": false
+    },
+    {
+      "code": "525A",
+      "from": "Masazır kəndi (\"Yeni Bakı\" yaş. komp.)",
+      "to": "Memar Əcəmi m/st",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": null,
+      "uncertain": false
+    },
+    {
+      "code": "525B",
+      "from": "Masazır kəndi (\"Zəngilan şəhərciyi\" yaş. komp.)",
+      "to": "Memar Əcəmi m/st",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": null,
+      "uncertain": false
+    },
+    {
+      "code": "533",
+      "from": "Bakı Beynəlxalq Avtovağzal Kompleksi",
+      "to": "Aşağə güzdək qəsəbə 2 nömrəli tam orta məktəb",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "SAHİL MMC",
+      "uncertain": false
+    },
+    {
+      "code": "551",
+      "from": "Bakı Beynəlxalq Avtovağzal Kompleksi",
+      "to": "Atyalı qəsəbəsi",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "KƏNAN NƏCƏFOV SABİR OĞLU",
+      "uncertain": false
+    },
+    {
+      "code": "553",
+      "from": "Güzdək qəsəbə tam orta məktəb",
+      "to": "Bakı Beynəlxalq Avtovağzal Kompleksi",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "NİCAT FƏRHADOV ZEYNAL OĞLU",
+      "uncertain": false
+    },
+    {
+      "code": "555",
+      "from": "Müşfiqabad qәsəbəsi 33 nömrəli tam orta məktəb",
+      "to": "Sumqayıt avtovağzalı",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "RAMİL İSMAYILOV İLHAM OĞLU",
+      "uncertain": false
+    },
+    {
+      "code": "557",
+      "from": "Abşeron ticarət mərkəzi",
+      "to": "33 nömrəli tam orta məktəb",
+      "fare": 0.7,
+      "fareSource": "route",
+      "operator": "SAHİL MMC",
+      "uncertain": false
+    },
+    {
+      "code": "567",
+      "from": "Avtovağzal NMM",
+      "to": "Qobu qəsəbəsi",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "ENA Transport MMC",
+      "uncertain": false
+    },
+    {
+      "code": "569",
+      "from": "Bakı Beynəlxalq Avtovağzal Kompleksi",
+      "to": "Şəfiqə Axundova küçəsi",
+      "fare": 0.5,
+      "fareSource": "route",
+      "operator": "XAN NƏQLİYYAT MMC",
+      "uncertain": false
+    },
+    {
+      "code": "594",
+      "from": "20 Yanvar m/st",
+      "to": "Sumqayıt şəhəri",
+      "fare": 0.9,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "595",
+      "from": "Avtovağzal NMM",
+      "to": "Sumqayıt avtovağzalı",
+      "fare": 0.9,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "596",
+      "from": "Lökbatan Nəqliyyat Mübadilə Mərkəzi",
+      "to": "Niyazi Əsgərov küçəsi 14",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": "F.RÖVŞƏN İSTEHSALAT MÜƏSSİSƏSİ",
+      "uncertain": false
+    },
+    {
+      "code": "E1",
+      "from": "Xalqlar Dostluğu m/st",
+      "to": "Abşeron ticarət mərkəzi",
+      "fare": 0.8,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "E2",
+      "from": "Xırdalan şəh.",
+      "to": "20 Yanvar m/st",
+      "fare": 0.6,
+      "fareSource": "route",
+      "operator": null,
+      "uncertain": false
+    },
+    {
+      "code": "H1",
+      "from": "Heydər Əliyev adına Beynəlxalq Hava Limanı",
+      "to": "28 May m/st",
+      "fare": 1.3,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "M1",
+      "from": "Metro əvəzedici",
+      "to": "ekspres",
+      "fare": 0.6,
+      "fareSource": "flat",
+      "operator": null,
+      "uncertain": false
+    },
+    {
+      "code": "M2",
+      "from": "Metro əvəzedici",
+      "to": "ekspres",
+      "fare": 0.6,
+      "fareSource": "flat",
+      "operator": null,
+      "uncertain": false
+    },
+    {
+      "code": "M3",
+      "from": "Metro əvəzedici",
+      "to": "ekspres",
+      "fare": 0.6,
+      "fareSource": "flat",
+      "operator": null,
+      "uncertain": false
+    },
+    {
+      "code": "M4",
+      "from": "Metro əvəzedici",
+      "to": "ekspres",
+      "fare": 0.6,
+      "fareSource": "flat",
+      "operator": null,
+      "uncertain": false
+    },
+    {
+      "code": "M5",
+      "from": "Metro əvəzedici",
+      "to": "ekspres",
+      "fare": 0.6,
+      "fareSource": "flat",
+      "operator": null,
+      "uncertain": false
+    },
+    {
+      "code": "M6",
+      "from": "Metro əvəzedici",
+      "to": "ekspres",
+      "fare": 0.6,
+      "fareSource": "flat",
+      "operator": null,
+      "uncertain": false
+    },
+    {
+      "code": "M7",
+      "from": "Metro əvəzedici",
+      "to": "ekspres",
+      "fare": 0.6,
+      "fareSource": "flat",
+      "operator": null,
+      "uncertain": false
+    },
+    {
+      "code": "M8",
+      "from": "Gənclik m/st",
+      "to": "Maştağa qəs.",
+      "fare": 0.65,
+      "fareSource": "route",
+      "operator": "BakuBus MMC",
+      "uncertain": false
+    },
+    {
+      "code": "M9",
+      "from": "Metro əvəzedici",
+      "to": "ekspres",
+      "fare": 0.6,
+      "fareSource": "flat",
+      "operator": null,
+      "uncertain": false
+    }
+  ],
+  "metro": {
+    "fare": 0.6,
+    "lines": [
+      {
+        "id": "red",
+        "nameAz": "Qırmızı xətt",
+        "nameEn": "Red line",
+        "color": "#D32F2F",
+        "stations": [
+          "İçərişəhər",
+          "Sahil",
+          "28 May",
+          "Gənclik",
+          "Nərimanov",
+          "Ulduz",
+          "Koroğlu",
+          "Qara Qarayev",
+          "Neftçilər",
+          "Xalqlar Dostluğu",
+          "Əhmədli",
+          "Həzi Aslanov",
+          "Bakmil"
+        ]
+      },
+      {
+        "id": "green",
+        "nameAz": "Yaşıl xətt",
+        "nameEn": "Green line",
+        "color": "#388E3C",
+        "stations": [
+          "Dərnəgül",
+          "Azadlıq prospekti",
+          "Nəsimi",
+          "Memar Əcəmi",
+          "20 Yanvar",
+          "İnşaatçılar",
+          "Elmlər Akademiyası",
+          "Nizami",
+          "Cəfər Cabbarlı",
+          "Xətai"
+        ]
+      },
+      {
+        "id": "purple",
+        "nameAz": "Bənövşəyi xətt",
+        "nameEn": "Purple line",
+        "color": "#7B1FA2",
+        "stations": [
+          "Xocəsən",
+          "Avtovağzal",
+          "Memar Əcəmi",
+          "8 Noyabr"
+        ]
+      }
+    ]
+  },
+  "train": [],
+  "sources": [
+    {
+      "title": "AYNA bus route map API: route list (getBusList)",
+      "url": "https://map-api.ayna.gov.az/api/bus/getBusList",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA bus route map API: route detail (getBusById?id=N, ids 1-209)",
+      "url": "https://map-api.ayna.gov.az/api/bus/getBusById?id=1",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA bus route map (front end)",
+      "url": "https://map.ayna.gov.az/",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: Yeni tariflər sistemi tətbiq olundu (2025-09-29)",
+      "url": "https://ayna.gov.az/az/news/yeni-tarifler-sistemi-tetbiq-olundu-874",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "Fed.az: AYNA list of routes with raised fares (2025-09-29)",
+      "url": "https://fed.az/az/neqliyyat/avtobus-metroda-qiymet-deyismesi-ile-bagli-ayna-nin-aciqlamasi-si%CC%87yahi-241494",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "APA: New bus and metro fares in Baku to take effect from October 1 (2025-09-29)",
+      "url": "https://en.apa.az/infrastructure/new-bus-and-metro-fares-in-baku-to-take-effect-from-october-1-479105",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 594 və 595 ekspres marşrutlarında qiymət dəyişikliyi (2026-01-13)",
+      "url": "https://ayna.gov.az/az/news/594-ve-595-nomreli-ekspres-marsrutlarinda-qiymet-deyisikliyi-992",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "Modern.az: Fare on Baku-Sumgayit buses increased (2026-01-13)",
+      "url": "https://modern.az/en/country/557242/fare-on-baku-sumgayit-buses-increased/",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 218 nömrəli yeni marşrut (2026-10-16)",
+      "url": "https://ayna.gov.az/az/news/218-nomreli-yeni-marsrut-xetti-istifadeye-verilir-1259",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 156 və 156A (2026-10-29)",
+      "url": "https://ayna.gov.az/az/news/156-ve-156a-nomreli-muntezem-marsrutlar-uzre-avtobuslar-yenilenir-1268",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 92 (2026-10-13)",
+      "url": "https://ayna.gov.az/az/news/92-nomreli-marsrutun-butun-avtobuslari-yenilenir-1255",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 199 (2026-08-31)",
+      "url": "https://ayna.gov.az/az/news/199-nomreli-marsrutun-butun-avtobuslari-deyisdirilir-1206",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 51 və 118A (2026-08-03)",
+      "url": "https://ayna.gov.az/az/news/51-ve-118a-nomreli-marsrutlar-uzre-avtobuslar-yenilenir-1180",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 135 (2026-07-31)",
+      "url": "https://ayna.gov.az/az/news/135-nomreli-marsrutun-avtobuslari-deyisdirilir-1179",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 195E (2026-07-27)",
+      "url": "https://ayna.gov.az/az/news/195e-nomreli-ekspres-marsrutu-fealiyyete-baslayir-1175",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 525A/525B/524 (2026-07-17)",
+      "url": "https://ayna.gov.az/az/news/525-nomreli-marsrutun-fealiyyeti-tekmillesdirilir-1167",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 150E Koroğlu - Sea Breeze (2026-07-17)",
+      "url": "https://ayna.gov.az/az/news/koroglu-nmm-i-sea-breeze-ile-elaqelendiren-ekspres-marsrutu-fealiyyete-baslayir-1166",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 39 (2026-07-15)",
+      "url": "https://ayna.gov.az/az/news/39-nomreli-marsrutun-hereket-sxemi-ve-avtobuslari-deyisdirilir-1163",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 77 və 91 (2026-06-30)",
+      "url": "https://ayna.gov.az/az/news/77-ve-91-nomreli-marsrutlar-uzre-avtobuslar-deyisdirilir-1151",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 214 və 214A (2026-06-30)",
+      "url": "https://ayna.gov.az/az/news/214-ve-214a-nomreli-marsrut-xetlerinde-muasir-avtobuslar-fealiyyet-gosterecek-1149",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 149E (2026-06-19)",
+      "url": "https://ayna.gov.az/az/news/149e-nomreli-ekspres-marsrutu-fealiyyete-baslayir-1140",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 22 (2026-06-16)",
+      "url": "https://ayna.gov.az/az/news/22-nomreli-marsrut-uzre-butun-avtobuslar-yenilenir-1135",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 107 və 107A (2026-06-02)",
+      "url": "https://ayna.gov.az/az/news/107-ve-107a-nomreli-marsrutlar-uzre-sernisinlere-muasir-avtobuslar-xidmet-gosterecek-1125",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 161 və 162 (2026-06-01)",
+      "url": "https://ayna.gov.az/az/news/161-ve-162-nomreli-marsrutlar-uzre-muasir-avtobuslar-sernisinlere-xidmet-gosterir-1121",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 119 (2026-05-31)",
+      "url": "https://ayna.gov.az/az/news/119-nomreli-muntezem-marsrutun-avtobuslari-deyisdirilir-1119",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 79 (2026-05-31)",
+      "url": "https://ayna.gov.az/az/news/79-nomreli-marsrutun-butun-avtobuslar-yenilenir-1118",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 102 və 191 (2026-05-14)",
+      "url": "https://ayna.gov.az/az/news/102-ve-191-nomreli-muntezem-marsrutlar-uzre-avtobuslar-yenilenir-1097",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 45 (2026-05-12)",
+      "url": "https://ayna.gov.az/az/news/45-nomreli-muntezem-marsrutun-avtobuslari-yenilenir-1095",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 185 (2026-05-01)",
+      "url": "https://ayna.gov.az/az/news/185-nomreli-muntezem-marsrutun-avtobuslari-deyisdirilir-1087",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 142 (2026-04-30)",
+      "url": "https://ayna.gov.az/az/news/142-nomreli-marsrutun-avtobuslari-yenilenir-1086",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 140A (2026-04-23)",
+      "url": "https://ayna.gov.az/az/news/140a-nomreli-marsrut-nagdsiz-odenis-sistemine-kecir-1077",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 53 (2026-04-21)",
+      "url": "https://ayna.gov.az/az/news/53-nomreli-seherdaxili-marsrut-uzre-butun-avtobuslar-yenilenir-1075",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 41 (2026-03-19)",
+      "url": "https://ayna.gov.az/az/news/41-nomreli-marsrut-nagdsiz-odenis-sistemine-kecir-1053",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 202 (2026-03-17)",
+      "url": "https://ayna.gov.az/az/news/202-nomreli-marsrutun-avtobuslari-yenilenir-1048",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 49 (2026-03-07)",
+      "url": "https://ayna.gov.az/az/news/49-nomreli-marsrutun-avtobuslari-yenilenir-1039",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 569 (2026-02-27)",
+      "url": "https://ayna.gov.az/az/news/569-nomreli-marsrut-xettinde-avtobuslar-deyisir-1030",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 67 (2026-02-24)",
+      "url": "https://ayna.gov.az/az/news/67-nomreli-marsrutun-avtobuslari-yenilenir-1026",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 214A (2026-02-21)",
+      "url": "https://ayna.gov.az/az/news/214a-nomreli-marsrut-xetti-istifadeye-verilir-1025",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 206 (2026-02-10)",
+      "url": "https://ayna.gov.az/az/news/206-nomreli-marsrut-uzre-muasir-avtobuslar-sernisinlere-xidmet-gosterecek-1015",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 146 (2025-12-05)",
+      "url": "https://ayna.gov.az/az/news/146-nomreli-marsrutda-istismar-olunan-avtobuslar-yenilenir-956",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 36 (2025-12-05)",
+      "url": "https://ayna.gov.az/az/news/36-nomreli-marsrutda-muasir-avtobuslar-sernisinlere-xidmet-gosterecek-955",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 12 (2025-12-05)",
+      "url": "https://ayna.gov.az/az/news/12-nomreli-marsrutda-ekoloji-temiz-avtobuslar-sernisinlerin-ixtiyarina-verilir-954",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 31 (2025-12-01)",
+      "url": "https://ayna.gov.az/az/news/31-nomreli-marsrutda-istismar-olunan-butun-avtobuslar-yenilenir-947",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 500 (2025-11-10)",
+      "url": "https://ayna.gov.az/az/news/sumqayit-seherini-paytaxtla-elaqelendiren-500-nomreli-marsrut-xetti-istifadeye-verilir-923",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 71 (2025-11-06)",
+      "url": "https://ayna.gov.az/az/news/71-nomreli-marsrut-uzre-muasir-avtobuslar-sernisinlere-xidmet-gosterecek-921",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 81 və 160 (2025-10-31)",
+      "url": "https://ayna.gov.az/az/news/81-ve-160-nomreli-marsrutlar-uzre-avtobuslar-deyisdirilir-914",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 53 (2025-10-31)",
+      "url": "https://ayna.gov.az/az/news/53-nomreli-marsrut-uzre-muasir-avtobuslar-sernisinlere-xidmet-gosterecek-913",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 503 (2025-10-31)",
+      "url": "https://ayna.gov.az/az/news/503-nomreli-muntezem-marsrutun-hereket-sxemi-deyisdirilir-912",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: E2 (2025-10-16)",
+      "url": "https://ayna.gov.az/az/news/e2-nomreli-ekspres-marsrut-xetti-istifadeye-verilir-895",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 93 (2025-10-13)",
+      "url": "https://ayna.gov.az/az/news/93-nomreli-marsrutun-avtobuslari-yenilenir-890",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 340 (2025-09-23)",
+      "url": "https://ayna.gov.az/az/news/340-nomreli-muntezem-avtobus-marsrutu-fealiyyete-baslayir-866",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: Metro xətlərinin ayrılması - dəstəkləyici tədbirlər (2026-08-04)",
+      "url": "https://ayna.gov.az/az/news/metro-xetlerinin-ayrilmasi-ile-bagli-ayna-nin-destekleyici-tedbirleri-1182",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: 6 yeni ekspres marşrutu (M1-M6) (2026-08-13)",
+      "url": "https://ayna.gov.az/az/news/6-yeni-ekspres-marsrutu-avqustun-14-den-fealiyyete-baslayir-1192",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "AYNA: Ödənişsiz Avtovağzal və Xocəsən metrostansiyaları (2026-09-22)",
+      "url": "https://ayna.gov.az/az/news/odenissiz-fealiyyet-gosterecek-avtovagzal-ve-xocesen-metrostansiyalarinin-qarsisinda-avtobuslar-ucun-araliq-dayanacaq-menteqesi-yaradilib-1231",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "Bakı Metropoliteni: Qırmızı xətt",
+      "url": "https://metro.gov.az/az/about-lines/2",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "Bakı Metropoliteni: Yaşıl xətt",
+      "url": "https://metro.gov.az/az/about-lines/3",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "Bakı Metropoliteni: Bənövşəyi xətt",
+      "url": "https://metro.gov.az/az/about-lines/7",
+      "accessed": "2026-10-31"
+    },
+    {
+      "title": "İstifadəçi təsdiqi: M ekspres marşrutlarının hamısı 0.60 AZN",
+      "url": "",
+      "accessed": "2026-10-31"
+    }
+  ]
+}

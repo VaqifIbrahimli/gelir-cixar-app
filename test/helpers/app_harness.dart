@@ -13,6 +13,7 @@ import 'package:gelir_cixar/core/app_info.dart';
 import 'package:gelir_cixar/core/notifications.dart';
 import 'package:gelir_cixar/core/prefs.dart';
 import 'package:gelir_cixar/data/providers.dart';
+import 'package:gelir_cixar/features/shell/floating_nav.dart';
 import 'package:gelir_cixar/l10n/app_localizations.dart';
 import 'package:intl/date_symbol_data_local.dart';
 import 'package:package_info_plus/package_info_plus.dart';
@@ -75,13 +76,19 @@ class AppHarness {
     await db.close();
   }
 
+  /// Taps a tab of the floating nav. Only the selected tab shows its label,
+  /// so tabs are found by their tooltip.
   Future<void> tapTab(String label) async {
-    await tester.tap(find.descendant(of: find.byType(NavigationBar), matching: find.text(label)));
+    await tester.tap(find.descendant(of: find.byType(AppFloatingNav), matching: find.byTooltip(label)));
     await settle();
   }
 }
 
-Future<AppHarness> pumpApp(WidgetTester tester, {String lang = 'az'}) async {
+Future<AppHarness> pumpApp(
+  WidgetTester tester, {
+  String lang = 'az',
+  Map<String, Object> prefs = const <String, Object>{},
+}) async {
   await initializeDateFormatting('az');
   await initializeDateFormatting('en');
 
@@ -94,15 +101,16 @@ Future<AppHarness> pumpApp(WidgetTester tester, {String lang = 'az'}) async {
     PrefKeys.lockOnboarded: true,
     PrefKeys.language: lang,
     PrefKeys.notificationsEnabled: false,
+    ...prefs,
   });
   FlutterSecureStorage.setMockInitialValues(<String, String>{});
-  final SharedPreferences prefs = await SharedPreferences.getInstance();
+  final SharedPreferences store = await SharedPreferences.getInstance();
   final AppDatabase db = openTestDb();
 
   await tester.pumpWidget(ProviderScope(
     overrides: [
       databaseProvider.overrideWithValue(db),
-      sharedPreferencesProvider.overrideWithValue(prefs),
+      sharedPreferencesProvider.overrideWithValue(store),
       notificationServiceProvider.overrideWithValue(FakeNotifications()),
       packageInfoProvider.overrideWith(
         (Ref ref) async => PackageInfo(
@@ -116,7 +124,7 @@ Future<AppHarness> pumpApp(WidgetTester tester, {String lang = 'az'}) async {
     child: const GelirCixarApp(),
   ));
 
-  final AppHarness h = AppHarness(tester, db, prefs);
+  final AppHarness h = AppHarness(tester, db, store);
   await h.settle();
   return h;
 }

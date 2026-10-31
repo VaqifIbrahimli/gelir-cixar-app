@@ -8,6 +8,7 @@ import 'package:gelir_cixar/core/prefs.dart';
 import 'package:gelir_cixar/core/theme.dart';
 import 'package:gelir_cixar/data/providers.dart';
 import 'package:gelir_cixar/features/budgets/widgets/budget_progress_row.dart';
+import 'package:gelir_cixar/features/shell/floating_nav.dart';
 import 'package:gelir_cixar/features/transactions/widgets/tx_tile.dart';
 
 import 'package:flutter_riverpod/flutter_riverpod.dart';
@@ -113,7 +114,8 @@ void main() {
 
       expect(find.text('Settings'), findsWidgets);
       expect(find.text('Ayarlar'), findsNothing);
-      expect(find.text(h.en.navHome), findsOneWidget, reason: 'bottom bar relabelled');
+      // Only the selected tab shows its label; the others carry it as a tooltip.
+      expect(find.byTooltip(h.en.navHome), findsOneWidget, reason: 'bottom bar relabelled');
       expect(h.prefs.getString(PrefKeys.language), 'en');
       await h.dispose();
     });
@@ -282,7 +284,7 @@ void main() {
       await tester.tap(find.text(h.az.onboardingSkip));
       await h.settle();
       expect(find.byType(OnboardingScreen), findsNothing);
-      expect(find.byType(NavigationBar), findsOneWidget);
+      expect(find.byType(AppFloatingNav), findsOneWidget);
       expect(h.prefs.getBool(PrefKeys.onboardingDone), isTrue);
       expect(h.prefs.getBool(PrefKeys.lockOnboarded), isTrue, reason: 'no forced PIN screen afterwards');
       await h.dispose();
@@ -301,7 +303,7 @@ void main() {
     testWidgets('an upgrade that completed the v1.0 PIN step skips onboarding', (WidgetTester tester) async {
       final AppHarness h = await pumpFresh(tester, prefs: <String, Object>{PrefKeys.lockOnboarded: true});
       expect(find.byType(OnboardingScreen), findsNothing);
-      expect(find.byType(NavigationBar), findsOneWidget);
+      expect(find.byType(AppFloatingNav), findsOneWidget);
       await h.dispose();
     });
   });

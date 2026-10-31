@@ -774,5 +774,273 @@
   "rateJumpTitle": "Məzənnə kəskin dəyişib",
   "rateJumpBody": "AMB-dən gələn bu məzənnələr əvvəlkindən 50%-dən çox fərqlənir. Tətbiq edilsin?",
   "rateJumpKeep": "Köhnəni saxla",
-  "rateJumpApply": "Tətbiq et"
+  "rateJumpApply": "Tətbiq et",
+  "lockTimeoutTitle": "Avtomatik kilid",
+  "lockTimeoutHint": "Tətbiq arxa fonda bu qədər qaldıqdan sonra PIN tələb olunur.",
+  "lockTimeoutImmediately": "Dərhal",
+  "lockTimeoutSeconds": "{seconds} saniyə sonra",
+  "@lockTimeoutSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "lockTimeoutMinutes": "{minutes} dəqiqə sonra",
+  "@lockTimeoutMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "lockTimeoutHours": "{hours} saat sonra",
+  "@lockTimeoutHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "lockTimeoutReauthReason": "Avtomatik kilid vaxtını dəyişmək üçün təsdiqləyin",
+  "lockBiometricEnrollmentChanged": "Telefona yeni barmaq izi əlavə edilib. Təhlükəsizlik üçün PIN daxil edin.",
+  "lockRecoveryTitle": "PIN məlumatı itib",
+  "lockRecoveryBody": "Telefonun təhlükəsiz yaddaşı sıfırlandığı üçün tətbiqin PIN kodu silinib. Məlumatlarınız yerindədir. Davam etmək üçün telefonun öz kilidi (PIN, naxış və ya barmaq izi) ilə təsdiqləyin, sonra yeni PIN təyin edin.",
+  "lockRecoveryConfirmButton": "Telefon kilidi ilə təsdiqlə",
+  "lockRecoveryReason": "Gəlir-Çıxar-a girişi bərpa etmək üçün təsdiqləyin",
+  "lockRecoveryAuthFailed": "Təsdiq alınmadı. Yenidən cəhd edin.",
+  "lockRecoveryInsecureBody": "Bu telefonda ekran kilidi (PIN, naxış və ya parol) qurulmayıb, ona görə də kimliyinizi telefon vasitəsilə təsdiqləmək mümkün deyil. Yeni PIN təyin etməklə girişi bərpa edə bilərsiniz.",
+  "lockRecoveryRestoreButton": "Məlumatlarıma girişi bərpa et",
+  "lockRecoveryWarningTitle": "Diqqət",
+  "lockRecoveryWarningBody": "Telefonu əlində tutan hər kəs bu addımla yeni PIN təyin edib məlumatlarınızı görə bilər. Bunu yalnız telefon sizindirsə edin. Telefonda ekran kilidi qurmağınız tövsiyə olunur.",
+  "lockRecoveryWarningConfirm": "Bərpa et",
+  "thisMonthShort": "Bu ay",
+  "cardPosition": "Kart {n} / {total}",
+  "@cardPosition": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "cardEndingIn": "kart sonu {last4}",
+  "@cardEndingIn": {
+    "placeholders": {
+      "last4": {
+        "type": "String"
+      }
+    }
+  },
+  "bonusBadge": "Bonus {pct}%",
+  "@bonusBadge": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "negativeShort": "Mənfi",
+  "cardDesign": "Kart dizaynı",
+  "cardChangeDesign": "Kart dizaynını dəyiş",
+  "cardDesignPhoto": "Şəkil",
+  "cardChoosePhoto": "Şəkil seç",
+  "cardChangePhoto": "Şəkli dəyiş",
+  "cardRemovePhoto": "Şəkli sil",
+  "cardPhotoMissing": "Şəkil tapılmadı",
+  "cardPhotoFailed": "Şəkli açmaq mümkün olmadı",
+  "cardLast4Label": "Kartın son 4 rəqəmi",
+  "cardLast4Helper": "Yalnız son 4 rəqəm. Tam kart nömrəsini heç vaxt daxil etməyin.",
+  "cardLast4Invalid": "Düz 4 rəqəm daxil edin",
+  "selectedItem": "{name}, seçilib",
+  "@selectedItem": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "accountTypeBonus": "Bonus",
+  "bonusRate": "Köçürmə dərəcəsi (%)",
+  "bonusRateHelper": "Bonusdan başqa hesaba köçürəndə çatan faiz",
+  "bonusRateInvalid": "1 ilə 100 arasında tam ədəd",
+  "makeTransfer": "Köçürmə et",
+  "time": "Saat",
+  "addedAt": "Əlavə edilib: {dt}",
+  "@addedAt": {
+    "placeholders": {
+      "dt": {
+        "type": "String"
+      }
+    }
+  },
+  "editedAt": "Dəyişdirilib: {dt}",
+  "@editedAt": {
+    "placeholders": {
+      "dt": {
+        "type": "String"
+      }
+    }
+  },
+  "duplicate": "Təkrarla",
+  "transportMode": "Növ",
+  "transportBus": "Avtobus",
+  "transportMetro": "Metro",
+  "transportTaxi": "Taksi",
+  "transportTrain": "Elektrik qatarı",
+  "transportFuel": "Yanacaq",
+  "transportParking": "Parkinq",
+  "transportBakuCard": "BakıKart artırma",
+  "busRoute": "Marşrut",
+  "chooseRoute": "Marşrut seçin",
+  "searchRoutes": "Marşrut axtar: kod və ya dayanacaq",
+  "recentRoutes": "Son istifadə olunanlar",
+  "allRoutes": "Bütün marşrutlar",
+  "noRouteFound": "Marşrut tapılmadı",
+  "trips": "Gediş sayı",
+  "tripsCount": "{n} gediş",
+  "@tripsCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "fareHint": "Tarif: {fare} × {n}",
+  "@fareHint": {
+    "placeholders": {
+      "fare": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "fareManual": "Məbləğ əl ilə dəyişdirilib",
+  "resetToFare": "Tarifə qaytar",
+  "fareUncertain": "tarif dəqiq deyil",
+  "metroStation": "Stansiya (istəyə görə)",
+  "chooseStation": "Stansiya seçin",
+  "bakuCardDoubleCountHint": "Artırmanı xərc kimi qeyd edirsinizsə, gedişləri ayrıca qeyd etməyin: xərc iki dəfə sayılar.",
+  "transportFares": "Nəqliyyat tarifləri",
+  "transportFaresSubtitle": "Avtobus, metro və qatar tarifləri",
+  "addOwnRoute": "Öz marşrutumu əlavə et",
+  "editOwnRoute": "Marşrutu dəyiş",
+  "routeCode": "Marşrut nömrəsi",
+  "routeFrom": "Haradan",
+  "routeTo": "Haraya",
+  "fare": "Tarif",
+  "routeCodeExists": "Bu nömrə artıq var",
+  "routeCodeInvalid": "1–6 simvol: hərf, rəqəm və ya \"-\"",
+  "fieldRequired": "Doldurun",
+  "fareInvalid": "0,01 ilə 99,99 arasında",
+  "fareNotSet": "Təyin edilməyib",
+  "myRoute": "Mənim",
+  "fareEdited": "Dəyişdirilib",
+  "resetFare": "Standart tarifə qaytar",
+  "faresVerifiedAt": "Tariflər {date} tarixində yoxlanılıb. Dəyişibsə, burada düzəldin.",
+  "@faresVerifiedAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "faresVerifiedShort": "Yoxlanılıb: {date}",
+  "@faresVerifiedShort": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "faresSources": "Mənbələr",
+  "metroAndTrain": "Metro və qatar",
+  "transferSent": "Göndərilən {a}",
+  "@transferSent": {
+    "placeholders": {
+      "a": {
+        "type": "String"
+      }
+    }
+  },
+  "transferArrives": "Çatan {a} ({pct}%)",
+  "@transferArrives": {
+    "placeholders": {
+      "a": {
+        "type": "String"
+      },
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "bonusLoss": "Bonus itkisi: {a}",
+  "@bonusLoss": {
+    "placeholders": {
+      "a": {
+        "type": "String"
+      }
+    }
+  },
+  "bonusLossLabel": "Bonus itkisi",
+  "bonusLossExplain": "Bonus hesabından köçürəndə məbləğin yalnız {pct}%-i çatır.",
+  "@bonusLossExplain": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "bonusReceivedEdit": "Çatan məbləğ",
+  "bonusReceivedTooBig": "Çatan məbləğ göndəriləndən çox ola bilməz",
+  "bonusSameCurrencyOnly": "Bonus hesabından yalnız eyni valyutada olan hesaba köçürmək olar",
+  "sentSubtitle": "{a} göndərildi",
+  "@sentSubtitle": {
+    "placeholders": {
+      "a": {
+        "type": "String"
+      }
+    }
+  },
+  "pairDeleted": "Köçürmə və bonus itkisi birlikdə silindi",
+  "systemCategoryLocked": "Sistem kateqoriyasıdır: silmək və arxivləmək olmaz",
+  "transportCategory": "Nəqliyyat kateqoriyası",
+  "transportCategoryBody": "Əlavə edəndə avtobus, metro və digər növləri seçmək olar",
+  "budgetsEnabled": "Büdcələr",
+  "budgetsEnabledBody": "Büdcə bölməsini, Ana səhifə kartını və xəbərdarlıqları göstər",
+  "budgetsHidden": "Büdcələr gizlədildi. Məlumatlarınız silinmir.",
+  "pressBackAgainToExit": "Çıxmaq üçün yenidən geri toxunun",
+  "reportTransport": "Nəqliyyat",
+  "reportByMode": "Növlər üzrə",
+  "reportTopRoutes": "Ən çox istifadə olunan marşrutlar",
+  "timeOfDay": "Saat aralığı",
+  "timeFrom": "Başlanğıc saatı",
+  "timeTo": "Son saat",
+  "backupImagesSkipped": "{n} kart şəkli 1 MB-dan böyük olduğu üçün ehtiyat nüsxəyə düşmədi",
+  "@backupImagesSkipped": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "accountCardSemantics": "{type}, {name}, {balance}",
+  "@accountCardSemantics": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      },
+      "balance": {
+        "type": "String"
+      }
+    }
+  },
+  "exportColTransportMode": "Nəqliyyat növü"
 }

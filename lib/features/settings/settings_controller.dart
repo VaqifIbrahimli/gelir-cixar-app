@@ -14,7 +14,12 @@ class AppSettings {
     this.blockScreenshots = true,
     this.seedId = 'teal',
     this.useDynamicColor = false,
+    this.budgetsEnabled = true,
   });
+
+  /// v1.2: when false the Budgets tab, the Home budget card and budget
+  /// alerts are hidden; budget data is kept.
+  final bool budgetsEnabled;
 
   final String languageCode;
   final ThemeMode themeMode;
@@ -42,6 +47,7 @@ class AppSettings {
     bool? blockScreenshots,
     String? seedId,
     bool? useDynamicColor,
+    bool? budgetsEnabled,
   }) =>
       AppSettings(
         languageCode: languageCode ?? this.languageCode,
@@ -51,6 +57,7 @@ class AppSettings {
         blockScreenshots: blockScreenshots ?? this.blockScreenshots,
         seedId: seedId ?? this.seedId,
         useDynamicColor: useDynamicColor ?? this.useDynamicColor,
+        budgetsEnabled: budgetsEnabled ?? this.budgetsEnabled,
       );
 }
 
@@ -75,6 +82,7 @@ class SettingsController extends Notifier<AppSettings> {
       blockScreenshots: p.getBool(PrefKeys.blockScreenshots) ?? true,
       seedId: p.getString(PrefKeys.seedId) ?? 'teal',
       useDynamicColor: p.getBool(PrefKeys.useDynamicColor) ?? false,
+      budgetsEnabled: p.getBool(PrefKeys.budgetsEnabled) ?? true,
     );
   }
 
@@ -101,6 +109,11 @@ class SettingsController extends Notifier<AppSettings> {
   Future<void> setUseDynamicColor(bool on) async {
     state = state.copyWith(useDynamicColor: on);
     await _prefs.setBool(PrefKeys.useDynamicColor, on);
+  }
+
+  Future<void> setBudgetsEnabled(bool on) async {
+    state = state.copyWith(budgetsEnabled: on);
+    await _prefs.setBool(PrefKeys.budgetsEnabled, on);
   }
 
   Future<void> setBlockScreenshots(bool on) async {

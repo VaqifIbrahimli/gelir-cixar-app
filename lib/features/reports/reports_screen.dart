@@ -115,6 +115,18 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
     context.go(Routes.transactions);
   }
 
+  void _openRoute(RouteUsage r) {
+    ref.read(txFilterProvider.notifier).apply(
+          TxFilter(
+            types: const <TxType>[TxType.expense],
+            transportMode: r.mode,
+            routeCode: r.code,
+            window: _window,
+          ),
+        );
+    context.go(Routes.transactions);
+  }
+
   @override
   void initState() {
     super.initState();
@@ -144,11 +156,11 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
         ],
       ),
       body: ListView(
-        padding: const EdgeInsets.fromLTRB(
+        padding: EdgeInsets.fromLTRB(
           AppSpacing.lg,
           AppSpacing.sm,
           AppSpacing.lg,
-          AppSpacing.xxl,
+          AppNav.contentInset(context),
         ),
         children: <Widget>[
           SingleChildScrollView(
@@ -216,6 +228,8 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
             lang: lang,
             onCategory: _openCategory,
           ),
+          if (_pieType == TxType.expense)
+            TransportReportCard(window: w, lang: lang, onRoute: _openRoute),
           SectionHeader(
             l.reportsByMonth,
             trailing: SegmentedButton<int>(
@@ -231,6 +245,170 @@ class _ReportsScreenState extends ConsumerState<ReportsScreen> {
           ),
           _MonthlyCharts(months: _months, lang: lang),
         ],
+      ),
+    );
+  }
+}
+
+/// "Nəqliyyat" card (DESIGN.md §18.10): spend per mode as horizontal bars,
+/// then the top 5 bus routes / metro stations by trips. Hidden when the
+/// period has no transport spending.
+class TransportReportCard extends ConsumerWidget {
+  const TransportReportCard({super.key, required this.window, required this.lang, required this.onRoute});
+
+  final DateWindow window;
+  final String lang;
+  final ValueChanged<RouteUsage> onRoute;
+
+  @override
+  Widget build(BuildContext context, WidgetRef ref) {
+    final AppLocalizations l = AppLocalizations.of(context);
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
+    final AppColors colors = AppColors.of(context);
+    final TransportReport r = ref.watch(transportReportProvider(window)).value ?? TransportReport.empty;
+    final ResolvedFares? fares = ref.watch(resolvedFaresProvider).value;
+    final int total = r.total;
+    if (total <= 0) return const SizedBox.shrink();
+    final List<MapEntry<TransportMode, int>> modes = r.byMode.entries.toList()
+      ..sort((MapEntry<TransportMode, int> a, MapEntry<TransportMode, int> b) => b.value.compareTo(a.value));
+    final int max = modes.first.value;
+    final TextStyle? sub = theme.textTheme.titleSmall?.copyWith(color: cs.onSurfaceVariant);
+    final bool reduced = AppMotion.reduced(context);
+    final String summary = <String>[
+      for (final MapEntry<TransportMode, int> e in modes)
+        '${transportModeLabel(l, e.key)} ${Fmt.base(e.value, lang)}, ${(e.value * 100 / total).round()}%',
+    ].join('; ');
+
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.lg),
+      child: Container(
+        padding: AppSpacing.card,
+        decoration: BoxDecoration(color: cs.surfaceContainerLow, borderRadius: AppRadius.brLg),
+        child: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: <Widget>[
+            Row(
+              children: <Widget>[
+                Icon(Icons.directions_bus_outlined, size: 20, color: cs.onSurfaceVariant),
+                const SizedBox(width: AppSpacing.sm),
+                Expanded(
+                  child: Semantics(
+                    header: true,
+                    child: Text(l.reportTransport, style: theme.textTheme.titleMedium),
+                  ),
+                ),
+                Text(Fmt.base(total, lang), style: AppTextStyles.amountTile),
+              ],
+            ),
+            const SizedBox(height: AppSpacing.md),
+            Text(l.reportByMode, style: sub),
+            Semantics(
+              label: summary,
+              excludeSemantics: true,
+              child: Column(
+                children: <Widget>[
+                  for (int k = 0; k < modes.length; k++)
+                    Padding(
+                      padding: const EdgeInsets.only(top: AppSpacing.sm),
+                      child: Column(
+                        crossAxisAlignment: CrossAxisAlignment.start,
+                        children: <Widget>[
+                          Row(
+                            children: <Widget>[
+                              Icon(
+                                TransportModeStyle.forMode(modes[k].key).icon,
+                                size: 20,
+                                color: TransportModeStyle.forMode(modes[k].key).color(colors),
+                              ),
+                              const SizedBox(width: AppSpacing.sm),
+                              Expanded(
+                                child: Text(transportModeLabel(l, modes[k].key), style: theme.textTheme.bodyMedium),
+                              ),
+                              Text(Fmt.base(modes[k].value, lang), style: AppTextStyles.amountTile),
+                              SizedBox(
+                                width: 44,
+                                child: Text(
+                                  '${(modes[k].value * 100 / total).round()} %',
+                                  textAlign: TextAlign.end,
+                                  style: theme.textTheme.labelSmall,
+                                ),
+                              ),
+                            ],
+                          ),
+                          const SizedBox(height: AppSpacing.xs),
+                          TweenAnimationBuilder<double>(
+                            tween: Tween<double>(begin: reduced ? modes[k].value / max : 0, end: modes[k].value / max),
+                            duration: reduced
+                                ? Duration.zero
+                                : AppMotion.chartEntry + AppMotion.stagger * k,
+                            curve: AppMotion.chartCurve,
+                            builder: (BuildContext context, double v, _) => ClipRRect(
+                              borderRadius: const BorderRadius.all(Radius.circular(4)),
+                              child: LinearProgressIndicator(
+                                value: v,
+                                minHeight: 8,
+                                color: TransportModeStyle.forMode(modes[k].key).color(colors),
+                                backgroundColor: cs.surfaceContainerHighest,
+                              ),
+                            ),
+                          ),
+                        ],
+                      ),
+                    ),
+                ],
+              ),
+            ),
+            if (r.routes.isNotEmpty) ...<Widget>[
+              const SizedBox(height: AppSpacing.lg),
+              Text(l.reportTopRoutes, style: sub),
+              for (int k = 0; k < r.routes.length; k++)
+                InkWell(
+                  borderRadius: AppRadius.brSm,
+                  onTap: () => onRoute(r.routes[k]),
+                  child: ConstrainedBox(
+                    constraints: const BoxConstraints(minHeight: 48),
+                    child: Row(
+                      children: <Widget>[
+                        SizedBox(width: 20, child: Text('${k + 1}', style: theme.textTheme.labelLarge)),
+                        Container(
+                          constraints: const BoxConstraints(minWidth: 40, minHeight: 28),
+                          padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                          alignment: Alignment.center,
+                          decoration: BoxDecoration(color: cs.secondaryContainer, borderRadius: AppRadius.brSm),
+                          child: r.routes[k].mode == TransportMode.metro
+                              ? Icon(Icons.subway_outlined, size: 18, color: cs.onSecondaryContainer)
+                              : Text(
+                                  r.routes[k].code,
+                                  style: theme.textTheme.labelLarge
+                                      ?.copyWith(color: cs.onSecondaryContainer)
+                                      .merge(AppTextStyles.tabular),
+                                ),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Expanded(
+                          child: Text(
+                            r.routes[k].mode == TransportMode.metro
+                                ? r.routes[k].code
+                                : (fares?.busRoute(r.routes[k].code)?.label ?? ''),
+                            maxLines: 1,
+                            overflow: TextOverflow.ellipsis,
+                            style: theme.textTheme.bodyMedium,
+                          ),
+                        ),
+                        Text(
+                          '×${r.routes[k].trips}',
+                          style: theme.textTheme.labelMedium?.copyWith(color: cs.onSurfaceVariant),
+                        ),
+                        const SizedBox(width: AppSpacing.sm),
+                        Text(Fmt.base(r.routes[k].amount, lang), style: AppTextStyles.amountTile),
+                      ],
+                    ),
+                  ),
+                ),
+            ],
+          ],
+        ),
       ),
     );
   }

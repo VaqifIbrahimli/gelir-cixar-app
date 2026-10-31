@@ -61,7 +61,8 @@ void main() {
 
     final BackupSummary s = await backup.restoreJson(json);
     expect(s.transactions, 1);
-    expect((await db.select(db.categories).get()).length, 14);
+    // 14 seeded categories + the v1.2 "Bonus itkisi" system category.
+    expect((await db.select(db.categories).get()).length, 15);
 
     // A transaction pointing at a missing account must roll everything back.
     final Map<String, dynamic> broken = jsonDecode(json) as Map<String, dynamic>;

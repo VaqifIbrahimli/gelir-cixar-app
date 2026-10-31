@@ -15,6 +15,20 @@ class Accounts extends Table {
   IntColumn get colorIndex => integer().withDefault(const Constant(0))();
   BoolColumn get isArchived => boolean().withDefault(const Constant(false))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  /// v1.2: `AppCardDesigns` preset id, or 'photo' (see [cardImagePath]).
+  TextColumn get cardDesignId =>
+      text().withLength(min: 1, max: 20).withDefault(const Constant('teal'))();
+
+  /// v1.2: file name (not a path) inside `<app documents>/card_images/`.
+  TextColumn get cardImagePath => text().nullable().withLength(min: 1, max: 80)();
+
+  /// v1.2: the user's own label, exactly 4 digits. Never a full card number.
+  TextColumn get cardLast4 => text().nullable().withLength(min: 4, max: 4)();
+
+  /// v1.2, bonus accounts only: the percentage that arrives when money is
+  /// moved out to another account (1..100).
+  IntColumn get bonusRatePercent => integer().withDefault(const Constant(50))();
 }
 
 /// Income / expense categories. Named `TxCategory` in Dart to avoid clashing
@@ -33,6 +47,10 @@ class Categories extends Table {
   TextColumn get type => textEnum<CategoryType>()();
   BoolColumn get isArchived => boolean().withDefault(const Constant(false))();
   IntColumn get sortOrder => integer().withDefault(const Constant(0))();
+
+  /// v1.2: transport picker / bonus-loss system category.
+  TextColumn get specialKind => textEnum<CategorySpecialKind>()
+      .withDefault(Constant(CategorySpecialKind.none.name))();
 }
 
 /// Income, expense and transfer records.
@@ -65,6 +83,22 @@ class Transactions extends Table {
   DateTimeColumn get date => dateTime()();
   TextColumn get note => text().withDefault(const Constant(''))();
   DateTimeColumn get createdAt => dateTime().withDefault(currentDateAndTime)();
+
+  /// v1.2: last edit (null = never edited).
+  DateTimeColumn get updatedAt => dateTime().nullable()();
+
+  /// v1.2: transport sub-mode of an expense in a transport category.
+  TextColumn get transportMode => textEnum<TransportMode>().nullable()();
+
+  /// v1.2: bus route code ("65", "7A"), or the metro station name.
+  TextColumn get routeCode => text().nullable().withLength(min: 1, max: 60)();
+
+  /// v1.2: number of trips (bus / metro / train); 1 otherwise.
+  IntColumn get trips => integer().withDefault(const Constant(1))();
+
+  /// v1.2: rows written together (a bonus transfer and its loss) share this
+  /// id; they are deleted, restored and edited as one.
+  TextColumn get linkGroupId => text().nullable().withLength(min: 1, max: 64)();
 }
 
 /// Monthly per-category limits (UI arrives in phase 2).
@@ -170,4 +204,24 @@ class HoldingEntries extends Table {
   IntColumn get transactionId => integer()
       .nullable()
       .references(Transactions, #id, onDelete: KeyAction.cascade)();
+}
+
+/// v1.2: user overrides of the bundled Baku fares (assets/transport) and the
+/// user's own routes. A row with [isCustom] false changes the fare of a
+/// bundled route; [isCustom] true adds a route. Metro / train fares use
+/// [code] ''.
+@DataClassName('TransportFare')
+class TransportFares extends Table {
+  TextColumn get mode => textEnum<TransportMode>()();
+  TextColumn get code => text().withLength(min: 0, max: 6)();
+  TextColumn get fromName => text().withLength(min: 0, max: 60).withDefault(const Constant(''))();
+  TextColumn get toName => text().withLength(min: 0, max: 60).withDefault(const Constant(''))();
+
+  /// AZN minor units.
+  IntColumn get fare => integer()();
+  BoolColumn get isCustom => boolean().withDefault(const Constant(false))();
+  DateTimeColumn get updatedAt => dateTime().withDefault(currentDateAndTime)();
+
+  @override
+  Set<Column> get primaryKey => <Column>{mode, code};
 }

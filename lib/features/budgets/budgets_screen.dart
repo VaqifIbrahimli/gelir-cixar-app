@@ -113,7 +113,7 @@ class _BudgetsScreenState extends ConsumerState<BudgetsScreen> {
                         p.ratio * 100 >= BudgetThresholds.warning)
                     .length;
                 return ListView(
-                  padding: const EdgeInsets.only(bottom: AppSpacing.xxl),
+                  padding: EdgeInsets.only(bottom: AppNav.contentInset(context)),
                   children: <Widget>[
                     _OverallCard(month: _month, budgets: list, lang: lang),
                     if (nearLimit > 0) _WarningBanner(count: nearLimit),
@@ -371,7 +371,7 @@ class _BudgetSheetState extends ConsumerState<_BudgetSheet> {
         .toSet();
     final List<TxCategory> options = expenseCats
         .where((TxCategory c) =>
-            c.id == _categoryId || (!c.isArchived && !taken.contains(c.id)))
+            !c.isSystem && (c.id == _categoryId || (!c.isArchived && !taken.contains(c.id))))
         .toList();
     final bool isEdit = widget.existing != null;
 

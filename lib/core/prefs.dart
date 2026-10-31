@@ -30,6 +30,9 @@ abstract final class PrefKeys {
   /// Epoch ms of the CBAR bulletin date last applied.
   static const String ratesBulletinDate = 'rates.bulletinDate';
 
+  /// v1.2: Budgets tab, Home card and alerts (default on).
+  static const String budgetsEnabled = 'settings.budgetsEnabled';
+
   static const String lockEnabled = 'lock.enabled';
   static const String biometricEnabled = 'lock.biometric';
   static const String lockOnboarded = 'lock.onboarded';
