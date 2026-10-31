@@ -54,9 +54,10 @@ void main() {
   tearDown(() => db.close());
 
   test('upgrades to v3 and keeps the data', () async {
-    expect(db.schemaVersion, 3);
+    // The upgrade runs on to the latest schema (v4 since v1.2).
+    expect(db.schemaVersion, 4);
     final QueryRow v = await db.customSelect('PRAGMA user_version').getSingle();
-    expect(v.data.values.single, 3);
+    expect(v.data.values.single, 4);
 
     final MoneyTx tx = (await db.select(db.transactions).get()).single;
     expect(tx.amount, 1250);

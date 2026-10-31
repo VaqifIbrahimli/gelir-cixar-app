@@ -1,6 +1,11 @@
 // Gəlir-Çıxar: Material 3 theme.
 //
-// Design source of truth: docs/DESIGN.md (v1.0 §1–8, v1.1 §9–17).
+// Design source of truth: docs/DESIGN.md (v1.0 §1–8, v1.1 §9–17, v1.2 §18).
+//
+// v1.2 additions (all new symbols; nothing existing changed):
+//   AppRadius.card / brCard, AppCardDesign, AppCardDesigns (presets, byId,
+//   photo, photoScrim), AppCarousel, AppNav (floating pill nav),
+//   AccountTypeStyle, TransportModeStyle, MetroLineStyle, AppMotion v1.2.
 // Flutter SDK only. This file does NOT import dynamic_color: callers pass the
 // wallpaper scheme in as a plain `ColorScheme?`.
 //
@@ -73,6 +78,10 @@ abstract final class AppRadius {
   /// v1.1: rounded top of a chart bar.
   static const BorderRadius brBarTop =
       BorderRadius.vertical(top: Radius.circular(xs));
+
+  /// v1.2: bank-card-style account cards on Home (DESIGN.md §18.2).
+  static const double card = 20;
+  static const BorderRadius brCard = BorderRadius.all(Radius.circular(card));
 }
 
 /// Component size tokens.
@@ -176,6 +185,19 @@ abstract final class AppMotion {
 
   /// Onboarding page change and illustration settle.
   static const Duration onboardingPage = long2;
+
+  // ---- v1.2 (DESIGN.md §18.11) ----
+  /// Carousel `animateToPage` (dot tap, "back to totals").
+  static const Duration carouselPage = medium2;
+
+  /// Floating nav: selected label fade-in and icon lift.
+  static const Duration navLabel = medium1;
+
+  /// Window for the second back press that exits the app (§18.9).
+  static const Duration backExitWindow = Duration(seconds: 2);
+
+  /// Detail rows that appear in a form (transport picker, bonus-loss row).
+  static const Duration reveal = medium1;
 
   // ---- curves ----
   static const Curve standard = Easing.standard;
@@ -557,6 +579,671 @@ class HoldingPlaceStyle {
 
   /// Icon used for the holdings feature itself (Home card, Settings tile).
   static const IconData featureIcon = Icons.inventory_2_outlined;
+}
+
+// ---------------------------------------------------------------------------
+// v1.2: account card designs (DESIGN.md §18.2)
+// ---------------------------------------------------------------------------
+
+/// One bank-card look. Every on-card colour is checked against BOTH gradient
+/// stops (DESIGN.md §18.2.2): [onCard] and [onCardVariant] are >= 4.5:1 on
+/// each stop, so any pixel of the linear gradient passes too.
+@immutable
+class AppCardDesign {
+  const AppCardDesign._({
+    required this.id,
+    required this.labelAz,
+    required this.labelEn,
+    required this.colors,
+    required this.onCard,
+    required this.onCardVariant,
+    this.isPhoto = false,
+  });
+
+  /// Persisted value (`accounts.cardDesignId`). Never rename.
+  final String id;
+  final String labelAz;
+  final String labelEn;
+
+  /// Gradient stops, top-left -> bottom-right. For [AppCardDesigns.photo]
+  /// this is the placeholder shown while the image loads or if it is gone.
+  final List<Color> colors;
+
+  /// Name, balance, icon.
+  final Color onCard;
+
+  /// Currency code, "•••• 1234", secondary labels.
+  final Color onCardVariant;
+
+  /// True for the user-photo design: draw the image, then
+  /// [AppCardDesigns.photoScrimFor] on top, then the text.
+  final bool isPhoto;
+
+  String label(String lang) => lang == 'en' ? labelEn : labelAz;
+
+  /// Light card with dark text (gold, platinum).
+  bool get isLight => onCard.computeLuminance() < 0.2;
+
+  LinearGradient get gradient => LinearGradient(
+        begin: Alignment.topLeft,
+        end: Alignment.bottomRight,
+        colors: colors,
+      );
+
+  /// "Bonus 50%" badge fill. A fixed pair, independent of the card behind it
+  /// (10.84:1 on dark cards, 12.74:1 on light cards).
+  Color get badge =>
+      isLight ? const Color(0xFF2B1D00) : const Color(0xFFFFE08A);
+  Color get onBadge =>
+      isLight ? const Color(0xFFFFE08A) : const Color(0xFF3D2800);
+
+  /// Inner chips on the card (type icon circle): darkens on dark cards,
+  /// so contrast only goes up; lightens on light cards for the same reason.
+  Color get overlay =>
+      isLight ? const Color(0x33FFFFFF) : const Color(0x29000000);
+
+  /// Lowest text contrast of [onCard] / [onCardVariant] over the stops
+  /// (photo: over the worst case, a white pixel under the scrim's text band).
+  double get worstTextContrast {
+    if (isPhoto) {
+      return AppContrast.ratio(onCard, AppCardDesigns.photoWorstBackground);
+    }
+    double worst = 21;
+    for (final Color c in colors) {
+      for (final Color fg in <Color>[onCard, onCardVariant]) {
+        final double r = AppContrast.ratio(fg, c);
+        if (r < worst) worst = r;
+      }
+    }
+    return worst;
+  }
+}
+
+/// Preset card designs + photo design + card geometry/elevation tokens.
+abstract final class AppCardDesigns {
+  // ---- presets (ratios: DESIGN.md §18.2.2) ----
+  static const AppCardDesign teal = AppCardDesign._(
+    id: 'teal',
+    labelAz: 'Firuzəyi',
+    labelEn: 'Teal',
+    colors: <Color>[Color(0xFF004E52), Color(0xFF00777D)],
+    onCard: Color(0xFFFFFFFF),
+    onCardVariant: Color(0xFFE0F7F8),
+  );
+  static const AppCardDesign ocean = AppCardDesign._(
+    id: 'ocean',
+    labelAz: 'Okean',
+    labelEn: 'Ocean',
+    colors: <Color>[Color(0xFF0B3A82), Color(0xFF1D63BF)],
+    onCard: Color(0xFFFFFFFF),
+    onCardVariant: Color(0xFFDCEAFF),
+  );
+  static const AppCardDesign midnight = AppCardDesign._(
+    id: 'midnight',
+    labelAz: 'Gecə',
+    labelEn: 'Midnight',
+    colors: <Color>[Color(0xFF14183D), Color(0xFF33398F)],
+    onCard: Color(0xFFFFFFFF),
+    onCardVariant: Color(0xFFD9DBFF),
+  );
+  static const AppCardDesign plum = AppCardDesign._(
+    id: 'plum',
+    labelAz: 'Gavalı',
+    labelEn: 'Plum',
+    colors: <Color>[Color(0xFF3E1046), Color(0xFF83358F)],
+    onCard: Color(0xFFFFFFFF),
+    onCardVariant: Color(0xFFF5D9FA),
+  );
+  static const AppCardDesign sunset = AppCardDesign._(
+    id: 'sunset',
+    labelAz: 'Qürub',
+    labelEn: 'Sunset',
+    colors: <Color>[Color(0xFF7A1838), Color(0xFFB8431F)],
+    onCard: Color(0xFFFFFFFF),
+    onCardVariant: Color(0xFFFFEDE6),
+  );
+  static const AppCardDesign forest = AppCardDesign._(
+    id: 'forest',
+    labelAz: 'Meşə',
+    labelEn: 'Forest',
+    colors: <Color>[Color(0xFF0E3A2B), Color(0xFF23714F)],
+    onCard: Color(0xFFFFFFFF),
+    onCardVariant: Color(0xFFD9F0E4),
+  );
+  static const AppCardDesign graphite = AppCardDesign._(
+    id: 'graphite',
+    labelAz: 'Qrafit',
+    labelEn: 'Graphite',
+    colors: <Color>[Color(0xFF1E2227), Color(0xFF4A525C)],
+    onCard: Color(0xFFFFFFFF),
+    onCardVariant: Color(0xFFDCE1E7),
+  );
+  static const AppCardDesign onyx = AppCardDesign._(
+    id: 'onyx',
+    labelAz: 'Qara',
+    labelEn: 'Onyx',
+    colors: <Color>[Color(0xFF0A0A0C), Color(0xFF2C2C33)],
+    onCard: Color(0xFFFFFFFF),
+    onCardVariant: Color(0xFFD4D4DA),
+  );
+  static const AppCardDesign gold = AppCardDesign._(
+    id: 'gold',
+    labelAz: 'Qızılı',
+    labelEn: 'Gold',
+    colors: <Color>[Color(0xFFF3D98E), Color(0xFFC9A24A)],
+    onCard: Color(0xFF2A1C00),
+    onCardVariant: Color(0xFF3D2C00),
+  );
+  static const AppCardDesign platinum = AppCardDesign._(
+    id: 'platinum',
+    labelAz: 'Gümüşü',
+    labelEn: 'Platinum',
+    colors: <Color>[Color(0xFFEEF1F4), Color(0xFFB7C0CA)],
+    onCard: Color(0xFF14181C),
+    onCardVariant: Color(0xFF353D45),
+  );
+
+  /// User photo background. Text is always white (no variant tone: the
+  /// scrim budget is spent on white only, see [photoScrimFor]).
+  static const AppCardDesign photo = AppCardDesign._(
+    id: 'photo',
+    labelAz: 'Şəkil',
+    labelEn: 'Photo',
+    colors: <Color>[Color(0xFF1E2227), Color(0xFF4A525C)],
+    onCard: Color(0xFFFFFFFF),
+    onCardVariant: Color(0xFFFFFFFF),
+    isPhoto: true,
+  );
+
+  /// Picker order. [photo] is offered separately as the last tile.
+  static const List<AppCardDesign> presets = <AppCardDesign>[
+    teal,
+    ocean,
+    midnight,
+    plum,
+    sunset,
+    forest,
+    graphite,
+    onyx,
+    gold,
+    platinum,
+  ];
+
+  static const String defaultId = 'teal';
+  static const String photoId = 'photo';
+
+  /// Unknown / null ids fall back to [teal]; 'photo' returns [photo].
+  static AppCardDesign byId(String? id) {
+    if (id == photoId) return photo;
+    for (final AppCardDesign d in presets) {
+      if (d.id == id) return d;
+    }
+    return teal;
+  }
+
+  /// Default design for the n-th account created (cycles the presets, so a
+  /// fresh install's cards are not all the same colour).
+  static AppCardDesign forIndex(int index) =>
+      presets[index.abs() % presets.length];
+
+  // ---- geometry ----
+  /// ISO/IEC 7810 ID-1 (85.60 × 53.98 mm).
+  static const double aspectRatio = 1.586;
+  static const double radius = AppRadius.card;
+  static const BorderRadius borderRadius = AppRadius.brCard;
+  static const EdgeInsets padding = EdgeInsets.all(20);
+
+  /// Type-icon circle on the card.
+  static const double typeIcon = 32;
+
+  /// Nominal M3 elevation level (for Material widgets); the actual look is
+  /// [shadows].
+  static const double elevation = 6;
+
+  /// Card shadow. Light theme: a soft shadow tinted with the gradient's end
+  /// colour plus a tight key shadow. Dark theme: a plain black shadow (a
+  /// coloured one is invisible on dark surfaces) + [border].
+  static List<BoxShadow> shadows(AppCardDesign d, Brightness b) =>
+      b == Brightness.light
+          ? <BoxShadow>[
+              BoxShadow(
+                color: d.colors.last.withValues(alpha: d.isLight ? 0.22 : 0.30),
+                blurRadius: 24,
+                spreadRadius: -6,
+                offset: const Offset(0, 10),
+              ),
+              const BoxShadow(
+                color: Color(0x1A000000),
+                blurRadius: 6,
+                offset: Offset(0, 2),
+              ),
+            ]
+          : const <BoxShadow>[
+              BoxShadow(
+                color: Color(0x66000000),
+                blurRadius: 16,
+                offset: Offset(0, 6),
+              ),
+            ];
+
+  /// Hairline that separates the card from the surface where the gradient
+  /// alone would not (dark cards on dark surfaces, light cards on light).
+  static Border? border(AppCardDesign d, Brightness b) {
+    if (b == Brightness.dark && !d.isLight) {
+      return Border.all(color: const Color(0x1AFFFFFF));
+    }
+    if (b == Brightness.light && d.isLight) {
+      return Border.all(color: const Color(0x1F000000));
+    }
+    return null;
+  }
+
+  /// Background decoration of a preset card (photo cards: use
+  /// [photoDecoration]).
+  static BoxDecoration decoration(AppCardDesign d, Brightness b) =>
+      BoxDecoration(
+        gradient: d.gradient,
+        borderRadius: borderRadius,
+        boxShadow: shadows(d, b),
+        border: border(d, b),
+      );
+
+  /// Background decoration of a photo card. Layer order is image (this) ->
+  /// [photoScrimFor] (a DecoratedBox with [borderRadius]) -> text. Do not use
+  /// `foregroundDecoration` for the scrim: it would paint over the text.
+  /// Decode with `ResizeImage` at the card's physical size.
+  static BoxDecoration photoDecoration(ImageProvider image, Brightness b) =>
+      BoxDecoration(
+        color: photo.colors.first,
+        image: DecorationImage(image: image, fit: BoxFit.cover),
+        borderRadius: borderRadius,
+        boxShadow: shadows(photo, b),
+        border: border(photo, b),
+      );
+
+  // ---- photo scrim (DESIGN.md §18.2.3) ----
+  /// Black alpha in the text bands. 0.58 over a pure-white pixel gives
+  /// #6B6B6B: white text 5.33:1 (AA needs alpha >= 0.535).
+  static const double scrimTextAlpha = 0.58;
+
+  /// Top edge / bottom edge alphas (a little extra for the card corners).
+  static const double scrimTopAlpha = 0.62;
+  static const double scrimBottomAlpha = 0.70;
+
+  /// Middle of the card: no text there, so the photo shows through.
+  static const double scrimMidAlpha = 0.36;
+
+  /// Flat scrim for text scale > 1.3 (text may move out of the bands).
+  /// 0.62 -> white 6.19:1 on a white pixel.
+  static const double scrimFlatAlpha = 0.62;
+
+  /// Height of the top text band (padding 20 + 36dp name row + 8 slack).
+  static const double scrimTopBand = 64;
+
+  /// Height of the bottom text band (padding 20 + 20dp last4 row + 4 gap
+  /// + 36dp balance + 8 slack).
+  static const double scrimBottomBand = 88;
+
+  /// Reference card height (310dp wide card) for [photoScrim].
+  static const double referenceHeight = 195;
+
+  /// The worst-case background under white text: a white pixel under
+  /// [scrimTextAlpha] black (sRGB blend, as Flutter composites).
+  static const Color photoWorstBackground = Color(0xFF6B6B6B);
+
+  static Color _black(double a) =>
+      Color.fromARGB((a * 255).round(), 0, 0, 0);
+
+  /// Scrim gradient (top -> bottom) for a card of [height] dp. The text
+  /// bands are fixed in dp, so the guarantee holds for any card size. If
+  /// the bands would meet, or [textScale] > 1.3, a flat scrim is returned.
+  static LinearGradient photoScrimFor(double height, {double textScale = 1}) {
+    final double t1 = scrimTopBand / height;
+    final double t2 = 1 - scrimBottomBand / height;
+    if (textScale > 1.3 || t2 - t1 < 0.12) {
+      final Color f = _black(scrimFlatAlpha);
+      return LinearGradient(
+        begin: Alignment.topCenter,
+        end: Alignment.bottomCenter,
+        colors: <Color>[f, f],
+      );
+    }
+    return LinearGradient(
+      begin: Alignment.topCenter,
+      end: Alignment.bottomCenter,
+      colors: <Color>[
+        _black(scrimTopAlpha),
+        _black(scrimTextAlpha),
+        _black(scrimMidAlpha),
+        _black(scrimTextAlpha),
+        _black(scrimBottomAlpha),
+      ],
+      stops: <double>[0, t1, (t1 + t2) / 2, t2, 1],
+    );
+  }
+
+  /// [photoScrimFor] at [referenceHeight] (stops 0 / .33 / .44 / .55 / 1).
+  static LinearGradient get photoScrim => photoScrimFor(referenceHeight);
+
+  /// Readability shadow under photo-card text. Decorative only: the AA
+  /// guarantee comes from the scrim, not from this.
+  static const List<Shadow> photoTextShadow = <Shadow>[
+    Shadow(color: Color(0x66000000), blurRadius: 4, offset: Offset(0, 1)),
+  ];
+
+  // ---- text styles on cards ----
+  /// Account balance on a card (count-up). 28sp counts as large text.
+  static const TextStyle balanceStyle = TextStyle(
+    fontSize: 28,
+    height: 36 / 28,
+    fontWeight: FontWeight.w600,
+    letterSpacing: -0.25,
+    fontFeatures: <FontFeature>[FontFeature.tabularFigures()],
+  );
+
+  /// "•••• 1234".
+  static const TextStyle last4Style = TextStyle(
+    fontSize: 14,
+    height: 20 / 14,
+    fontWeight: FontWeight.w600,
+    letterSpacing: 2,
+    fontFeatures: <FontFeature>[FontFeature.tabularFigures()],
+  );
+}
+
+// ---------------------------------------------------------------------------
+// v1.2: Home card carousel (DESIGN.md §18.1)
+// ---------------------------------------------------------------------------
+
+abstract final class AppCarousel {
+  /// `PageView(viewportFraction: ..., padEnds: false)`.
+  static const double viewportFraction = 0.86;
+
+  /// Leading inset of every page (= gutter); the gap between cards.
+  static const double pageInset = AppSpacing.lg;
+
+  /// Non-current cards scale down by distance: 1 - 0.06 * |offset|.
+  static const double inactiveScale = 0.94;
+
+  /// Space between the cards and the dots.
+  static const double dotsTop = AppSpacing.md;
+
+  /// Dots: at most this many are drawn; beyond that they scroll.
+  static const int maxVisibleDots = 7;
+  static const double dot = 6;
+  static const double dotActive = 18;
+  static const double dotGap = 6;
+
+  /// Scale of the 2nd-from-edge and edge dots when the strip scrolls.
+  static const double dotEdgeScale1 = 0.66;
+  static const double dotEdgeScale2 = 0.33;
+
+  /// Card width for a viewport of [viewportWidth].
+  static double cardWidth(double viewportWidth) =>
+      viewportWidth * viewportFraction - pageInset;
+
+  /// PageView height: the 1.586 card, grown with large text so content never
+  /// clips (all pages share this height).
+  static double height(double viewportWidth, TextScaler scaler) {
+    final double base = cardWidth(viewportWidth) / AppCardDesigns.aspectRatio;
+    final double s = scaler.scale(14) / 14;
+    return s <= 1.0 ? base : base * s.clamp(1.0, 1.6);
+  }
+}
+
+// ---------------------------------------------------------------------------
+// v1.2: floating pill navigation (DESIGN.md §18.3)
+// ---------------------------------------------------------------------------
+
+abstract final class AppNav {
+  /// Pill height (excluding the raised FAB).
+  static const double height = 64;
+
+  /// Side margin; on compact screens (< [compactBreakpoint]) it shrinks so
+  /// every tab keeps a 48dp target.
+  static const double margin = AppSpacing.lg;
+  static const double marginCompact = AppSpacing.sm;
+  static const double compactBreakpoint = 392;
+
+  /// Gap between the pill and the bottom safe-area inset.
+  static const double bottomGap = AppSpacing.md;
+
+  static const BorderRadius borderRadius = AppRadius.brFull;
+
+  /// surfaceContainer at this opacity + backdrop blur.
+  static const double opacity = 0.88;
+  static const double blurSigma = 20;
+
+  /// Centre "+" FAB: a circle that rises [fabLift] above the pill's top
+  /// edge, ringed by [fabRing] of the scaffold surface.
+  static const double fab = 56;
+  static const double fabLift = 12;
+  static const double fabRing = 4;
+
+  /// Width reserved for the FAB inside the pill.
+  static const double fabSlot = 72;
+  static const double fabSlotCompact = 56;
+
+  /// Selected-tab indicator (behind the icon).
+  static const double indicatorWidth = 48;
+  static const double indicatorHeight = 30;
+  static const double iconSize = 24;
+
+  /// How far the selected icon moves up to make room for its label.
+  static const double iconLift = 8;
+
+  /// Labels are hidden (icons + tooltip only) above this text scale.
+  static const double labelMaxTextScale = 1.3;
+
+  /// Minimum tab target width.
+  static const double minTab = AppSizes.minTouch;
+
+  static bool isCompact(double screenWidth) => screenWidth < compactBreakpoint;
+
+  static double marginFor(double screenWidth) =>
+      isCompact(screenWidth) ? marginCompact : margin;
+
+  static double fabSlotFor(double screenWidth) =>
+      isCompact(screenWidth) ? fabSlotCompact : fabSlot;
+
+  /// Distance from the screen bottom to the pill's bottom edge.
+  static double bottomOffset(BuildContext context) =>
+      MediaQuery.viewPaddingOf(context).bottom + bottomGap;
+
+  /// Bottom padding scrollables need under `extendBody: true` so the last
+  /// item clears the pill (+ 16dp breathing room).
+  static double contentInset(BuildContext context) =>
+      bottomOffset(context) + height + AppSpacing.lg;
+
+  /// Translucent pill fill. Worst case (black content behind, light theme)
+  /// keeps onSurfaceVariant at 6.07:1 and onSurface at 11.28:1.
+  static Color background(ColorScheme cs) =>
+      cs.surfaceContainer.withValues(alpha: opacity);
+
+  static List<BoxShadow> shadows(Brightness b) => b == Brightness.light
+      ? const <BoxShadow>[
+          BoxShadow(
+            color: Color(0x24000000),
+            blurRadius: 24,
+            offset: Offset(0, 8),
+          ),
+        ]
+      : const <BoxShadow>[
+          BoxShadow(
+            color: Color(0x66000000),
+            blurRadius: 24,
+            offset: Offset(0, 8),
+          ),
+        ];
+
+  /// Hairline around the pill in dark theme (surfaceContainer is close to
+  /// the content behind it).
+  static Border? border(ColorScheme cs) => cs.brightness == Brightness.dark
+      ? Border.all(color: cs.outlineVariant.withValues(alpha: 0.6))
+      : null;
+}
+
+// ---------------------------------------------------------------------------
+// v1.2: account types, transport modes, metro lines
+// ---------------------------------------------------------------------------
+
+/// Visual style of an account type, keyed by `AccountType.name`
+/// (cash, card, bank, savings, bonus).
+@immutable
+class AccountTypeStyle {
+  const AccountTypeStyle._(this.name, this.icon, this.defaultDesignId);
+
+  final String name;
+  final IconData icon;
+
+  /// Suggested card design for a new account of this type.
+  final String defaultDesignId;
+
+  bool get isBonus => name == 'bonus';
+
+  static const AccountTypeStyle cash =
+      AccountTypeStyle._('cash', Icons.payments_outlined, 'forest');
+  static const AccountTypeStyle card =
+      AccountTypeStyle._('card', Icons.credit_card, 'ocean');
+  static const AccountTypeStyle bank =
+      AccountTypeStyle._('bank', Icons.account_balance_outlined, 'midnight');
+  static const AccountTypeStyle savings =
+      AccountTypeStyle._('savings', Icons.savings_outlined, 'teal');
+  static const AccountTypeStyle bonus =
+      AccountTypeStyle._('bonus', Icons.redeem, 'gold');
+
+  static const List<AccountTypeStyle> values = <AccountTypeStyle>[
+    cash,
+    card,
+    bank,
+    savings,
+    bonus,
+  ];
+
+  /// Unknown names fall back to [card].
+  static AccountTypeStyle of(String? name) => values.firstWhere(
+        (AccountTypeStyle s) => s.name == name,
+        orElse: () => card,
+      );
+
+  static AccountTypeStyle forType(Enum type) => of(type.name);
+}
+
+/// Transport sub-modes for the "Nəqliyyat" category (DESIGN.md §18.5),
+/// keyed by name: bus, metro, taxi, train, fuel, parking, bakuCard.
+@immutable
+class TransportModeStyle {
+  const TransportModeStyle._(
+    this.name,
+    this.icon,
+    this.paletteIndex,
+    this.order, {
+    this.hasRoutes = false,
+    this.hasStations = false,
+    this.hasTrips = false,
+  });
+
+  final String name;
+  final IconData icon;
+
+  /// Index into [AppColors.categorical] (bars in the Reports card).
+  final int paletteIndex;
+  final int order;
+
+  /// Bus: searchable route list.
+  final bool hasRoutes;
+
+  /// Metro: optional station picker.
+  final bool hasStations;
+
+  /// Fixed fare × trip-count stepper (bus, metro, train).
+  final bool hasTrips;
+
+  static const TransportModeStyle bus = TransportModeStyle._(
+      'bus', Icons.directions_bus_outlined, 0, 0,
+      hasRoutes: true, hasTrips: true);
+  static const TransportModeStyle metro = TransportModeStyle._(
+      'metro', Icons.subway_outlined, 3, 1,
+      hasStations: true, hasTrips: true);
+  static const TransportModeStyle taxi =
+      TransportModeStyle._('taxi', Icons.local_taxi_outlined, 6, 2);
+  static const TransportModeStyle train = TransportModeStyle._(
+      'train', Icons.train_outlined, 5, 3,
+      hasTrips: true);
+  static const TransportModeStyle fuel =
+      TransportModeStyle._('fuel', Icons.local_gas_station_outlined, 1, 4);
+  static const TransportModeStyle parking =
+      TransportModeStyle._('parking', Icons.local_parking_outlined, 8, 5);
+  static const TransportModeStyle bakuCard =
+      TransportModeStyle._('bakuCard', Icons.add_card, 7, 6);
+
+  static const List<TransportModeStyle> values = <TransportModeStyle>[
+    bus,
+    metro,
+    taxi,
+    train,
+    fuel,
+    parking,
+    bakuCard,
+  ];
+
+  /// Unknown names fall back to [taxi] (a mode with no extra fields).
+  static TransportModeStyle of(String? name) => values.firstWhere(
+        (TransportModeStyle s) => s.name == name,
+        orElse: () => taxi,
+      );
+
+  static TransportModeStyle forMode(Enum mode) => of(mode.name);
+
+  Color color(AppColors c) => c.category(paletteIndex);
+}
+
+/// Baku Metro line colours for the station picker (DESIGN.md §18.5.3).
+/// Each is >= 3:1 on surface ... surfaceContainerLow in both themes; the
+/// line name is always shown next to the dot, and the branch is drawn as a
+/// ring, so colour is never the only cue.
+@immutable
+class MetroLineStyle {
+  const MetroLineStyle._(
+    this.name,
+    this.color,
+    this.labelAz,
+    this.labelEn, {
+    this.ring = false,
+  });
+
+  final String name;
+  final Color color;
+  final String labelAz;
+  final String labelEn;
+
+  /// Draw as a 2dp ring instead of a filled dot (branch line).
+  final bool ring;
+
+  String label(String lang) => lang == 'en' ? labelEn : labelAz;
+
+  static const MetroLineStyle red = MetroLineStyle._(
+      'red', Color(0xFFD63A2F), 'Qırmızı xətt', 'Red line');
+  static const MetroLineStyle green = MetroLineStyle._(
+      'green', Color(0xFF2B9A66), 'Yaşıl xətt', 'Green line');
+  static const MetroLineStyle greenBranch = MetroLineStyle._(
+      'greenBranch', Color(0xFF2B9A66), 'Yaşıl xətt (Xətai qolu)',
+      'Green line (Khatai branch)',
+      ring: true);
+  static const MetroLineStyle purple = MetroLineStyle._(
+      'purple', Color(0xFF9B4FC8), 'Bənövşəyi xətt', 'Purple line');
+
+  static const List<MetroLineStyle> values = <MetroLineStyle>[
+    red,
+    green,
+    greenBranch,
+    purple,
+  ];
+
+  static MetroLineStyle of(String? name) => values.firstWhere(
+        (MetroLineStyle s) => s.name == name,
+        orElse: () => red,
+      );
 }
 
 // ---------------------------------------------------------------------------

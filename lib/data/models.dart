@@ -45,6 +45,7 @@ class TxDetails {
     this.toAccount,
     this.category,
     this.holding,
+    this.linkedLoss,
   });
 
   final MoneyTx tx;
@@ -54,6 +55,22 @@ class TxDetails {
 
   /// The holding of a toHolding / fromHolding move.
   final Holding? holding;
+
+  /// Bonus-loss expense written with this transfer (same linkGroupId),
+  /// when the list grouped them (DESIGN.md §18.6.3).
+  final TxDetails? linkedLoss;
+
+  TxDetails withLinkedLoss(TxDetails? loss) => TxDetails(
+        tx: tx,
+        account: account,
+        toAccount: toAccount,
+        category: category,
+        holding: holding,
+        linkedLoss: loss,
+      );
+
+  /// Sent amount of a bonus transfer (arrived + loss).
+  int get sentAmount => tx.amount + (linkedLoss?.tx.amount ?? 0);
 
   /// "Nağd → Ev seyfi" style label for transfers and holding moves.
   String? get moveLabel => switch (tx.type) {
@@ -103,6 +120,33 @@ class DateWindow {
   int get hashCode => Object.hash(start, end);
 }
 
+/// Minutes since midnight (0..1439) of a local time, e.g. 22:00 -> 1320.
+int minuteOfDay(DateTime d) => d.hour * 60 + d.minute;
+
+/// A time-of-day window in minutes since midnight, both ends inclusive.
+/// When [from] > [to] it wraps midnight: 22:00–06:00 matches 23:15 and 05:59.
+@immutable
+class TimeOfDayRange {
+  const TimeOfDayRange(this.from, this.to)
+      : assert(from >= 0 && from < 1440),
+        assert(to >= 0 && to < 1440);
+
+  final int from;
+  final int to;
+
+  bool get wraps => from > to;
+
+  bool containsMinute(int m) => wraps ? (m >= from || m <= to) : (m >= from && m <= to);
+
+  bool contains(DateTime d) => containsMinute(minuteOfDay(d));
+
+  @override
+  bool operator ==(Object other) => other is TimeOfDayRange && other.from == from && other.to == to;
+
+  @override
+  int get hashCode => Object.hash(from, to);
+}
+
 /// Transaction list query. Value-equal so it can key a provider family.
 @immutable
 class TxFilter {
@@ -113,6 +157,9 @@ class TxFilter {
     this.window,
     this.query = '',
     this.limit,
+    this.transportMode,
+    this.routeCode,
+    this.timeOfDay,
   });
 
   /// Empty means all types.
@@ -125,12 +172,22 @@ class TxFilter {
   final String query;
   final int? limit;
 
+  /// v1.2: transport sub-mode / route code (bus) or station (metro).
+  final TransportMode? transportMode;
+  final String? routeCode;
+
+  /// v1.2: local time-of-day window (may wrap midnight).
+  final TimeOfDayRange? timeOfDay;
+
   bool get isActive =>
       types.isNotEmpty ||
       accountId != null ||
       categoryId != null ||
       window != null ||
-      query.trim().isNotEmpty;
+      query.trim().isNotEmpty ||
+      transportMode != null ||
+      routeCode != null ||
+      timeOfDay != null;
 
   TxFilter copyWith({
     List<TxType>? types,
@@ -138,6 +195,9 @@ class TxFilter {
     int? Function()? categoryId,
     DateWindow? Function()? window,
     String? query,
+    TransportMode? Function()? transportMode,
+    String? Function()? routeCode,
+    TimeOfDayRange? Function()? timeOfDay,
   }) =>
       TxFilter(
         types: types ?? this.types,
@@ -146,6 +206,9 @@ class TxFilter {
         window: window != null ? window() : this.window,
         query: query ?? this.query,
         limit: limit,
+        transportMode: transportMode != null ? transportMode() : this.transportMode,
+        routeCode: routeCode != null ? routeCode() : this.routeCode,
+        timeOfDay: timeOfDay != null ? timeOfDay() : this.timeOfDay,
       );
 
   @override
@@ -156,7 +219,10 @@ class TxFilter {
       other.categoryId == categoryId &&
       other.window == window &&
       other.query == query &&
-      other.limit == limit;
+      other.limit == limit &&
+      other.transportMode == transportMode &&
+      other.routeCode == routeCode &&
+      other.timeOfDay == timeOfDay;
 
   @override
   int get hashCode => Object.hash(
@@ -166,13 +232,68 @@ class TxFilter {
         window,
         query,
         limit,
+        transportMode,
+        routeCode,
+        timeOfDay,
       );
+}
+
+/// Rows removed together by TransactionRepository.deleteWithLinked (a
+/// transaction, its linked bonus-loss partner, and holding entries of a
+/// holding move), so undo can put all of them back.
+@immutable
+class DeletedTransactions {
+  const DeletedTransactions(this.transactions, this.entries);
+
+  final List<MoneyTx> transactions;
+  final List<HoldingEntry> entries;
+
+  /// True when more than one transaction went (a bonus transfer pair).
+  bool get isPair => transactions.length > 1;
+}
+
+/// Transport spending of a period (Reports card, DESIGN.md §18.10).
+@immutable
+class TransportReport {
+  const TransportReport({required this.byMode, required this.routes});
+
+  static const TransportReport empty =
+      TransportReport(byMode: <TransportMode, int>{}, routes: <RouteUsage>[]);
+
+  /// AZN minor units per mode, modes with spending only.
+  final Map<TransportMode, int> byMode;
+
+  /// Bus routes and metro stations, most trips first.
+  final List<RouteUsage> routes;
+
+  int get total => byMode.values.fold<int>(0, (int s, int v) => s + v);
+}
+
+@immutable
+class RouteUsage {
+  const RouteUsage({required this.mode, required this.code, required this.trips, required this.amount});
+
+  final TransportMode mode;
+  final String code;
+  final int trips;
+
+  /// AZN minor units.
+  final int amount;
 }
 
 extension TxCategoryName on TxCategory {
   String localizedName(String languageCode) =>
       languageCode == 'en' && nameEn.trim().isNotEmpty ? nameEn : nameAz;
+
+  /// The seeded "Bonus itkisi" category: never deleted, archived or budgeted.
+  bool get isSystem => specialKind == CategorySpecialKind.bonusLoss;
+
+  bool get isTransport => specialKind == CategorySpecialKind.transport;
 }
+
+/// Received amount of a bonus transfer: [sent] × [ratePercent] %, rounded
+/// half up to the qəpik (DESIGN.md §18.6.2). The loss is sent − received.
+int bonusReceived(int sent, int ratePercent) => (sent * ratePercent + 50) ~/ 100;
 
 /// `yyyy-MM` key of a month, as stored in `budgets.month`.
 String monthKey(DateTime d) =>
@@ -303,4 +424,26 @@ class NetWorth {
   final int holdings;
 
   int get total => accounts + holdings;
+}
+
+/// Folds each bonus-loss expense into the transfer it was written with
+/// (same linkGroupId, DESIGN.md §18.6.3), keeping the list order. A loss
+/// whose transfer is not in [items] (e.g. filtered out) stays on its own.
+List<TxDetails> groupBonusPairs(List<TxDetails> items) {
+  final Map<String, TxDetails> losses = <String, TxDetails>{};
+  final Set<String> transfers = <String>{};
+  for (final TxDetails t in items) {
+    final String? g = t.tx.linkGroupId;
+    if (g == null) continue;
+    if (t.tx.type == TxType.transfer) transfers.add(g);
+    if (t.tx.type == TxType.expense) losses[g] = t;
+  }
+  if (losses.isEmpty) return items;
+  return <TxDetails>[
+    for (final TxDetails t in items)
+      if (t.tx.linkGroupId case final String g? when t.tx.type == TxType.transfer && losses.containsKey(g))
+        t.withLinkedLoss(losses[g])
+      else if (!(t.tx.type == TxType.expense && t.tx.linkGroupId != null && transfers.contains(t.tx.linkGroupId)))
+        t,
+  ];
 }

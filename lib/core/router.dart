@@ -17,7 +17,9 @@ import '../features/lock/pin_flow_screen.dart';
 import '../features/reports/reports_screen.dart';
 import '../features/settings/appearance_screen.dart';
 import '../features/settings/exchange_rates_screen.dart';
+import '../features/settings/settings_controller.dart';
 import '../features/settings/settings_screen.dart';
+import '../features/settings/transport_fares_screen.dart';
 import '../features/shell/app_shell.dart';
 import '../features/transactions/transaction_edit_screen.dart';
 import '../features/transactions/transactions_screen.dart';
@@ -35,6 +37,7 @@ abstract final class Routes {
   static const String rates = '/rates';
   static const String appearance = '/appearance';
   static const String export = '/export';
+  static const String transportFares = '/transport-fares';
 
   static const String holdings = '/holdings';
   static const String newHolding = '/holdings/new';
@@ -50,8 +53,11 @@ abstract final class Routes {
       '/categories/new?type=${type.name}';
   static String editCategory(int id) => '/categories/$id';
 
-  static String newTransaction([TxType type = TxType.expense]) =>
-      '/transaction/new?type=${type.name}';
+  static String newTransaction([TxType type = TxType.expense, int? accountId]) =>
+      '/transaction/new?type=${type.name}${accountId == null ? '' : '&account=$accountId'}';
+
+  /// Add screen pre-filled from transaction [id], dated now ("Təkrarla").
+  static String duplicateTransaction(int id) => '/transaction/new?duplicate=$id';
   static String editTransaction(int id) => '/transaction/$id';
 
   /// Returns `true` via `pop` when the flow completed.
@@ -65,6 +71,11 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
   final GoRouter router = GoRouter(
     navigatorKey: rootNavigatorKey,
     initialLocation: Routes.home,
+    // Budgets switched off: the tab is hidden and deep links go Home.
+    redirect: (BuildContext context, GoRouterState state) =>
+        state.uri.path == Routes.budgets && !ref.read(settingsProvider).budgetsEnabled
+            ? Routes.home
+            : null,
     routes: <RouteBase>[
       StatefulShellRoute.indexedStack(
         builder: (BuildContext context, GoRouterState state,
@@ -114,7 +125,11 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
           return _slideUp(
             context,
             state,
-            TransactionEditScreen(initialType: type),
+            TransactionEditScreen(
+              initialType: type,
+              initialAccountId: int.tryParse(state.uri.queryParameters['account'] ?? ''),
+              duplicateOf: int.tryParse(state.uri.queryParameters['duplicate'] ?? ''),
+            ),
           );
         },
       ),
@@ -217,6 +232,11 @@ final Provider<GoRouter> routerProvider = Provider<GoRouter>((Ref ref) {
         parentNavigatorKey: rootNavigatorKey,
         path: Routes.export,
         builder: (_, _) => const ExportScreen(),
+      ),
+      GoRoute(
+        parentNavigatorKey: rootNavigatorKey,
+        path: Routes.transportFares,
+        builder: (_, _) => const TransportFaresScreen(),
       ),
       GoRoute(
         parentNavigatorKey: rootNavigatorKey,

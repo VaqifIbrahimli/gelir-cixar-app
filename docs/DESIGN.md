@@ -8,6 +8,10 @@ The implementation lives in `lib/core/theme.dart`: `AppTheme.light`, `AppTheme.d
 
 > **v1.1** (2026-10-28) is specified in §9–§17 at the end of this file. Where v1.1 changes a
 > v1.0 value, the v1.0 table below shows the new value with the old one in brackets.
+>
+> **v1.2** (2026-10-31) is specified in §18: Home card carousel, card designs, floating nav,
+> time, transport, bonus accounts, lock timeout, budgets switch, double-back exit. §18
+> overrides §6.1, §6.8, §7.2 and §13.1/§13.2 where they conflict.
 
 ---
 
@@ -1408,3 +1412,831 @@ PIN                                     Avtomatik məzənnə
 | `AppSharedAxisPageTransitionsBuilder`, `AppFadeThroughPageTransitionsBuilder` | Respect reduced motion |
 | `AppHaptics.key / pinDigit / confirm / error / longPress` | §11.5 |
 | `AppDurations` | Unchanged (fast / normal / slow) |
+
+---
+
+# v1.2: Card carousel, floating nav, transport, bonus accounts
+
+Date: 2026-10-31. Everything in §1–§17 still applies unless a section below overrides it.
+All new tokens live in `lib/core/theme.dart` (new symbols only; no existing API changed).
+
+## 18. v1.2
+
+### 18.0 Changelog and decisions
+
+| # | Change | Why |
+|---|---|---|
+| 1 | The balance card (§13.2) and the account strip (§7.2) are replaced by **one carousel** of 1.586 cards: totals card first, then one card per account, then an "add account" card | One swipeable object instead of two stacked blocks. Each account gets an identity (colour or photo) that carries into its detail screen |
+| 2 | The month income/expense tiles move off the hero card into a compact **"Bu ay" strip** under the carousel | They do not fit on a 1.586 card next to three totals, and they are period data, not balances |
+| 3 | 10 preset card gradients + user photo. On-card text is checked against **both** gradient stops; the photo gets a black scrim with bands measured in dp | Contrast must hold for every pixel the text can land on (§18.2) |
+| 4 | Floating pill nav with an **integrated, raised centre "+"** (not notched). The FAB is visible on every tab | A notch needs a custom clip path on a translucent, blurred pill. A raised circle with a surface-coloured ring looks the same and is a plain Stack |
+| 5 | The selected tab shows its label; unselected tabs are icon-only. The label may use the free width of its half of the bar | "Əməliyyatlar" (≈ 75dp at 12sp) cannot fit a 48dp slot |
+| 6 | The nav **stays put** on scroll (no hide-on-scroll) | §18.3.6 |
+| 7 | Tapping an account card opens the account's transactions; long-press opens card actions | Mirrors the v1.0 account detail (§7.5) |
+| 8 | Transport sub-picker, fares, bonus-loss pair, lock timeout sheet, budgets switch, double-back exit | Feature requests for v1.2 |
+| 9 | Budgets nav icon unchanged (`savings`). The `savings` account type uses `savings_outlined`; the two never appear side by side | Avoids breaking muscle memory |
+| 10 | Tapping a transaction tile opens a **detail sheet** instead of the edit screen | It shows date, time and "added at"; Edit is one tap away |
+
+Data the builder needs (names are suggestions):
+- `Account.cardDesignId` (String). The default comes from `AccountTypeStyle.defaultDesignId`
+  or `AppCardDesigns.forIndex(n)`.
+- `Account.cardPhotoPath`.
+- `Account.cardLast4` (String? of exactly 4 digits).
+- `Account.bonusRatePercent` (int 1–100, bonus type only) and `AccountType.bonus`.
+- `Tx.createdAt` / `Tx.updatedAt`, `Tx.transportMode`, `Tx.routeId`, `Tx.stationId`,
+  `Tx.trips`, `Tx.linkedLossId`.
+- `Settings.budgetsEnabled` (default true) and `Settings.autoLockSeconds` (default 60).
+
+---
+
+### 18.1 Home card carousel
+
+#### 18.1.1 Home layout (v1.2)
+```
+┌──────────────────────────────────────────────┐
+│ Sabahınız xeyir                              │  large app bar (unchanged, §13.6)
+│ Cümə, 31 oktyabr                             │
+│ ┌──────────────────────────────┐┌───        │  PageView, viewportFraction 0.86,
+│ │ Xərclənə bilən balans     👁 ││ (💳)       │  padEnds: false, 16dp page inset (start);
+│ │ 3 210,75 ₼                   ││ Kapit     │  the next card peeks ≈ 34dp at 360dp width
+│ │                              ││           │
+│ │ ▣ Kənarda      Σ Ümumi sərvət││ 2 100     │  card 293.6 × 185 at 360dp
+│ │ 4 500,00 ₼  ›  7 710,75 ₼    ││ AZN       │
+│ └──────────────────────────────┘└───        │
+│ ━━ • • • •                       Hamısı ›    │  dots (start) + TextButton → Accounts
+│ ┌ Bu ay · Oktyabr ▾ ──────────────────────┐  │  "Bu ay" strip (18.1.6)
+│ │ ↓ + 1 850,00 ₼        ↑ − 1 120,40 ₼    │  │
+│ └─────────────────────────────────────────┘  │
+│ ┌ Bu həftə ─────────── 312,40 ₼ ┐            │  §13.3 (unchanged)
+│ ┌ Büdcə ──────────── Hamısı › ──┐            │  §13.4; hidden when budgets are off (18.8)
+│ ┌ Kənar yerlər ───── Hamısı › ──┐            │  §13.5
+│ Son əməliyyatlar                 Hamısı ›    │
+│ tile · tile · tile · tile · tile             │
+│                                              │  bottom padding = AppNav.contentInset
+└──────────────────────────────────────────────┘
+   ╭───────────────(+)───────────────╮           floating nav (18.3)
+```
+The v1.1 `AccountStrip` is removed from Home. The "Hesablar" section header is replaced by the
+"Hamısı ›" button on the dots row.
+
+#### 18.1.2 Geometry (`AppCarousel`, `AppCardDesigns`)
+
+| Token | Value | Notes |
+|---|---|---|
+| `AppCarousel.viewportFraction` | 0.86 | `PageView(controller: PageController(viewportFraction: 0.86), padEnds: false)` |
+| `AppCarousel.pageInset` | 16 | Each page is `Padding(left: 16)`. The first card lines up with the gutter, and cards are 16 apart |
+| Card width | `AppCarousel.cardWidth(w)` = w × 0.86 − 16 | 360 → 293.6; 411 → 337.5 |
+| Card height | width / `AppCardDesigns.aspectRatio` (1.586) | 360 → 185; 411 → 213 |
+| PageView height | `AppCarousel.height(w, textScaler)` | Grows with text scale, ×1.0 … ×1.6, so nothing clips at 200 % |
+| Radius | `AppRadius.card` = 20 (`brCard`) | Between `lg` 16 and `xl` 24, so it reads as a physical card |
+| Padding | 20 on all sides (`AppCardDesigns.padding`) | |
+| Elevation | `AppCardDesigns.elevation` = 6 (nominal) → `shadows(design, brightness)` | Light: tinted shadow (end colour @ 30 %, blur 24, y 10, spread −6) + key shadow (black 10 %, blur 6, y 2). Dark: black 40 %, blur 16, y 6, plus a hairline `border()` |
+| Inactive scale | 1 − 0.06 × \|page − index\| (min 0.94) | Driven by `controller.page`, so it follows the finger |
+| Dots | 6dp; active pill 18 × 6; gap 6; max 7 visible | `onSurfaceVariant @ 38 %` / `primary`. Edge dots scale to 0.66 and 0.33 when the strip scrolls |
+
+#### 18.1.3 Card 0: totals card
+```
+┌──────────────────────────────────────┐  AppColors.balanceGradient (unchanged: hand-tuned
+│ Xərclənə bilən balans             👁 │  teal, or derived from the scheme primary, §12.5)
+│ 3 210,75 ₼                           │  amountHero onBalanceCard, count-up, FittedBox
+│ [Mənfi balans]                       │  only if < 0 (dangerContainer pill)
+│                                      │  flexible space
+│ ▣ Kənarda          Σ Ümumi sərvət    │  labelMedium onBalanceCardVariant
+│ 4 500,00 ₼    ›    7 710,75 ₼        │  amountSecondary balanceHolding / onBalanceCard
+└──────────────────────────────────────┘
+```
+- The two bottom metrics sit side by side (`Expanded` each, 8dp gap). The "Kənarda" block is an
+  InkWell at least 48dp tall that opens `/holdings`.
+- With no holdings, the bottom row is a single row "＋ Kənar yer əlavə et" in
+  `onBalanceCardVariant`, and net worth is hidden (the §13.2 rule).
+- The eye toggle masks the totals card **and** every account card balance. It is one setting.
+- Tapping the card body does nothing, because the card has no single destination. The eye and
+  the Kənarda block are the tap targets. All colours and ratios are the v1.1 ones (§2.4, §12.5).
+
+#### 18.1.4 Account card
+```
+┌──────────────────────────────────────┐  AppCardDesigns.byId(account.cardDesignId)
+│ (💳) Kapital Kart        [Bonus 50%] │  32dp circle (design.overlay) + 18dp type icon in onCard;
+│                                      │  name titleMedium onCard, 1 line, ellipsis;
+│                                      │  badge on bonus accounts only
+│                                      │
+│ 2 100,00                             │  AppCardDesigns.balanceStyle (28/36) onCard, count-up
+│ AZN                    •••• 1234     │  labelMedium onCardVariant · last4Style onCardVariant
+└──────────────────────────────────────┘
+```
+- **Type icon**: `AccountTypeStyle.forType(account.type).icon`. Cash is `payments_outlined`,
+  card `credit_card`, bank `account_balance_outlined`, savings `savings_outlined`, bonus
+  `redeem`.
+- **Balance**: the number only, in `balanceStyle`. The currency code sits in the bottom row so
+  the big number stays short. For a foreign currency the bottom row reads "USD · ≈ 204,00 ₼".
+- **Negative balance**: a "−" prefix (U+2212) plus a 20dp `dangerContainer` pill "Mənfi" after
+  the currency code. The balance stays `onCard`, because red text on a coloured card cannot be
+  guaranteed to pass AA.
+- **Masked**: "•••••" with no count-up. `•••• 1234` stays visible: it is the user's own label,
+  and FLAG_SECURE already covers screenshots.
+- **cardLast4**: shown only when set. Exactly 4 digits, in `last4Style` (tabular,
+  letter-spacing 2).
+- **Bonus badge**: a pill, 22 high with 8 horizontal padding, `AppRadius.brFull`, labelSmall
+  w600, in `design.badge` / `design.onBadge`. This is a fixed pair: 10.84:1 on dark cards and
+  12.74:1 on light cards and photos. The text "Bonus 50%" comes from `bonusRatePercent`.
+- **Text zones** (needed for the photo scrim, 18.2.3): small text goes only in the top 64dp and
+  the bottom 88dp. The 28sp balance sits inside the bottom band. Nothing is drawn in the
+  middle.
+
+#### 18.1.5 Last page: "add account"
+Same size as a card. `surfaceContainerLow` fill, a 1dp `outlineVariant` border, radius 20 and
+no shadow. A centred `add_circle_outline` (32, `primary`) sits above "Hesab əlavə et"
+(titleMedium, `primary`). It opens the new-account route.
+
+#### 18.1.6 "Bu ay" strip
+A `HomeCard`-style row (surfaceContainerLow, radius 16, padding 12/16).
+- Header: "Bu ay · Oktyabr ▾" in titleSmall. Tapping it opens the v1.1 month picker sheet.
+- Below it, two halves: "↓ + 1 850,00 ₼" in `income` and "↑ − 1 120,40 ₼" in `expense`
+  (amountTile). These colours pass AA on surfaces (§2.4).
+- A month change uses fade through. The eye toggle masks both amounts.
+
+#### 18.1.7 Behaviour
+| Action | Result |
+|---|---|
+| Swipe | Standard `PageScrollPhysics`. Haptic `key()` when a new page settles |
+| Tap an account card | Push the account detail / transactions route (`Routes.account(id)`), shared axis X |
+| Long-press an account card | Bottom sheet: "Əməliyyat əlavə et" (account prefilled) · "Köçürmə et" (source prefilled) · "Kart dizaynını dəyiş" · "Düzəliş et". Haptic `AppHaptics.longPress()` |
+| Tap a dot | `animateToPage` (`AppMotion.carouselPage`, `emphasized`) |
+| "Hamısı ›" | Push the Accounts list |
+| Cold start | Page 0 (totals). Tab switches keep the page (`PageStorageKey('home.cards')`) |
+| Account added | Animate to its card once, after the route pops |
+| Account archived or deleted | Its card is removed. If it was the current page, go to the previous one |
+
+**Order:** the totals card, then accounts in the user's sort order (archived ones excluded),
+then the add card.
+
+**1 account:** 3 pages (totals, account, add), so the dots show 3. On page 0 the peek of the
+account card tells the user the strip swipes.
+
+**15 accounts:** 17 pages.
+- The dots scroll: 7 are visible and the active dot stays in the middle three. The outermost
+  dot scales to 0.33 and the next one to 0.66, so the user can see there is more.
+- "Hamısı ›" is the fast path to a list.
+- Count-up runs only the first time a card settles in a session, so fast flicking never queues
+  15 animations.
+
+#### 18.1.8 Reduced motion
+| Animation | With reduced motion |
+|---|---|
+| Inactive card scale | Off (all cards at 1.0) |
+| Dot tap | `jumpToPage` |
+| Count-up | Final value |
+| Dot width change | Instant |
+| Swiping | Unchanged: it is user-driven, not an animation |
+
+#### 18.1.9 Semantics
+- Each card is one merged node, e.g. "Kart hesabı, Kapital Kart, 2 100 manat, kart sonu 1234,
+  bonus 50 faiz. Kart 2 / 17. Düymə". The long-press actions are exposed as
+  `customSemanticsActions`.
+- The totals card keeps its three separate row labels (§17.2).
+- The dots are wrapped in `ExcludeSemantics`; the position is in the card label instead.
+- PageView provides the scroll left/right actions for TalkBack.
+
+---
+
+### 18.2 Card designs
+
+#### 18.2.1 Picker (account add/edit screen, section "Kart dizaynı")
+```
+┌ Kart dizaynı ─────────────────────────────┐
+│ ┌──────────────────────────────────────┐  │  live preview at full card size
+│ │ (💳) Kapital Kart                    │  │
+│ │ 2 100,00                             │  │
+│ │ AZN                    •••• 1234     │  │
+│ └──────────────────────────────────────┘  │
+│ [▰][▰][▰][▰][▰][▰][▰][▰][▰][▰][📷]       │  56×36 mini cards, radius 8, gap 8, scrolls
+│ Firuzəyi                                  │  name of the selected one, bodySmall
+│ Kartın son 4 rəqəmi  [ 1234 ]             │  digits only, maxLength 4, optional
+│ Yalnız son 4 rəqəm. Tam kart nömrəsini    │  helper bodySmall onSurfaceVariant
+│ heç vaxt daxil etməyin.                   │
+└───────────────────────────────────────────┘
+```
+- Selected mini card: a 3dp `primary` ring with a 2dp gap and a ✓ in `onCard`. Semantics:
+  "Okean, seçilib".
+- 📷 tile (`add_photo_alternate_outlined`):
+  1. Open the gallery picker.
+  2. Crop to 1.586 (pan and zoom in an `InteractiveViewer` fixed to the card frame).
+  3. Store a JPEG copy, longest side 1200px, in the app documents directory.
+  4. Then show the "Şəkli dəyiş" and "Şəkli sil" text buttons.
+- Card number: **never** ask for more than the last 4 digits.
+
+#### 18.2.2 Presets (`AppCardDesigns.presets`) and contrast
+The values are the same in light and dark themes, because a card is a physical object. Ratios
+are WCAG 2.x, measured against **both** stops. 21 interior samples of each gradient were also
+checked, and none goes below the lighter stop.
+
+| id | az / en | Stops (TL → BR) | onCard | onCard vs start / end | onCardVariant | Variant vs start / end | Worst | Badge pair |
+|---|---|---|---|---|---|---|---|---|
+| `teal` (default) | Firuzəyi / Teal | `#004E52` → `#00777D` | `#FFFFFF` | 9.50 / 5.34 | `#E0F7F8` | 8.51 / 4.79 | 4.79 | 10.84 |
+| `ocean` | Okean / Ocean | `#0B3A82` → `#1D63BF` | `#FFFFFF` | 10.81 / 5.85 | `#DCEAFF` | 8.89 / 4.81 | 4.81 | 10.84 |
+| `midnight` | Gecə / Midnight | `#14183D` → `#33398F` | `#FFFFFF` | 17.10 / 9.89 | `#D9DBFF` | 12.65 / 7.31 | 7.31 | 10.84 |
+| `plum` | Gavalı / Plum | `#3E1046` → `#83358F` | `#FFFFFF` | 15.36 / 7.31 | `#F5D9FA` | 11.84 / 5.64 | 5.64 | 10.84 |
+| `sunset` | Qürub / Sunset | `#7A1838` → `#B8431F` | `#FFFFFF` | 10.42 / 5.44 | `#FFEDE6` | 9.18 / 4.79 | 4.79 | 10.84 |
+| `forest` | Meşə / Forest | `#0E3A2B` → `#23714F` | `#FFFFFF` | 12.66 / 5.92 | `#D9F0E4` | 10.57 / 4.94 | 4.94 | 10.84 |
+| `graphite` | Qrafit / Graphite | `#1E2227` → `#4A525C` | `#FFFFFF` | 15.99 / 7.92 | `#DCE1E7` | 12.16 / 6.02 | 6.02 | 10.84 |
+| `onyx` | Qara / Onyx | `#0A0A0C` → `#2C2C33` | `#FFFFFF` | 19.78 / 13.86 | `#D4D4DA` | 13.40 / 9.39 | 9.39 | 10.84 |
+| `gold` | Qızılı / Gold | `#F3D98E` → `#C9A24A` | `#2A1C00` | 11.96 / 6.92 | `#3D2C00` | 9.70 / 5.61 | 5.61 | 12.74 |
+| `platinum` | Gümüşü / Platinum | `#EEF1F4` → `#B7C0CA` | `#14181C` | 15.74 / 9.69 | `#353D45` | 9.72 / 5.99 | 5.99 | 12.74 |
+
+- **Every on-card text colour passes AA (≥ 4.5:1) on every preset.** The tightest are the teal
+  and sunset variants at 4.79. Do not lighten those end stops.
+- Badge: dark cards use a `#FFE08A` fill with `#3D2800` text (10.84). Light cards invert it
+  (`#2B1D00` / `#FFE08A`, 12.74). The pair is fixed, so the card behind it does not matter.
+- Inner type-icon circle (`design.overlay`): black 16 % on dark cards, white 20 % on light
+  cards. Both move the background *away* from the text colour, so contrast can only go up.
+- Card edge against the page (not a text requirement, but it helps the shape read):
+
+| Card group | Light theme (vs `#F8FAF9`) | Dark theme (vs `#0F1416`) | Treatment |
+|---|---|---|---|
+| 8 dark presets | 9.06 – 18.87 | 1.34 – 3.48 | Dark theme adds `border()`: 1dp white 10 %, plus a black shadow |
+| gold, platinum | 2.29 / 1.76 | 13.36 / 16.36 | Light theme adds `border()`: 1dp black 12 %, plus the tinted shadow |
+
+- **Do not** put green/red income/expense text on cards. Card balances are always `onCard` with
+  a sign; semantic colour stays on the surfaces.
+
+#### 18.2.3 Photo background and scrim (`AppCardDesigns.photo`, `photoScrimFor`)
+Layer order, bottom to top:
+1. The image (`photoDecoration`, `BoxFit.cover`, decoded with `ResizeImage` at the card's
+   physical size).
+2. The scrim: `DecoratedBox(gradient: photoScrimFor(h))`, clipped to `brCard`.
+3. The text.
+
+Text on photos is **always white** (`onCardVariant` is white too). `photoTextShadow` is added
+as a decorative extra.
+
+**Why these numbers.** Flutter blends in sRGB: black at alpha *a* over a channel value *c*
+gives *c·(1−a)*. The worst photo pixel for white text is pure white (c = 1), which leaves a grey
+of (1−a). White text needs that grey's relative luminance to be ≤ 0.183 for 4.5:1.
+
+| Black alpha over a white pixel | Result | White text | Passes |
+|---|---|---|---|
+| 0.30 | `#B2B2B2` | 2.12 | — |
+| 0.36 (middle, no text) | `#A3A3A3` | 2.5 | — |
+| 0.42 | `#949494` | 3.03 | large text (≥ 24sp) only |
+| 0.45 | `#8C8C8C` | 3.36 | large text only |
+| 0.535 | `#767676` | 4.50 | AA threshold |
+| **0.58 (text bands)** | `#6B6B6B` | **5.33** | AA, with ~0.8 headroom |
+| 0.62 (top edge, flat mode) | `#616161` | 6.19 | AA |
+| 0.70 (bottom edge) | `#4D4D4D` | 8.45 | AAA |
+
+**Gradient (top → bottom).** The bands are in dp, so the guarantee holds for any card height.
+
+| Position | Alpha | Why |
+|---|---|---|
+| 0 | 0.62 | Top edge, above the name row |
+| `64 / h` (end of the top band) | 0.58 | Name, type icon and badge sit in 20…56dp |
+| Midpoint between the bands | 0.36 | No text here, so the photo shows through |
+| `1 − 88 / h` (start of the bottom band) | 0.58 | Balance (28sp) and the last4/currency row |
+| 1 | 0.70 | Bottom edge |
+
+- At h = 185 (360dp screen) the stops are 0 / .35 / .43 / .52 / 1. At the 195 reference height
+  they are 0 / .33 / .44 / .55 / 1 (`AppCardDesigns.photoScrim`).
+- `photoScrimFor` returns a flat 0.62 scrim (6.19:1) when either:
+  - the two bands would come within 12 % of each other (a very small card), or
+  - `textScale > 1.3` (text may leave the bands).
+
+So white text over any photo is **≥ 5.33:1** inside the bands. 0.58 is used instead of the
+0.535 minimum to leave room for anti-aliasing and JPEG ringing. The 45–50 % scrim from the
+brief would only cover large text (3.36–3.95:1). The bonus badge keeps its fixed pair. If the
+photo file is missing, the card falls back to the `graphite` gradient with a small
+`broken_image_outlined` icon in the corner.
+
+---
+
+### 18.3 Floating pill navigation (`AppNav`)
+
+#### 18.3.1 Anatomy
+```
+                        ╭────╮
+                        │ ＋ │  56dp primary circle, `add` icon in onPrimary,
+ ╭──────────────────────┤    ├───────────────────────────╮ 4dp ring in `surface`, lifted 12dp
+ │  ▐🏠▌      🧾         ╰────╯   📊      🐷       ⚙     │  pill 64dp, radius full
+ │ Ana səhifə                                            │  surfaceContainer @ 88 % + blur σ 20
+ ╰────────────────────────────────────────────────────────╯
+ ←16→                                                 ←16→   margins (8 below 392dp)
+                              ↕ 12 + viewPadding.bottom
+```
+
+| Token | Value |
+|---|---|
+| `AppNav.height` | 64 |
+| `margin` / `marginCompact` | 16 / 8 (screens narrower than `compactBreakpoint`, 392dp) |
+| `bottomGap` | 12, added to `MediaQuery.viewPaddingOf(context).bottom` (see `bottomOffset`) |
+| `borderRadius` | full |
+| Fill | `AppNav.background(cs)` = `surfaceContainer` @ 0.88, behind a `BackdropFilter(ImageFilter.blur(σ 20))` clipped to the pill |
+| Shadow | Light: black 14 %, blur 24, y 8. Dark: black 40 %, blur 24, y 8, plus a 1dp `outlineVariant @ 60 %` hairline (`AppNav.border`) |
+| FAB | 56dp circle, `primary` / `onPrimary`, 24dp icon. Lifted `fabLift` (12) above the pill's top edge, with a `fabRing` (4dp) in `cs.surface`; same shadow as the pill |
+| FAB slot | 72 (compact 56), reserved in the middle of the pill |
+| Indicator | 48 × 30, radius full, `primaryContainer`; filled icon in `onPrimaryContainer` |
+| Unselected icon | 24, outlined variant, `onSurfaceVariant` |
+| Selected label | labelMedium (12/16 w600), `onSurface`, 1 line, ellipsis |
+| Widget height (for Scaffold) | `fabLift + height + bottomOffset`. Floating SnackBars then sit above it automatically |
+| Scroll inset | `AppNav.contentInset(context)` = bottomOffset + 64 + 16. It replaces the v1.1 `SizedBox(96)` on Home |
+
+The shell uses `Scaffold(extendBody: true, bottomNavigationBar: AppFloatingNav(...))` and drops
+`floatingActionButton`. The FAB opens Add Transaction from **every** tab: it is part of the bar
+now, and "add" is never the wrong action. Tooltip and semantics: "Əməliyyat əlavə et".
+
+#### 18.3.2 Layout algorithm
+1. The pill width is P = screen − 2 × margin. The FAB slot F sits in the exact centre.
+2. Each half, (P − F) / 2 wide, holds its tabs in equal slots:
+   - left: [Ana səhifə, Əməliyyatlar];
+   - right: [Hesabatlar, Büdcələr, Ayarlar] with 5 tabs, or [Hesabatlar, Ayarlar] with 4.
+3. Every slot must be at least 48dp wide.
+   - 360dp with 5 tabs: P 344, F 56 → halves of 144 → right slots 3 × 48 ✓, left 2 × 72.
+   - 411dp with 5 tabs: P 379, F 72 → halves of 153.5 → right 51.2, left 76.8.
+4. The FAB stays at the geometric centre in both modes. With 5 tabs the left icons are spaced
+   wider than the right ones. That is deliberate: thumb memory for "+" matters more than equal
+   spacing, and uneven spacing is the unavoidable result of 2 + 3.
+
+| Screen | Tabs | Margin | FAB slot | Left slot | Right slot |
+|---|---|---|---|---|---|
+| 360 | 5 | 8 | 56 | 72 | 48 |
+| 360 | 4 | 8 | 56 | 72 | 72 |
+| 411 | 5 | 16 | 72 | 76.8 | 51.2 |
+| 411 | 4 | 16 | 72 | 76.8 | 76.8 |
+
+#### 18.3.3 Labels: selected tab only
+- **Unselected:** the icon is centred vertically in the 64dp pill. There is no visible label,
+  but there is a `Tooltip` and a full semantic label ("Hesabatlar, tab, 3 / 5").
+- **Selected:** the indicator and icon move up by `iconLift` (8dp), so the indicator top is at
+  y 9, and the label fades in below (y 41–57).
+- The label is centred under its icon, then **clamped inside its half** of the bar: at least
+  8dp from the half's edges and never over the FAB slot. Its maximum width is half − 16 (at
+  least 128dp). "Əməliyyatlar" (≈ 75dp) and "Hesabatlar" (≈ 66dp) fit with no ellipsis, and so
+  do the English labels.
+- When `textScaler.scale(1) > AppNav.labelMaxTextScale` (1.3), no labels are shown. The
+  indicator and the filled icon carry the selection, and the tooltip carries the name.
+
+#### 18.3.4 5 tabs vs 4 tabs
+- Budgets on: 5 tabs (2 + "+" + 3). Budgets off: 4 tabs (2 + "+" + 2, fully symmetric).
+- Keep the `StatefulShellRoute` branches fixed at 5. The shell maps the visible tab index to the
+  branch index, so turning budgets off never re-creates the other branches.
+- When the switch changes, the right half animates: the Budgets slot shrinks to 0 width and
+  fades out (`AppMotion.navLabel`, `emphasized`). With reduced motion it is instant.
+
+#### 18.3.5 Safe area, keyboard, gestures
+- With gesture navigation (≈ 24dp inset) the pill's bottom edge sits 36dp up. With 3-button
+  navigation (48dp) it sits 60dp up.
+- The pill never sits inside the system gesture area. Use `viewPadding`, not `padding`, so the
+  offset does not jump when the keyboard opens.
+- With the keyboard open, the bar stays under the keyboard (the Scaffold default). Tab screens
+  with text fields (Transactions search) pad their results by `viewInsets.bottom`.
+- Landscape or width ≥ 600dp: the pill is at most 480 wide, centred.
+
+#### 18.3.6 Scroll behaviour: **stays put**
+Decision: no hide-on-scroll. Reasons:
+1. "+" is the most used control in the app. Hiding it while people scroll their list turns
+   adding a transaction into a two-step action.
+2. A hiding bar changes the visible viewport and moves floating snackbars ("Geri al") while the
+   user is trying to tap them.
+3. The pill is translucent and floating, so content stays visible behind it, and
+   `contentInset` lets the last row scroll clear of it.
+4. It is one less animation to handle for reduced motion.
+
+#### 18.3.7 Contrast, including dynamic colour
+- **Worst case:** pure black content behind the pill in the light theme, pure white in the dark
+  theme, blended in sRGB at 88 %. Blur only averages, so real backdrops score higher.
+- **"M3" columns:** neutral tones of the M3 roles (surfaceContainer tone 94 / 12,
+  onSurfaceVariant 30 / 80, onSurface 10 / 90, primary 40 / 80, primaryContainer 90 / 30).
+  WCAG depends only on luminance, so these hold for any seed or wallpaper (the §12.4 argument).
+
+| Pair | Teal light | Teal dark | M3 any hue, light | M3 any hue, dark | Needed |
+|---|---|---|---|---|---|
+| Unselected icon `onSurfaceVariant` on the pill | 6.07 | 6.58 | 6.08 | 6.66 | 3.0 |
+| Selected label `onSurface` on the pill | 11.32 | 8.79 | 11.28 | 8.78 | 4.5 |
+| Selected icon `onPrimaryContainer` on the indicator | 13.18 | 7.23 | 13.30 | 7.17 | 3.0 |
+| FAB icon `onPrimary` on `primary` | 6.47 | 7.61 | 6.48 | 7.73 | 3.0 |
+| FAB `primary` vs the worst-case pill | 4.29 | 6.55 | 5.59 | 9.65 | 3.0 |
+
+Opacity 0.85 still passes (onSurfaceVariant 5.66 / 5.98). Do not go below 0.80.
+
+---
+
+### 18.4 Date and time
+
+#### 18.4.1 Add / edit transaction
+```
+│  📅 Bu gün ▾     🕐 14:32 ▾        📝 Qeyd   │  two ActionChips + the note chip, 48dp targets
+```
+- **Date chip:** `calendar_today_outlined`, labelled "Bu gün", "Dünən", "28 okt" (current year)
+  or "28 okt 2025". Tap → `showDatePicker`.
+- **Time chip:** `schedule`, labelled `HH:mm`. Tap → `showTimePicker(initialEntryMode: dial)`,
+  wrapped in `MediaQuery(alwaysUse24HourFormat: true)` in both languages. The app always shows
+  24-hour time.
+- A new transaction takes the current time when the screen opens (it does not keep ticking).
+  Changing the date keeps the time. Editing keeps the stored time.
+- Semantics: "Tarix: bu gün, düymə", "Saat: 14:32, düymə".
+
+#### 18.4.2 Tiles
+The §6.2 time line stays and is made consistent: `HH:mm` in bodySmall `onSurfaceVariant` under
+the amount, with tabular figures. The day headers already carry the date.
+
+#### 18.4.3 Transaction detail sheet (tap on any tile)
+v1.2 changes a tile tap from "open edit" to "open details". Edit is one tap further.
+```
+┌ ─── (drag) ──────────────────────────────────┐
+│ (●🚌) Nəqliyyat                  − 1,20 ₼    │  40dp avatar, titleLarge, amountDetail
+│       [🚌 65 ×2]                             │  transport chip (18.5.5), if any
+│ ─────────────────────────────────────────── │
+│ Tarix          Cümə, 31 oktyabr 2026         │  48dp rows: labelMedium onSurfaceVariant /
+│ Saat           08:14                         │  bodyLarge onSurface; columns 120 / flex
+│ Hesab          Kapital Kart                  │
+│ Marşrut        65 · Xırdalan – 28 May        │
+│ Qeyd           İşə                           │
+│ ─────────────────────────────────────────── │
+│ Əlavə edilib: 31 okt 2026, 08:16             │  bodySmall onSurfaceVariant
+│ Dəyişdirilib: 31 okt 2026, 09:02             │  only if updatedAt − createdAt > 60 s
+│ [ Sil ]   [ Təkrarla ]   [  Düzəliş et  ]    │  Text (danger) · Outlined · Filled, 48dp
+└──────────────────────────────────────────────┘
+```
+- "Təkrarla" opens Add with every field copied and the date/time set to now.
+- Transfers and holding moves show their own rows (Haradan / Haraya). A bonus pair shows both
+  the transfer and the loss (18.6).
+
+---
+
+### 18.5 Transport picker
+
+#### 18.5.1 When and where
+The picker is shown on the Add/Edit screen when the selected category has
+`specialKind == transport`. It appears under the account and category selectors with
+`AnimatedSize` (`AppMotion.reveal`, 250ms). If the category changes, it disappears and its
+values are not saved.
+
+#### 18.5.2 Modes (`TransportModeStyle`)
+| name | az / en | Icon | Palette # | Extra fields |
+|---|---|---|---|---|
+| `bus` | Avtobus / Bus | `directions_bus_outlined` | 0 blue | route (search), trips, fare |
+| `metro` | Metro / Metro | `subway_outlined` | 3 raspberry | station (optional), trips, fare |
+| `taxi` | Taksi / Taxi | `local_taxi_outlined` | 6 mustard | — |
+| `train` | Elektrik qatarı / Commuter train | `train_outlined` | 5 teal | trips, fare |
+| `fuel` | Yanacaq / Fuel | `local_gas_station_outlined` | 1 orange | litres (optional) |
+| `parking` | Parkinq / Parking | `local_parking_outlined` | 8 periwinkle | — |
+| `bakuCard` | BakıKart artırma / BakıKart top-up | `add_card` | 7 slate | info hint |
+
+```
+│ Növ                                          │  titleSmall
+│ [🚌 Avtobus] [Ⓜ Metro] [🚕 Taksi] [🚆 Qatar] →│  ChoiceChips with icons, horizontal scroll;
+│                                              │  the last used mode is preselected
+│ ┌ Marşrut ─────────────────────────────── ›┐ │  bus: 56dp tile, opens the route sheet
+│ │ [65]  Xırdalan – 28 May                  │ │
+│ └──────────────────────────────────────────┘ │
+│ Gediş sayı             [ − ]  ×2  [ + ]      │  IconButton.outlined 48dp, value titleMedium
+│ Tarif: 0,60 ₼ × 2                            │  bodySmall onSurfaceVariant, under the amount
+```
+- **Amount auto-fill:** choosing a route or changing the trip count writes `fare × trips` into
+  the keypad display, and the hint "Tarif: 0,60 ₼ × 2" appears under the amount.
+- **Editable:** typing on the keypad makes the amount manual. The hint then reads "Məbləğ əl
+  ilə dəyişdirilib · **Tarifə qaytar**" (a 48dp TextButton). From then on, changing trips no
+  longer overwrites the amount until "Tarifə qaytar" is tapped.
+- **Trips:** 1–20; "−" is disabled at 1. Haptic `key()` on each step.
+- **BakıKart artırma:** an info row (`info_outline`, bodySmall): "Artırmanı xərc kimi qeyd
+  edirsinizsə, gedişləri ayrıca qeyd etməyin: xərc iki dəfə sayılar." Bus and metro are paid
+  with BakıKart, so logging both the top-up and the trips counts the money twice.
+- **Fuel:** an optional decimal "Litr" field. When it is set, "≈ 1,00 ₼/l" shows in bodySmall.
+
+#### 18.5.3 Route sheet (bus) and station sheet (metro)
+```
+┌ ─── (drag) ──────────────────────────────────┐  modal sheet, 90 % height
+│ [🔍 Marşrut axtar: kod və ya dayanacaq     ] │  SearchBar, autofocus
+│ SON İSTİFADƏ OLUNANLAR                       │  titleSmall primary; up to 5, newest first
+│ [65]  Xırdalan – 28 May             0,60 ₼   │  56dp row: code badge, bodyMedium (2 lines),
+│ [3]   Əhmədli – Sahil               0,60 ₼   │  fare in bodySmall onSurfaceVariant
+│ BÜTÜN MARŞRUTLAR                             │
+│ [1]   …                                      │  natural sort: 1, 2, 3 … 10, 11, 65, 65A
+│ [＋ Öz marşrutumu əlavə et]                   │  last row, also shown when a search is empty
+└──────────────────────────────────────────────┘
+```
+- **Code badge:** at least 40 × 28, radius 8, `secondaryContainer` / `onSecondaryContainer`,
+  labelLarge tabular, centred. User routes add a 1dp `outline` border and a "Mənim" chip.
+- **Search** matches the code prefix first, then any stop name. It ignores accents, so
+  "xirdalan" finds "Xırdalan".
+- **No match:** "Marşrut tapılmadı" plus the add button.
+- **Metro station sheet:** the same frame, grouped by line.
+  - Each section header is a 12dp line dot (`MetroLineStyle`) plus the line name in titleSmall.
+    Red `#D63A2F`, green `#2B9A66`, purple `#9B4FC8`; the Xətai branch is a 2dp green ring.
+  - Transfer stations (e.g. 28 May / Cəfər Cabbarlı) appear under each of their lines.
+  - The station is optional; the field reads "Stansiya (istəyə görə)".
+
+The metro line dots are graphics (3:1 needed), and the line name is always written next to
+them:
+
+| Line | on `#FFFFFF` | on `#F8FAF9` | on `#F2F5F4` | on `#0F1416` | on `#171D1E` |
+|---|---|---|---|---|---|
+| red `#D63A2F` | 4.66 | 4.45 | 4.25 | 3.98 | 3.66 |
+| green `#2B9A66` | 3.55 | 3.39 | 3.24 | 5.23 | 4.81 |
+| purple `#9B4FC8` | 4.83 | 4.61 | 4.40 | 3.84 | 3.53 |
+
+Keep these dots on `surface … surfaceContainerLow`. Sheets use `surfaceContainerLow`.
+
+#### 18.5.4 Settings → Məlumat → "Nəqliyyat tarifləri"
+```
+┌ ← Nəqliyyat tarifləri                     ＋ ┐  ＋ = add my own route
+│ [🔍 Axtar                                  ] │
+│ METRO VƏ QATAR                               │
+│ Ⓜ Metro                   [ 0,60 ₼ ] ✎       │  64dp row; ✎ turns the value into an input
+│ 🚆 Elektrik qatarı         [ 0,…  ₼ ] ✎       │
+│ AVTOBUS                                      │
+│ [1]  Bayıl – Sahil            0,60 ₼   ✎     │
+│ [65] Xırdalan – 28 May        0,80 ₼   ✕     │  edited fare: "Dəyişdirilib" chip
+│      Dəyişdirilib                            │  (tertiaryContainer); ✕ = reset
+│ [7K] Ev – İş   [Mənim]        0,60 ₼   ⋮     │  user route: ⋮ = Düzəliş et / Sil
+│ ─────────────────────────────────────────── │
+│ ⓘ Tariflər 15 sentyabr 2026 tarixində        │  footnote bodySmall onSurfaceVariant;
+│   yoxlanılıb. Dəyişibsə, burada düzəldin.    │  the date comes from the bundled fare data
+└──────────────────────────────────────────────┘
+```
+- Inline edit works as in §16.3: decimal keyboard, "," in az, range 0,01–99,99. It saves on ✓
+  or Enter.
+- The "Öz marşrutumu əlavə et" sheet has Marşrut nömrəsi (1–6 characters), Haradan, Haraya and
+  Tarif. "Saxla" stays disabled until all four are valid. A duplicate code shows "Bu nömrə
+  artıq var".
+- Editing a fare never changes past transactions, because each one stores its own amount.
+
+#### 18.5.5 On the transaction tile
+The subtitle line starts with a route chip, followed by the usual "Hesab · Qeyd".
+```
+│ (●🚌)  Nəqliyyat                   − 1,20 ₼  │
+│        [🚌 65 ×2] · Kart · İşə        08:14  │
+```
+- **Chip:** height 20, radius 6, horizontal padding 6, `secondaryContainer` /
+  `onSecondaryContainer`, a 14dp mode icon and labelSmall tabular text.
+- **Chip text:**
+  - bus: the route code, e.g. "65", plus " ×2" when trips > 1;
+  - metro: the station name, or "Metro";
+  - other modes: the short mode name ("Taksi").
+- Semantics: "Avtobus 65, 2 gediş".
+- Transactions filter: while the Nəqliyyat category filter is active, a second chip row offers
+  the modes.
+
+---
+
+### 18.6 Bonus account transfers
+
+#### 18.6.1 Account form
+The type chips gain "Bonus" (`redeem`). Choosing it shows a "Köçürmə dərəcəsi (%)" field
+(integer 1–100, default 50) with the helper "Bonusdan başqa hesaba köçürəndə çatan faiz". The
+card badge then reads "Bonus 50%".
+
+#### 18.6.2 Transfer form when "Haradan" is a bonus account
+```
+│                  5,00 ₼                      │  amountInput: the SENT amount (transfer colour)
+│       Bonus ▾   →   Kart ▾                   │
+│ ┌──────────────────────────────────────────┐ │  surfaceContainerLow, radius 12, padding 12
+│ │ Göndərilən 5,00 ₼  →  Çatan 2,50 ₼ (50%) │ │  bodyMedium onSurface; amounts labelLarge tabular
+│ ├──────────────────────────────────────────┤ │
+│ │ ↘ Bonus itkisi: 2,50 ₼                ⓘ  │ │  warningContainer strip, onWarningContainer,
+│ └──────────────────────────────────────────┘ │  18dp trending_down icon; ⓘ opens a tooltip
+```
+- The row appears with `AnimatedSize` (`AppMotion.reveal`) when the source is a bonus account
+  and its rate is below 100 %. It updates live while the user types.
+- **Warning colour for the loss:** the existing fixed pair `warningContainer` /
+  `onWarningContainer` (8.57 light / 9.91 dark). Amber says "you lose something" without
+  claiming it is spending (red) or a budget overrun (danger). No new colour token is needed.
+- **Rounding:** "Çatan" is rounded half up to 0,01, and the loss is sent − arrived, so the two
+  always add up.
+- The rule depends only on the source, so a bonus → bonus transfer shows the row too.
+- ⓘ tooltip: "Bonus hesabından köçürəndə məbləğin yalnız 50%-i çatır."
+
+#### 18.6.3 Transaction list: grouped pair
+```
+┌──────────────────────────────────────────────┐  one surfaceContainerLow block, radius 12
+│ (⇄) Bonus → Kart                    2,50 ₼   │  §6.2 transfer tile: the arrived amount;
+│  │   5,00 ₼ göndərildi                14:32  │  subtitle: the sent amount
+│  └(↘) Bonus itkisi                − 2,50 ₼   │  48dp child row: 24dp warningContainer
+│                                              │  avatar, bodyMedium; amount labelLarge `warning`
+└──────────────────────────────────────────────┘
+```
+- **Connector:** a 2dp `outlineVariant` line from the centre of the 40dp avatar down to the
+  24dp avatar (36dp indent).
+- **Loss amount:** `warning` text with a "−" sign, so colour is never the only cue. It measures
+  5.77 on `#F2F5F4` (light) and 9.71 on `#171D1E` (dark), and ≥ 4.5 on every surface tone
+  (§12.4).
+- **One item:** a tap on either row opens the detail sheet with both parts. Swipe-delete removes
+  both, with the snackbar "Köçürmə və bonus itkisi birlikdə silindi · Geri al".
+- Semantics: "Köçürmə, Bonusdan Karta, 2,50 manat çatdı, 5 manat göndərildi, bonus itkisi 2,50
+  manat".
+- Whether the loss counts in reports is a data-layer decision. Recommendation: it lowers
+  balances and net worth, is excluded from budgets, and appears in Reports only as its own
+  "Bonus itkisi" line.
+
+---
+
+### 18.7 Lock timeout picker
+Settings → Təhlükəsizlik → "Avtomatik kilid" is a ListTile whose subtitle shows the current
+value, e.g. "1 dəq". While PIN is off it is disabled, with the subtitle "Əvvəlcə PIN kodu
+qurun".
+```
+┌ ─── (drag) ──────────────────────────────────┐
+│ Avtomatik kilid                              │  titleLarge
+│ Tətbiq arxa plana keçəndən nə qədər sonra    │  bodyMedium onSurfaceVariant
+│ kilidlənsin                                  │
+│ (•) Dərhal                                   │  RadioListTile 56dp
+│ ( ) 30 saniyə                                │
+│ ( ) 1 dəqiqə                                 │
+│ ( ) 5 dəqiqə                                 │
+│ ( ) 10 dəqiqə                                │
+│ ( ) 30 dəqiqə                                │
+│ ( ) 1 saat                                   │
+└──────────────────────────────────────────────┘
+```
+- Values in seconds: 0, 30, 60, 300, 600, 1800, 3600. The default is 60.
+- On selection: haptic `key()`, the radio animates (`state`), the sheet closes after 150ms and
+  the subtitle updates. There is no Save button.
+- Subtitle short forms: "Dərhal", "30 san", "1 dəq", "5 dəq", "10 dəq", "30 dəq", "1 saat".
+- "Dərhal" locks on every `paused` lifecycle event. The other values compare the time spent in
+  the background on `resumed`.
+
+---
+
+### 18.8 Budgets on/off
+Settings → Ümumi → "Büdcələr" is a `SwitchListTile` with the subtitle "Büdcə bölməsini, Ana
+səhifə kartını və xəbərdarlıqları göstər". It is on by default.
+
+| When off | Effect |
+|---|---|
+| Nav | 4 tabs, symmetric (18.3.4) |
+| Home | The budget summary card is removed and the cards below move up (no gap) |
+| Alerts | The 80 % / 100 % warnings are off |
+| Data | Kept. Turning budgets back on restores everything |
+| Deep link `/budgets` | Redirects to Home |
+| Feedback | Snackbar "Büdcələr gizlədildi. Məlumatlarınız silinmir." |
+
+```
+Home, budgets off
+│ [carousel]  ━ • •                Hamısı ›   │
+│ ┌ Bu ay ──────────────────────────────────┐ │
+│ ┌ Bu həftə ───────────────────────────────┐ │
+│ ┌ Kənar yerlər ───────────────────────────┐ │
+│ Son əməliyyatlar                            │
+   ╭─[🏠] [🧾] ──(+)── [📊] [⚙]─╮
+```
+
+---
+
+### 18.9 Double-back-to-exit
+- This applies only on the **Home tab root** when there is nothing to pop. On any other tab,
+  back goes to Home first (`goBranch(0)`) with no snackbar.
+- **First back:** call `ScaffoldMessenger.hideCurrentSnackBar()`, then show a floating SnackBar
+  "Çıxmaq üçün yenidən geri toxunun" / "Press back again to exit". It has no action, and its
+  duration is `AppMotion.backExitWindow` (2 s). It sits above the pill automatically.
+- **Second back within 2 s:** `SystemNavigator.pop()`. After 2 s the state resets.
+- Implementation: `PopScope(canPop: false, onPopInvokedWithResult: ...)` in the shell. This
+  turns off the predictive back animation on the Home root, which is expected for this pattern.
+- It is not active on the lock screen, or while a sheet or dialog is open (those pop first).
+
+---
+
+### 18.10 Reports: "Nəqliyyat" card
+The card appears in Reports (Xərc mode), under the category legend, when transport spending in
+the period is above zero. It uses the §13.1 card style (surfaceContainerLow, radius 16,
+padding 16).
+```
+┌ 🚌 Nəqliyyat                       86,40 ₼ ┐  titleMedium + amountTile onSurface
+│ Növlər üzrə                                │  titleSmall onSurfaceVariant
+│ 🚌 Avtobus                 42,00 ₼   49 %  │  row: 20dp icon (mode colour), bodyMedium,
+│ ███████████████████████░░░░░░░░░░░░░░░░    │  amountTile, labelSmall %; bar 8dp radius 4,
+│ 🚕 Taksi                   28,40 ₼   33 %  │  mode colour on surfaceContainerHighest,
+│ ███████████████░░░░░░░░░░░░░░░░░░░░░░░░    │  width ∝ value / max
+│ Ⓜ Metro                    16,00 ₼   18 %  │
+│ ████████░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░░    │
+│ Ən çox istifadə olunan marşrutlar          │  titleSmall onSurfaceVariant
+│ 1  [65]  Xırdalan – 28 May   ×42  25,20 ₼  │  rank labelLarge, badge, bodyMedium (ellipsis),
+│ 2  [3]   Əhmədli – Sahil     ×20  12,00 ₼  │  trips labelMedium onSurfaceVariant, amountTile
+│ …  up to 5                                 │
+└────────────────────────────────────────────┘
+```
+- **Modes** are sorted by amount, and modes with zero spending are hidden. Bars animate per
+  §11.4 (`chartEntry`, 30ms stagger); with reduced motion they show the final width.
+- **Bar colours** come from the categorical palette (≥ 3:1 on the card, §2.3). The name and
+  value are always written, so colour is not the only cue.
+- **Routes** cover bus routes and metro stations with at least 1 trip, sorted by trips, then
+  amount. The list is hidden if there are none. Tapping a route opens Transactions filtered by
+  that route.
+- Semantics: a hidden summary such as "Avtobus 42 manat, 49 faiz; …".
+
+---
+
+### 18.11 Motion summary (v1.2 tokens in `AppMotion`)
+| Token / element | Duration | Curve | With reduced motion |
+|---|---|---|---|
+| `carouselPage` (dot tap) | 300ms | `emphasized` | `jumpToPage` |
+| Inactive card scale | follows the finger | — | off |
+| Card count-up (first settle per session) | `countUp` 800ms | `countUpCurve` | final value |
+| Dot width / colour | `state` 150ms | `standard` | instant |
+| `navLabel` (label fade, icon lift, indicator grow) | 250ms | `emphasized` | instant |
+| Budgets tab show/hide | `navLabel` | `emphasized` | instant |
+| `reveal` (transport panel, bonus row) | 250ms | `standard` (AnimatedSize) | instant |
+| `backExitWindow` | 2 s | — | unchanged |
+| Route / station sheets | Flutter default sheet | — | unchanged |
+
+---
+
+### 18.12 Accessibility additions
+- Every card text pair is listed with its ratio (18.2.2). Photo text is ≥ 5.33:1 by
+  construction (18.2.3). The nav pairs pass with any scheme (18.3.7).
+- Touch targets: nav tabs ≥ 48 × 64, FAB 56, trip stepper 48, chips 48 tall (32 visual), mini
+  design tiles 56 × 48 (36 visual plus padding).
+- At text scale > 1.3: the carousel grows (up to ×1.6), the photo scrim goes flat, nav labels
+  hide (tooltips stay), and transport chips wrap.
+- Colour is never the only cue: loss rows carry a "−" and a label, metro lines carry names (and
+  the branch is a ring), and transport bars carry values.
+- `cardLast4` is read digit by digit: "kart sonu 1 2 3 4".
+
+---
+
+### 18.13 New l10n keys (suggested names)
+
+| Key | az | en |
+|---|---|---|
+| `thisMonth` | Bu ay | This month |
+| `cardPosition(n, total)` | Kart {n} / {total} | Card {n} of {total} |
+| `cardEndingIn(last4)` | kart sonu {last4} | ending in {last4} |
+| `bonusBadge(pct)` | Bonus {pct}% | Bonus {pct}% |
+| `negativeShort` | Mənfi | Negative |
+| `cardDesign` | Kart dizaynı | Card design |
+| `cardChangeDesign` | Kart dizaynını dəyiş | Change card design |
+| `cardDesignPhoto` | Şəkil | Photo |
+| `cardChoosePhoto` / `cardChangePhoto` / `cardRemovePhoto` | Şəkil seç / Şəkli dəyiş / Şəkli sil | Choose photo / Change photo / Remove photo |
+| `cardPhotoMissing` | Şəkil tapılmadı | Photo not found |
+| `cardLast4Label` | Kartın son 4 rəqəmi | Last 4 digits of the card |
+| `cardLast4Helper` | Yalnız son 4 rəqəm. Tam kart nömrəsini heç vaxt daxil etməyin. | Only the last 4 digits. Never enter the full card number. |
+| `accountTypeBonus` | Bonus | Bonus |
+| `bonusRate` | Köçürmə dərəcəsi (%) | Transfer rate (%) |
+| `bonusRateHelper` | Bonusdan başqa hesaba köçürəndə çatan faiz | Share that arrives when you move bonus to another account |
+| `makeTransfer` | Köçürmə et | Make a transfer |
+| `date` / `time` | Tarix / Saat | Date / Time |
+| `yesterday` | Dünən | Yesterday |
+| `addedAt(dt)` | Əlavə edilib: {dt} | Added {dt} |
+| `editedAt(dt)` | Dəyişdirilib: {dt} | Edited {dt} |
+| `duplicate` | Təkrarla | Duplicate |
+| `transportMode` | Növ | Mode |
+| `transportBus` / `transportMetro` / `transportTaxi` | Avtobus / Metro / Taksi | Bus / Metro / Taxi |
+| `transportTrain` / `transportFuel` / `transportParking` | Elektrik qatarı / Yanacaq / Parkinq | Commuter train / Fuel / Parking |
+| `transportBakuCard` | BakıKart artırma | BakıKart top-up |
+| `busRoute` / `chooseRoute` | Marşrut / Marşrut seçin | Route / Choose a route |
+| `searchRoutes` | Marşrut axtar: kod və ya dayanacaq | Search routes: number or stop |
+| `recentRoutes` / `allRoutes` | Son istifadə olunanlar / Bütün marşrutlar | Recent / All routes |
+| `noRouteFound` | Marşrut tapılmadı | No route found |
+| `trips` | Gediş sayı | Trips |
+| `tripsCount(n)` | {n} gediş | {n, plural, one{1 trip} other{{n} trips}} |
+| `fareHint(fare, n)` | Tarif: {fare} × {n} | Fare: {fare} × {n} |
+| `fareManual` | Məbləğ əl ilə dəyişdirilib | Amount edited by hand |
+| `resetToFare` | Tarifə qaytar | Use the fare |
+| `metroStation` / `chooseStation` | Stansiya (istəyə görə) / Stansiya seçin | Station (optional) / Choose a station |
+| `fuelLitres` | Litr (istəyə görə) | Litres (optional) |
+| `bakuCardDoubleCountHint` | Artırmanı xərc kimi qeyd edirsinizsə, gedişləri ayrıca qeyd etməyin: xərc iki dəfə sayılar. | If you log top-ups as spending, don't also log trips: the cost would count twice. |
+| `transportFares` | Nəqliyyat tarifləri | Transport fares |
+| `addOwnRoute` | Öz marşrutumu əlavə et | Add my own route |
+| `routeCode` / `routeFrom` / `routeTo` / `fare` | Marşrut nömrəsi / Haradan / Haraya / Tarif | Route number / From / To / Fare |
+| `routeCodeExists` | Bu nömrə artıq var | This number already exists |
+| `myRoute` | Mənim | Mine |
+| `fareEdited` / `resetFare` | Dəyişdirilib / Standart tarifə qaytar | Edited / Reset to standard fare |
+| `faresVerifiedAt(date)` | Tariflər {date} tarixində yoxlanılıb. Dəyişibsə, burada düzəldin. | Fares checked on {date}. If they have changed, edit them here. |
+| `transferSent(a)` | Göndərilən {a} | Sent {a} |
+| `transferArrives(a, pct)` | Çatan {a} ({pct}%) | Arrives {a} ({pct}%) |
+| `bonusLoss(a)` / `bonusLossLabel` | Bonus itkisi: {a} / Bonus itkisi | Bonus loss: {a} / Bonus loss |
+| `bonusLossExplain(pct)` | Bonus hesabından köçürəndə məbləğin yalnız {pct}%-i çatır. | Only {pct}% of the amount arrives when you move money out of a bonus account. |
+| `sentSubtitle(a)` | {a} göndərildi | {a} sent |
+| `pairDeleted` | Köçürmə və bonus itkisi birlikdə silindi | Transfer and bonus loss deleted together |
+| `autoLock` | Avtomatik kilid | Auto-lock |
+| `autoLockBody` | Tətbiq arxa plana keçəndən nə qədər sonra kilidlənsin | How long after you leave the app it locks |
+| `lockImmediately` | Dərhal | Immediately |
+| `lockSeconds(n)` / `lockSecondsShort(n)` | {n} saniyə / {n} san | {n} seconds / {n} s |
+| `lockMinutes(n)` / `lockMinutesShort(n)` | {n} dəqiqə / {n} dəq | {n, plural, one{1 minute} other{{n} minutes}} / {n} min |
+| `lockHour` | 1 saat | 1 hour |
+| `lockNeedsPin` | Əvvəlcə PIN kodu qurun | Set a PIN first |
+| `budgetsEnabled` | Büdcələr | Budgets |
+| `budgetsEnabledBody` | Büdcə bölməsini, Ana səhifə kartını və xəbərdarlıqları göstər | Show the Budgets tab, the Home card and alerts |
+| `budgetsHidden` | Büdcələr gizlədildi. Məlumatlarınız silinmir. | Budgets hidden. Your data is kept. |
+| `pressBackAgainToExit` | Çıxmaq üçün yenidən geri toxunun | Press back again to exit |
+| `reportTransport` / `reportByMode` | Nəqliyyat / Növlər üzrə | Transport / By mode |
+| `reportTopRoutes` | Ən çox istifadə olunan marşrutlar | Top routes |
+
+Existing keys reused: `addTransaction` (FAB tooltip), `addAccount`, `seeAll`, `edit`,
+`delete`, `undo` and the nav labels.
+
+---
+
+### 18.14 Theme API summary (v1.2, all additive)
+| API | Notes |
+|---|---|
+| `AppRadius.card` (20) / `brCard` | Account cards |
+| `AppCardDesign` | `id, labelAz, labelEn, label(lang), colors, gradient, onCard, onCardVariant, isPhoto, isLight, badge, onBadge, overlay, worstTextContrast` |
+| `AppCardDesigns.presets` | 10 presets: teal, ocean, midnight, plum, sunset, forest, graphite, onyx, gold, platinum |
+| `AppCardDesigns.byId(id)` / `forIndex(i)` / `defaultId` / `photoId` / `photo` | An unknown id gives teal; `'photo'` gives photo |
+| `AppCardDesigns.photoScrim` / `photoScrimFor(h, {textScale})` / `photoWorstBackground` / `photoTextShadow` / `scrim*Alpha`, `scrimTopBand`, `scrimBottomBand`, `referenceHeight` | 18.2.3 |
+| `AppCardDesigns.aspectRatio, radius, borderRadius, padding, typeIcon, elevation, shadows(d, b), border(d, b), decoration(d, b), photoDecoration(img, b), balanceStyle, last4Style` | Geometry, elevation, on-card text styles |
+| `AppCarousel.viewportFraction, pageInset, inactiveScale, dotsTop, maxVisibleDots, dot, dotActive, dotGap, dotEdgeScale1/2, cardWidth(w), height(w, scaler)` | 18.1.2 |
+| `AppNav.height, margin, marginCompact, compactBreakpoint, bottomGap, borderRadius, opacity, blurSigma, fab, fabLift, fabRing, fabSlot, fabSlotCompact, indicatorWidth/Height, iconSize, iconLift, labelMaxTextScale, minTab` | 18.3 |
+| `AppNav.isCompact(w), marginFor(w), fabSlotFor(w), bottomOffset(ctx), contentInset(ctx), background(cs), shadows(b), border(cs)` | Helpers |
+| `AccountTypeStyle.of(name) / forType(enum) / values`, `.icon`, `.defaultDesignId`, `.isBonus` | cash, card, bank, savings, bonus |
+| `TransportModeStyle.of(name) / forMode(enum) / values`, `.icon`, `.color(c)`, `.order`, `.hasRoutes`, `.hasStations`, `.hasTrips` | bus, metro, taxi, train, fuel, parking, bakuCard |
+| `MetroLineStyle.of(name) / values`, `.color`, `.ring`, `.label(lang)` | red, green, greenBranch, purple |
+| `AppMotion.carouselPage, navLabel, backExitWindow, reveal` | 18.11 |

@@ -32,7 +32,12 @@ class _CategoryEditScreenState extends ConsumerState<CategoryEditScreen> {
   int _icon = CategoryIcons.all.first.codePoint;
   int _color = 0;
 
+  /// v1.2: shows the transport picker in the transaction editor.
+  bool _transport = false;
+
   TxCategory? _original;
+
+  bool get _system => _original?.isSystem ?? false;
   bool _used = false;
   bool _loading = false;
   bool _saving = false;
@@ -68,6 +73,7 @@ class _CategoryEditScreenState extends ConsumerState<CategoryEditScreen> {
         _type = c.type;
         _icon = c.iconCodePoint;
         _color = c.colorIndex;
+        _transport = c.isTransport;
       }
     });
   }
@@ -92,6 +98,9 @@ class _CategoryEditScreenState extends ConsumerState<CategoryEditScreen> {
           iconCodePoint: _icon,
           colorIndex: _color,
           type: _type,
+          specialKind: _transport && _type == CategoryType.expense
+              ? CategorySpecialKind.transport
+              : CategorySpecialKind.none,
         );
       } else {
         await repo.update(_original!.copyWith(
@@ -100,6 +109,11 @@ class _CategoryEditScreenState extends ConsumerState<CategoryEditScreen> {
           iconCodePoint: _icon,
           colorIndex: _color,
           type: _type,
+          specialKind: _system
+              ? CategorySpecialKind.bonusLoss
+              : _transport && _type == CategoryType.expense
+                  ? CategorySpecialKind.transport
+                  : CategorySpecialKind.none,
         ));
       }
     } finally {
@@ -156,7 +170,7 @@ class _CategoryEditScreenState extends ConsumerState<CategoryEditScreen> {
       appBar: AppBar(
         title: Text(_isEdit ? l.editCategory : l.newCategory),
         actions: <Widget>[
-          if (_isEdit)
+          if (_isEdit && !_system)
             PopupMenuButton<String>(
               tooltip: l.more,
               onSelected: (String v) => v == 'archive' ? _toggleArchive() : _delete(),
@@ -197,10 +211,35 @@ class _CategoryEditScreenState extends ConsumerState<CategoryEditScreen> {
                   ),
                 ],
                 selected: <CategoryType>{_type},
-                onSelectionChanged: _used
+                onSelectionChanged: _used || _system
                     ? null
                     : (Set<CategoryType> s) => setState(() => _type = s.first),
               ),
+              if (_system)
+                Padding(
+                  padding: const EdgeInsets.only(top: AppSpacing.md),
+                  child: Row(
+                    children: <Widget>[
+                      Icon(Icons.lock_outline, size: 18, color: cs.onSurfaceVariant),
+                      const SizedBox(width: AppSpacing.sm),
+                      Expanded(
+                        child: Text(
+                          l.systemCategoryLocked,
+                          style: theme.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              if (_type == CategoryType.expense && !_system)
+                SwitchListTile(
+                  contentPadding: EdgeInsets.zero,
+                  secondary: const Icon(Icons.directions_bus_outlined),
+                  title: Text(l.transportCategory),
+                  subtitle: Text(l.transportCategoryBody),
+                  value: _transport,
+                  onChanged: (bool v) => setState(() => _transport = v),
+                ),
               const SizedBox(height: AppSpacing.lg),
               TextFormField(
                 controller: _nameAz,

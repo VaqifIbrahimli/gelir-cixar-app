@@ -5,6 +5,7 @@ import '../../core/format.dart';
 import '../../core/notifications.dart';
 import '../../data/providers.dart';
 import '../../l10n/app_localizations.dart';
+import '../lock/system_dialog_guard.dart';
 import '../settings/settings_controller.dart';
 
 /// Requests POST_NOTIFICATIONS once (Android 13+), if alerts are enabled.
@@ -13,7 +14,7 @@ Future<void> ensureNotificationPermission(WidgetRef ref) async {
   if (!ref.read(settingsProvider).notificationsEnabled) return;
   if (settings.notificationPermissionAsked) return;
   await settings.markNotificationPermissionAsked();
-  await ref.read(notificationServiceProvider).requestPermission();
+  await SystemDialogGuard.run(() => ref.read(notificationServiceProvider).requestPermission());
 }
 
 /// After a transaction is saved: if its category's budget for that month
@@ -30,6 +31,8 @@ Future<void> checkBudgetAlerts({
   required DateTime date,
 }) async {
   if (categoryId == null || type != TxType.expense) return;
+  // Budgets switched off in Settings: no 80 % / 100 % alerts (data kept).
+  if (!ref.read(settingsProvider).budgetsEnabled) return;
   final Rates rates = ref.read(ratesProvider).value ?? Rates.defaults;
   final BudgetAlertEvent? ev = await ref.read(budgetRepositoryProvider).checkThresholds(
         categoryId: categoryId,

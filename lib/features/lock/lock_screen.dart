@@ -6,6 +6,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import '../../core/theme.dart';
 import '../../l10n/app_localizations.dart';
 import 'lock_controller.dart';
+import 'lock_recovery_view.dart';
 import 'pin_service.dart';
 import 'widgets/pin_pad.dart';
 
@@ -116,7 +117,8 @@ class _LockScreenState extends ConsumerState<LockScreen>
       final DateTime? until = await c.lockedUntil();
       if (!mounted) return;
       if (until != null) startLockout(until);
-      if (ref.read(lockControllerProvider).biometricEnabled && until == null) {
+      final AppLockState lock = ref.read(lockControllerProvider);
+      if (lock.biometricEnabled && !lock.recovery && until == null) {
         _biometric();
       }
     });
@@ -151,7 +153,10 @@ class _LockScreenState extends ConsumerState<LockScreen>
   Widget build(BuildContext context) {
     final AppLocalizations l = AppLocalizations.of(context);
     final AppLockState lock = ref.watch(lockControllerProvider);
+    // Secure storage lost the PIN: re-authenticate and set a new one.
+    if (lock.recovery) return const LockRecoveryView();
     final bool locked = isLockedOut;
+    final ThemeData theme = Theme.of(context);
     return Scaffold(
       body: SafeArea(
         child: Center(
@@ -165,6 +170,16 @@ class _LockScreenState extends ConsumerState<LockScreen>
                   message: locked ? l.lockedOutFor(secondsLeft) : _message,
                   isError: locked || _message != null,
                 ),
+                if (lock.biometricEnrollmentChanged)
+                  Padding(
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xl),
+                    child: Text(
+                      l.lockBiometricEnrollmentChanged,
+                      key: const ValueKey<String>('lock-biometric-enrollment-changed'),
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.bodyMedium?.copyWith(color: theme.colorScheme.error),
+                    ),
+                  ),
                 const SizedBox(height: AppSpacing.lg),
                 PinPad(
                   key: _pad,

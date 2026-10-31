@@ -320,7 +320,7 @@ void main() {
       expect(eur.isManual, isTrue);
       expect(eur.rateToAzn, 2.0);
       await db.close();
-      expect(rawVersion(path), 3);
+      expect(rawVersion(path), 4, reason: 'the upgrade continues to the latest schema');
     });
 
     test('re-running over an already-applied step is harmless (idempotent)', () async {
@@ -339,7 +339,7 @@ void main() {
       expect(m['EUR']!.source, RateSource.cbar, reason: 'a CBAR row is not re-flagged as manual');
       expect(m['EUR']!.rateToAzn, 2.0, reason: 'values are never touched');
       await db.close();
-      expect(rawVersion(path), 3);
+      expect(rawVersion(path), 4, reason: 'the upgrade continues to the latest schema');
     });
   });
 

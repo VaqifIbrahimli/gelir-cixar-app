@@ -11,6 +11,7 @@ import '../../core/widgets.dart';
 import '../../data/enums.dart';
 import '../../l10n/app_localizations.dart';
 import '../lock/lock_controller.dart';
+import '../lock/lock_timeout_tile.dart';
 import '../lock/pin_flow_screen.dart';
 import 'backup_actions.dart';
 import 'exchange_rates_screen.dart';
@@ -65,7 +66,10 @@ class SettingsScreen extends ConsumerWidget {
       return;
     }
     if (await c.authenticateBiometric(l.biometricEnableReason)) {
-      await c.setBiometricEnabled(true);
+      // False when the Keystore key could not be created.
+      if (!await c.setBiometricEnabled(true)) {
+        messenger.showSnackBar(SnackBar(content: Text(l.biometricUnavailable)));
+      }
     }
   }
 
@@ -76,9 +80,22 @@ class SettingsScreen extends ConsumerWidget {
     await ctl.setNotificationsEnabled(on);
     if (!on) return;
     await ctl.markNotificationPermissionAsked();
-    final bool granted = await ref.read(notificationServiceProvider).requestPermission();
+    // The permission prompt is a system dialog: keep the auto-lock quiet.
+    final bool granted =
+        await SystemDialogGuard.run(() => ref.read(notificationServiceProvider).requestPermission());
     if (!granted) {
       messenger.showSnackBar(SnackBar(content: Text(l.notificationsDenied)));
+    }
+  }
+
+  Future<void> _toggleBudgets(BuildContext context, WidgetRef ref, bool on) async {
+    final AppLocalizations l = AppLocalizations.of(context);
+    final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
+    AppHaptics.key();
+    await ref.read(settingsProvider.notifier).setBudgetsEnabled(on);
+    if (!on) {
+      messenger.hideCurrentSnackBar();
+      messenger.showSnackBar(SnackBar(content: Text(l.budgetsHidden)));
     }
   }
 
@@ -104,7 +121,7 @@ class SettingsScreen extends ConsumerWidget {
     return Scaffold(
       appBar: AppBar(title: Text(l.navSettings)),
       body: ListView(
-        padding: const EdgeInsets.only(bottom: AppSpacing.xxl),
+        padding: EdgeInsets.only(bottom: AppNav.contentInset(context)),
         children: <Widget>[
           SectionHeader(l.settingsGeneral),
           ListTile(
@@ -132,6 +149,13 @@ class SettingsScreen extends ConsumerWidget {
             ),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push(Routes.appearance),
+          ),
+          SwitchListTile(
+            secondary: const Icon(Icons.savings_outlined),
+            title: Text(l.budgetsEnabled),
+            subtitle: Text(l.budgetsEnabledBody),
+            value: s.budgetsEnabled,
+            onChanged: (bool v) => _toggleBudgets(context, ref, v),
           ),
           ListTile(
             leading: const Icon(Icons.currency_exchange),
@@ -191,6 +215,7 @@ class SettingsScreen extends ConsumerWidget {
             enabled: lock.enabled,
             onTap: () => context.push<bool>(Routes.pin(PinFlowMode.change)),
           ),
+          const LockTimeoutTile(),
           SwitchListTile(
             secondary: const Icon(Icons.fingerprint),
             title: Text(l.fingerprint),
@@ -217,6 +242,13 @@ class SettingsScreen extends ConsumerWidget {
             title: Text(l.categories),
             trailing: const Icon(Icons.chevron_right),
             onTap: () => context.push(Routes.categories),
+          ),
+          ListTile(
+            leading: const Icon(Icons.directions_bus_outlined),
+            title: Text(l.transportFares),
+            subtitle: Text(l.transportFaresSubtitle),
+            trailing: const Icon(Icons.chevron_right),
+            onTap: () => context.push(Routes.transportFares),
           ),
           ListTile(
             leading: const Icon(Icons.savings_outlined),

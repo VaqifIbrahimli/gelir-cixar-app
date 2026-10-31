@@ -1379,4 +1379,396 @@ class AppLocalizationsAz extends AppLocalizations {
 
   @override
   String get rateJumpApply => 'Tətbiq et';
+
+  @override
+  String get lockTimeoutTitle => 'Avtomatik kilid';
+
+  @override
+  String get lockTimeoutHint =>
+      'Tətbiq arxa fonda bu qədər qaldıqdan sonra PIN tələb olunur.';
+
+  @override
+  String get lockTimeoutImmediately => 'Dərhal';
+
+  @override
+  String lockTimeoutSeconds(int seconds) {
+    return '$seconds saniyə sonra';
+  }
+
+  @override
+  String lockTimeoutMinutes(int minutes) {
+    return '$minutes dəqiqə sonra';
+  }
+
+  @override
+  String lockTimeoutHours(int hours) {
+    return '$hours saat sonra';
+  }
+
+  @override
+  String get lockTimeoutReauthReason =>
+      'Avtomatik kilid vaxtını dəyişmək üçün təsdiqləyin';
+
+  @override
+  String get lockBiometricEnrollmentChanged =>
+      'Telefona yeni barmaq izi əlavə edilib. Təhlükəsizlik üçün PIN daxil edin.';
+
+  @override
+  String get lockRecoveryTitle => 'PIN məlumatı itib';
+
+  @override
+  String get lockRecoveryBody =>
+      'Telefonun təhlükəsiz yaddaşı sıfırlandığı üçün tətbiqin PIN kodu silinib. Məlumatlarınız yerindədir. Davam etmək üçün telefonun öz kilidi (PIN, naxış və ya barmaq izi) ilə təsdiqləyin, sonra yeni PIN təyin edin.';
+
+  @override
+  String get lockRecoveryConfirmButton => 'Telefon kilidi ilə təsdiqlə';
+
+  @override
+  String get lockRecoveryReason =>
+      'Gəlir-Çıxar-a girişi bərpa etmək üçün təsdiqləyin';
+
+  @override
+  String get lockRecoveryAuthFailed => 'Təsdiq alınmadı. Yenidən cəhd edin.';
+
+  @override
+  String get lockRecoveryInsecureBody =>
+      'Bu telefonda ekran kilidi (PIN, naxış və ya parol) qurulmayıb, ona görə də kimliyinizi telefon vasitəsilə təsdiqləmək mümkün deyil. Yeni PIN təyin etməklə girişi bərpa edə bilərsiniz.';
+
+  @override
+  String get lockRecoveryRestoreButton => 'Məlumatlarıma girişi bərpa et';
+
+  @override
+  String get lockRecoveryWarningTitle => 'Diqqət';
+
+  @override
+  String get lockRecoveryWarningBody =>
+      'Telefonu əlində tutan hər kəs bu addımla yeni PIN təyin edib məlumatlarınızı görə bilər. Bunu yalnız telefon sizindirsə edin. Telefonda ekran kilidi qurmağınız tövsiyə olunur.';
+
+  @override
+  String get lockRecoveryWarningConfirm => 'Bərpa et';
+
+  @override
+  String get thisMonthShort => 'Bu ay';
+
+  @override
+  String cardPosition(int n, int total) {
+    return 'Kart $n / $total';
+  }
+
+  @override
+  String cardEndingIn(String last4) {
+    return 'kart sonu $last4';
+  }
+
+  @override
+  String bonusBadge(int pct) {
+    return 'Bonus $pct%';
+  }
+
+  @override
+  String get negativeShort => 'Mənfi';
+
+  @override
+  String get cardDesign => 'Kart dizaynı';
+
+  @override
+  String get cardChangeDesign => 'Kart dizaynını dəyiş';
+
+  @override
+  String get cardDesignPhoto => 'Şəkil';
+
+  @override
+  String get cardChoosePhoto => 'Şəkil seç';
+
+  @override
+  String get cardChangePhoto => 'Şəkli dəyiş';
+
+  @override
+  String get cardRemovePhoto => 'Şəkli sil';
+
+  @override
+  String get cardPhotoMissing => 'Şəkil tapılmadı';
+
+  @override
+  String get cardPhotoFailed => 'Şəkli açmaq mümkün olmadı';
+
+  @override
+  String get cardLast4Label => 'Kartın son 4 rəqəmi';
+
+  @override
+  String get cardLast4Helper =>
+      'Yalnız son 4 rəqəm. Tam kart nömrəsini heç vaxt daxil etməyin.';
+
+  @override
+  String get cardLast4Invalid => 'Düz 4 rəqəm daxil edin';
+
+  @override
+  String selectedItem(String name) {
+    return '$name, seçilib';
+  }
+
+  @override
+  String get accountTypeBonus => 'Bonus';
+
+  @override
+  String get bonusRate => 'Köçürmə dərəcəsi (%)';
+
+  @override
+  String get bonusRateHelper => 'Bonusdan başqa hesaba köçürəndə çatan faiz';
+
+  @override
+  String get bonusRateInvalid => '1 ilə 100 arasında tam ədəd';
+
+  @override
+  String get makeTransfer => 'Köçürmə et';
+
+  @override
+  String get time => 'Saat';
+
+  @override
+  String addedAt(String dt) {
+    return 'Əlavə edilib: $dt';
+  }
+
+  @override
+  String editedAt(String dt) {
+    return 'Dəyişdirilib: $dt';
+  }
+
+  @override
+  String get duplicate => 'Təkrarla';
+
+  @override
+  String get transportMode => 'Növ';
+
+  @override
+  String get transportBus => 'Avtobus';
+
+  @override
+  String get transportMetro => 'Metro';
+
+  @override
+  String get transportTaxi => 'Taksi';
+
+  @override
+  String get transportTrain => 'Elektrik qatarı';
+
+  @override
+  String get transportFuel => 'Yanacaq';
+
+  @override
+  String get transportParking => 'Parkinq';
+
+  @override
+  String get transportBakuCard => 'BakıKart artırma';
+
+  @override
+  String get busRoute => 'Marşrut';
+
+  @override
+  String get chooseRoute => 'Marşrut seçin';
+
+  @override
+  String get searchRoutes => 'Marşrut axtar: kod və ya dayanacaq';
+
+  @override
+  String get recentRoutes => 'Son istifadə olunanlar';
+
+  @override
+  String get allRoutes => 'Bütün marşrutlar';
+
+  @override
+  String get noRouteFound => 'Marşrut tapılmadı';
+
+  @override
+  String get trips => 'Gediş sayı';
+
+  @override
+  String tripsCount(int n) {
+    return '$n gediş';
+  }
+
+  @override
+  String fareHint(String fare, int n) {
+    return 'Tarif: $fare × $n';
+  }
+
+  @override
+  String get fareManual => 'Məbləğ əl ilə dəyişdirilib';
+
+  @override
+  String get resetToFare => 'Tarifə qaytar';
+
+  @override
+  String get fareUncertain => 'tarif dəqiq deyil';
+
+  @override
+  String get metroStation => 'Stansiya (istəyə görə)';
+
+  @override
+  String get chooseStation => 'Stansiya seçin';
+
+  @override
+  String get bakuCardDoubleCountHint =>
+      'Artırmanı xərc kimi qeyd edirsinizsə, gedişləri ayrıca qeyd etməyin: xərc iki dəfə sayılar.';
+
+  @override
+  String get transportFares => 'Nəqliyyat tarifləri';
+
+  @override
+  String get transportFaresSubtitle => 'Avtobus, metro və qatar tarifləri';
+
+  @override
+  String get addOwnRoute => 'Öz marşrutumu əlavə et';
+
+  @override
+  String get editOwnRoute => 'Marşrutu dəyiş';
+
+  @override
+  String get routeCode => 'Marşrut nömrəsi';
+
+  @override
+  String get routeFrom => 'Haradan';
+
+  @override
+  String get routeTo => 'Haraya';
+
+  @override
+  String get fare => 'Tarif';
+
+  @override
+  String get routeCodeExists => 'Bu nömrə artıq var';
+
+  @override
+  String get routeCodeInvalid => '1–6 simvol: hərf, rəqəm və ya \"-\"';
+
+  @override
+  String get fieldRequired => 'Doldurun';
+
+  @override
+  String get fareInvalid => '0,01 ilə 99,99 arasında';
+
+  @override
+  String get fareNotSet => 'Təyin edilməyib';
+
+  @override
+  String get myRoute => 'Mənim';
+
+  @override
+  String get fareEdited => 'Dəyişdirilib';
+
+  @override
+  String get resetFare => 'Standart tarifə qaytar';
+
+  @override
+  String faresVerifiedAt(String date) {
+    return 'Tariflər $date tarixində yoxlanılıb. Dəyişibsə, burada düzəldin.';
+  }
+
+  @override
+  String faresVerifiedShort(String date) {
+    return 'Yoxlanılıb: $date';
+  }
+
+  @override
+  String get faresSources => 'Mənbələr';
+
+  @override
+  String get metroAndTrain => 'Metro və qatar';
+
+  @override
+  String transferSent(String a) {
+    return 'Göndərilən $a';
+  }
+
+  @override
+  String transferArrives(String a, int pct) {
+    return 'Çatan $a ($pct%)';
+  }
+
+  @override
+  String bonusLoss(String a) {
+    return 'Bonus itkisi: $a';
+  }
+
+  @override
+  String get bonusLossLabel => 'Bonus itkisi';
+
+  @override
+  String bonusLossExplain(int pct) {
+    return 'Bonus hesabından köçürəndə məbləğin yalnız $pct%-i çatır.';
+  }
+
+  @override
+  String get bonusReceivedEdit => 'Çatan məbləğ';
+
+  @override
+  String get bonusReceivedTooBig => 'Çatan məbləğ göndəriləndən çox ola bilməz';
+
+  @override
+  String get bonusSameCurrencyOnly =>
+      'Bonus hesabından yalnız eyni valyutada olan hesaba köçürmək olar';
+
+  @override
+  String sentSubtitle(String a) {
+    return '$a göndərildi';
+  }
+
+  @override
+  String get pairDeleted => 'Köçürmə və bonus itkisi birlikdə silindi';
+
+  @override
+  String get systemCategoryLocked =>
+      'Sistem kateqoriyasıdır: silmək və arxivləmək olmaz';
+
+  @override
+  String get transportCategory => 'Nəqliyyat kateqoriyası';
+
+  @override
+  String get transportCategoryBody =>
+      'Əlavə edəndə avtobus, metro və digər növləri seçmək olar';
+
+  @override
+  String get budgetsEnabled => 'Büdcələr';
+
+  @override
+  String get budgetsEnabledBody =>
+      'Büdcə bölməsini, Ana səhifə kartını və xəbərdarlıqları göstər';
+
+  @override
+  String get budgetsHidden => 'Büdcələr gizlədildi. Məlumatlarınız silinmir.';
+
+  @override
+  String get pressBackAgainToExit => 'Çıxmaq üçün yenidən geri toxunun';
+
+  @override
+  String get reportTransport => 'Nəqliyyat';
+
+  @override
+  String get reportByMode => 'Növlər üzrə';
+
+  @override
+  String get reportTopRoutes => 'Ən çox istifadə olunan marşrutlar';
+
+  @override
+  String get timeOfDay => 'Saat aralığı';
+
+  @override
+  String get timeFrom => 'Başlanğıc saatı';
+
+  @override
+  String get timeTo => 'Son saat';
+
+  @override
+  String backupImagesSkipped(int n) {
+    return '$n kart şəkli 1 MB-dan böyük olduğu üçün ehtiyat nüsxəyə düşmədi';
+  }
+
+  @override
+  String accountCardSemantics(String type, String name, String balance) {
+    return '$type, $name, $balance';
+  }
+
+  @override
+  String get exportColTransportMode => 'Nəqliyyat növü';
 }

@@ -1,3 +1,5 @@
+import 'dart:math' as math;
+
 import 'package:drift/drift.dart';
 
 import '../database.dart';
@@ -40,6 +42,8 @@ class TransactionRepository {
       conds.add(t.date.isBiggerOrEqualValue(f.window!.start));
       conds.add(t.date.isSmallerThanValue(f.window!.end));
     }
+    if (f.transportMode != null) conds.add(t.transportMode.equalsValue(f.transportMode));
+    if (f.routeCode != null) conds.add(t.routeCode.equals(f.routeCode!));
     if (conds.isNotEmpty) q.where(conds.reduce((a, b) => a & b));
 
     q.orderBy(<OrderingTerm>[
@@ -48,16 +52,22 @@ class TransactionRepository {
     ]);
     // Note search runs in Dart: SQLite's LOWER() only folds ASCII, which
     // would miss Azerbaijani letters (Ə/ə, Ö/ö, Ü/ü ...).
+    // The time-of-day window also runs in Dart: it must use the device's
+    // local time exactly like the tiles show it.
     final String needle = f.query.trim().toLowerCase();
-    if (f.limit != null && needle.isEmpty) q.limit(f.limit!);
+    final TimeOfDayRange? tod = f.timeOfDay;
+    final bool dartFilter = needle.isNotEmpty || tod != null;
+    if (f.limit != null && !dartFilter) q.limit(f.limit!);
 
     return q.watch().map(
           (List<TypedResult> rows) => rows
               .where(
                 (TypedResult r) =>
-                    needle.isEmpty ||
-                    r.readTable(t).note.toLowerCase().contains(needle),
+                    (needle.isEmpty ||
+                        r.readTable(t).note.toLowerCase().contains(needle)) &&
+                    (tod == null || tod.contains(r.readTable(t).date)),
               )
+              .take(f.limit != null && dartFilter ? f.limit! : rows.length)
               .map(
                 (TypedResult r) => TxDetails(
                   tx: r.readTable(t),
@@ -70,6 +80,151 @@ class TransactionRepository {
               .toList(growable: false),
         );
   }
+
+  /// Codes of the [mode] routes (or stations) used most recently, newest
+  /// first, at most [limit].
+  Stream<List<String>> watchRecentRoutes(TransportMode mode, {int limit = 5}) => _db
+      .customSelect(
+        'SELECT route_code AS code, MAX(date) AS last FROM transactions '
+        'WHERE transport_mode = ? AND route_code IS NOT NULL '
+        'GROUP BY route_code ORDER BY last DESC LIMIT ?',
+        variables: <Variable<Object>>[Variable<String>(mode.name), Variable<int>(limit)],
+        readsFrom: <ResultSetImplementation<dynamic, dynamic>>{_db.transactions},
+      )
+      .watch()
+      .map((List<QueryRow> rows) => <String>[for (final QueryRow r in rows) r.read<String>('code')]);
+
+  /// The most recently used transport mode, for preselecting the picker.
+  Future<TransportMode?> lastTransportMode() async {
+    final QueryRow? r = await _db
+        .customSelect(
+          'SELECT transport_mode AS m FROM transactions WHERE transport_mode IS NOT NULL '
+          'ORDER BY date DESC, id DESC LIMIT 1',
+        )
+        .getSingleOrNull();
+    final String? name = r?.readNullable<String>('m');
+    return TransportMode.values.where((TransportMode m) => m.name == name).firstOrNull;
+  }
+
+  /// Other rows sharing [tx]'s link group (a bonus transfer and its loss).
+  Future<List<MoneyTx>> linkedOf(MoneyTx tx) async {
+    final String? g = tx.linkGroupId;
+    if (g == null) return const <MoneyTx>[];
+    return (_db.select(_db.transactions)
+          ..where((x) => x.linkGroupId.equals(g) & x.id.equals(tx.id).not()))
+        .get();
+  }
+
+  static final math.Random _rng = math.Random.secure();
+
+  /// Random 128-bit hex id for a link group.
+  static String newLinkGroupId() => <String>[
+        for (int i = 0; i < 16; i++) _rng.nextInt(256).toRadixString(16).padLeft(2, '0'),
+      ].join();
+
+  /// Writes a transfer out of a bonus account (DESIGN.md §18.6): the
+  /// transfer carries only [received] (it arrives in full on [toId]); the
+  /// difference [sent] − [received] is an expense on the bonus account in
+  /// the "Bonus itkisi" system category. Both rows share a linkGroupId and
+  /// are written in one transaction, so the bonus account goes down by
+  /// [sent] and the target up by [received].
+  ///
+  /// With [transferId] the existing pair is rewritten in place (ids kept);
+  /// the loss row is added or removed as needed. Same-currency accounts
+  /// only (the UI says so). Returns the transfer id.
+  Future<int> saveBonusTransfer({
+    int? transferId,
+    required int fromId,
+    required int toId,
+    required int sent,
+    required int received,
+    required DateTime date,
+    String note = '',
+  }) =>
+      _db.transaction(() async {
+        if (fromId == toId) throw ArgumentError('same account');
+        if (received <= 0 || received > sent) throw ArgumentError('received out of range');
+        final Account from =
+            await (_db.select(_db.accounts)..where((a) => a.id.equals(fromId))).getSingle();
+        final Account to = await (_db.select(_db.accounts)..where((a) => a.id.equals(toId))).getSingle();
+        if (from.type != AccountType.bonus) throw ArgumentError('source is not a bonus account');
+        if (from.currency != to.currency) throw ArgumentError('bonus transfers need one currency');
+
+        final int loss = sent - received;
+        MoneyTx? old;
+        List<MoneyTx> partners = const <MoneyTx>[];
+        if (transferId != null) {
+          old = await byId(transferId);
+          if (old == null) throw ArgumentError('transfer not found');
+          if (old.type.isHoldingMove) throw ArgumentError('holding moves are edited elsewhere');
+          partners = await linkedOf(old);
+        }
+        final String? group = loss > 0 ? (old?.linkGroupId ?? newLinkGroupId()) : null;
+        final DateTime now = DateTime.now();
+
+        final int id;
+        if (old == null) {
+          id = await _db.into(_db.transactions).insert(TransactionsCompanion.insert(
+                type: TxType.transfer,
+                accountId: fromId,
+                toAccountId: Value<int?>(toId),
+                amount: received,
+                date: date,
+                note: Value<String>(note),
+                linkGroupId: Value<String?>(group),
+              ));
+        } else {
+          id = old.id;
+          await _db.update(_db.transactions).replace(old.copyWith(
+                type: TxType.transfer,
+                accountId: fromId,
+                toAccountId: Value<int?>(toId),
+                categoryId: const Value<int?>(null),
+                amount: received,
+                toAmount: const Value<int?>(null),
+                date: date,
+                note: note,
+                linkGroupId: Value<String?>(group),
+                transportMode: const Value<TransportMode?>(null),
+                routeCode: const Value<String?>(null),
+                trips: 1,
+                updatedAt: Value<DateTime?>(now),
+              ));
+        }
+
+        final MoneyTx? oldLoss =
+            loss > 0 ? partners.where((MoneyTx p) => p.type == TxType.expense).firstOrNull : null;
+        for (final MoneyTx p in partners) {
+          if (p.id != oldLoss?.id) {
+            await (_db.delete(_db.transactions)..where((x) => x.id.equals(p.id))).go();
+          }
+        }
+        if (loss > 0) {
+          final int cat = await _db.ensureBonusLossCategory();
+          if (oldLoss == null) {
+            await _db.into(_db.transactions).insert(TransactionsCompanion.insert(
+                  type: TxType.expense,
+                  accountId: fromId,
+                  categoryId: Value<int?>(cat),
+                  amount: loss,
+                  date: date,
+                  note: Value<String>(note),
+                  linkGroupId: Value<String?>(group),
+                ));
+          } else {
+            await _db.update(_db.transactions).replace(oldLoss.copyWith(
+                  accountId: fromId,
+                  categoryId: Value<int?>(cat),
+                  amount: loss,
+                  date: date,
+                  note: note,
+                  linkGroupId: Value<String?>(group),
+                  updatedAt: Value<DateTime?>(now),
+                ));
+          }
+        }
+        return id;
+      });
 
   /// Income/expense totals in AZN for [window]. Transfers are excluded.
   Stream<PeriodTotals> watchTotals(DateWindow window, Rates rates) {
@@ -131,7 +286,39 @@ GROUP BY a.currency, t.type
         if (old.type.isHoldingMove || tx.type.isHoldingMove || tx.holdingId != null) {
           throw ArgumentError('holding moves are edited through HoldingRepository');
         }
-        await _db.update(_db.transactions).replace(tx);
+        // A row saved on its own leaves its link group: the partner (the
+        // bonus loss of a transfer) is removed so the pair never disagrees.
+        for (final MoneyTx p in await linkedOf(old)) {
+          await (_db.delete(_db.transactions)..where((x) => x.id.equals(p.id))).go();
+        }
+        await _db.update(_db.transactions).replace(tx.copyWith(
+              linkGroupId: const Value<String?>(null),
+              updatedAt: Value<DateTime?>(DateTime.now()),
+            ));
+      });
+
+  /// Deletes a transaction together with its linked partner (bonus loss),
+  /// and the holding entries of a holding move. Everything removed is
+  /// returned for [restoreDeleted]. Throws [HoldingAmountException] like
+  /// [delete].
+  Future<DeletedTransactions> deleteWithLinked(int id) => _db.transaction(() async {
+        final MoneyTx? tx = await byId(id);
+        if (tx == null) return const DeletedTransactions(<MoneyTx>[], <HoldingEntry>[]);
+        final List<MoneyTx> partners = await linkedOf(tx);
+        final List<HoldingEntry> entries = await delete(id);
+        for (final MoneyTx p in partners) {
+          await (_db.delete(_db.transactions)..where((x) => x.id.equals(p.id))).go();
+        }
+        return DeletedTransactions(<MoneyTx>[tx, ...partners], entries);
+      });
+
+  /// Undo of [deleteWithLinked]: every row comes back with its id.
+  Future<void> restoreDeleted(DeletedTransactions d) => _db.transaction(() async {
+        if (d.transactions.isEmpty) return;
+        await restore(d.transactions.first, entries: d.entries);
+        for (final MoneyTx p in d.transactions.skip(1)) {
+          await _db.into(_db.transactions).insert(p, mode: InsertMode.insertOrReplace);
+        }
       });
 
   /// Deletes a transaction. A holding move takes its holding entry with it

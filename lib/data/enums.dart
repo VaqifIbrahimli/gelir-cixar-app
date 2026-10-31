@@ -2,9 +2,20 @@
 /// without a migration: the database stores `enum.name`.
 library;
 
-enum AccountType { cash, card, bank, savings }
+/// [bonus] (v1.2): money that only partly arrives when moved out (see
+/// `Account.bonusRatePercent`). Appended last; values are stored by name.
+enum AccountType { cash, card, bank, savings, bonus }
 
 enum CategoryType { income, expense }
+
+/// Extra behaviour of a category (v1.2). [transport] shows the transport
+/// picker in the editor; [bonusLoss] marks the seeded system category that
+/// records what a bonus-account transfer loses (cannot be deleted, archived
+/// or budgeted).
+enum CategorySpecialKind { none, transport, bonusLoss }
+
+/// Sub-mode of a transport expense (v1.2, DESIGN.md §18.5).
+enum TransportMode { bus, metro, taxi, train, fuel, parking, bakuCard }
 
 /// [toHolding] / [fromHolding] move money between an account and a
 /// "Kənar yer" (holding). Like transfers they are never income or expense.

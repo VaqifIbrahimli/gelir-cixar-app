@@ -1379,4 +1379,420 @@ class AppLocalizationsEn extends AppLocalizations {
 
   @override
   String get rateJumpApply => 'Apply';
+
+  @override
+  String get lockTimeoutTitle => 'Auto-lock';
+
+  @override
+  String get lockTimeoutHint =>
+      'How long the app can stay in the background before the PIN is required.';
+
+  @override
+  String get lockTimeoutImmediately => 'Immediately';
+
+  @override
+  String lockTimeoutSeconds(int seconds) {
+    return 'After $seconds seconds';
+  }
+
+  @override
+  String lockTimeoutMinutes(int minutes) {
+    String _temp0 = intl.Intl.pluralLogic(
+      minutes,
+      locale: localeName,
+      other: 'After $minutes minutes',
+      one: 'After 1 minute',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String lockTimeoutHours(int hours) {
+    String _temp0 = intl.Intl.pluralLogic(
+      hours,
+      locale: localeName,
+      other: 'After $hours hours',
+      one: 'After 1 hour',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String get lockTimeoutReauthReason => 'Confirm to change the auto-lock time';
+
+  @override
+  String get lockBiometricEnrollmentChanged =>
+      'A new fingerprint was added to this phone. For your security, enter your PIN.';
+
+  @override
+  String get lockRecoveryTitle => 'PIN data was lost';
+
+  @override
+  String get lockRecoveryBody =>
+      'The phone\'s secure storage was reset, so the app PIN was deleted. Your data is still here. To continue, confirm with the phone\'s own lock (PIN, pattern or fingerprint), then set a new PIN.';
+
+  @override
+  String get lockRecoveryConfirmButton => 'Confirm with phone lock';
+
+  @override
+  String get lockRecoveryReason => 'Confirm to restore access to Gəlir-Çıxar';
+
+  @override
+  String get lockRecoveryAuthFailed => 'Not confirmed. Try again.';
+
+  @override
+  String get lockRecoveryInsecureBody =>
+      'This phone has no screen lock (PIN, pattern or password), so your identity can\'t be confirmed through the phone. You can restore access by setting a new PIN.';
+
+  @override
+  String get lockRecoveryRestoreButton => 'Restore access to my data';
+
+  @override
+  String get lockRecoveryWarningTitle => 'Warning';
+
+  @override
+  String get lockRecoveryWarningBody =>
+      'Anyone holding this phone can use this step to set a new PIN and see your data. Only continue if this is your phone. Setting up a screen lock on the phone is recommended.';
+
+  @override
+  String get lockRecoveryWarningConfirm => 'Restore';
+
+  @override
+  String get thisMonthShort => 'This month';
+
+  @override
+  String cardPosition(int n, int total) {
+    return 'Card $n of $total';
+  }
+
+  @override
+  String cardEndingIn(String last4) {
+    return 'ending in $last4';
+  }
+
+  @override
+  String bonusBadge(int pct) {
+    return 'Bonus $pct%';
+  }
+
+  @override
+  String get negativeShort => 'Negative';
+
+  @override
+  String get cardDesign => 'Card design';
+
+  @override
+  String get cardChangeDesign => 'Change card design';
+
+  @override
+  String get cardDesignPhoto => 'Photo';
+
+  @override
+  String get cardChoosePhoto => 'Choose photo';
+
+  @override
+  String get cardChangePhoto => 'Change photo';
+
+  @override
+  String get cardRemovePhoto => 'Remove photo';
+
+  @override
+  String get cardPhotoMissing => 'Photo not found';
+
+  @override
+  String get cardPhotoFailed => 'Couldn\'t open the photo';
+
+  @override
+  String get cardLast4Label => 'Last 4 digits of the card';
+
+  @override
+  String get cardLast4Helper =>
+      'Only the last 4 digits. Never enter the full card number.';
+
+  @override
+  String get cardLast4Invalid => 'Enter exactly 4 digits';
+
+  @override
+  String selectedItem(String name) {
+    return '$name, selected';
+  }
+
+  @override
+  String get accountTypeBonus => 'Bonus';
+
+  @override
+  String get bonusRate => 'Transfer rate (%)';
+
+  @override
+  String get bonusRateHelper =>
+      'Share that arrives when you move bonus to another account';
+
+  @override
+  String get bonusRateInvalid => 'A whole number from 1 to 100';
+
+  @override
+  String get makeTransfer => 'Make a transfer';
+
+  @override
+  String get time => 'Time';
+
+  @override
+  String addedAt(String dt) {
+    return 'Added $dt';
+  }
+
+  @override
+  String editedAt(String dt) {
+    return 'Edited $dt';
+  }
+
+  @override
+  String get duplicate => 'Duplicate';
+
+  @override
+  String get transportMode => 'Mode';
+
+  @override
+  String get transportBus => 'Bus';
+
+  @override
+  String get transportMetro => 'Metro';
+
+  @override
+  String get transportTaxi => 'Taxi';
+
+  @override
+  String get transportTrain => 'Commuter train';
+
+  @override
+  String get transportFuel => 'Fuel';
+
+  @override
+  String get transportParking => 'Parking';
+
+  @override
+  String get transportBakuCard => 'BakıKart top-up';
+
+  @override
+  String get busRoute => 'Route';
+
+  @override
+  String get chooseRoute => 'Choose a route';
+
+  @override
+  String get searchRoutes => 'Search routes: number or stop';
+
+  @override
+  String get recentRoutes => 'Recent';
+
+  @override
+  String get allRoutes => 'All routes';
+
+  @override
+  String get noRouteFound => 'No route found';
+
+  @override
+  String get trips => 'Trips';
+
+  @override
+  String tripsCount(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n trips',
+      one: '1 trip',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String fareHint(String fare, int n) {
+    return 'Fare: $fare × $n';
+  }
+
+  @override
+  String get fareManual => 'Amount edited by hand';
+
+  @override
+  String get resetToFare => 'Use the fare';
+
+  @override
+  String get fareUncertain => 'fare may be out of date';
+
+  @override
+  String get metroStation => 'Station (optional)';
+
+  @override
+  String get chooseStation => 'Choose a station';
+
+  @override
+  String get bakuCardDoubleCountHint =>
+      'If you log top-ups as spending, don\'t also log trips: the cost would count twice.';
+
+  @override
+  String get transportFares => 'Transport fares';
+
+  @override
+  String get transportFaresSubtitle => 'Bus, metro and train fares';
+
+  @override
+  String get addOwnRoute => 'Add my own route';
+
+  @override
+  String get editOwnRoute => 'Edit route';
+
+  @override
+  String get routeCode => 'Route number';
+
+  @override
+  String get routeFrom => 'From';
+
+  @override
+  String get routeTo => 'To';
+
+  @override
+  String get fare => 'Fare';
+
+  @override
+  String get routeCodeExists => 'This number already exists';
+
+  @override
+  String get routeCodeInvalid => '1–6 characters: letters, digits or \"-\"';
+
+  @override
+  String get fieldRequired => 'Required';
+
+  @override
+  String get fareInvalid => 'From 0.01 to 99.99';
+
+  @override
+  String get fareNotSet => 'Not set';
+
+  @override
+  String get myRoute => 'Mine';
+
+  @override
+  String get fareEdited => 'Edited';
+
+  @override
+  String get resetFare => 'Reset to standard fare';
+
+  @override
+  String faresVerifiedAt(String date) {
+    return 'Fares checked on $date. If they have changed, edit them here.';
+  }
+
+  @override
+  String faresVerifiedShort(String date) {
+    return 'Checked: $date';
+  }
+
+  @override
+  String get faresSources => 'Sources';
+
+  @override
+  String get metroAndTrain => 'Metro and train';
+
+  @override
+  String transferSent(String a) {
+    return 'Sent $a';
+  }
+
+  @override
+  String transferArrives(String a, int pct) {
+    return 'Arrives $a ($pct%)';
+  }
+
+  @override
+  String bonusLoss(String a) {
+    return 'Bonus loss: $a';
+  }
+
+  @override
+  String get bonusLossLabel => 'Bonus loss';
+
+  @override
+  String bonusLossExplain(int pct) {
+    return 'Only $pct% of the amount arrives when you move money out of a bonus account.';
+  }
+
+  @override
+  String get bonusReceivedEdit => 'Amount that arrives';
+
+  @override
+  String get bonusReceivedTooBig =>
+      'The amount that arrives can\'t be more than the amount sent';
+
+  @override
+  String get bonusSameCurrencyOnly =>
+      'Money can only move from a bonus account to an account in the same currency';
+
+  @override
+  String sentSubtitle(String a) {
+    return '$a sent';
+  }
+
+  @override
+  String get pairDeleted => 'Transfer and bonus loss deleted together';
+
+  @override
+  String get systemCategoryLocked =>
+      'System category: it can\'t be deleted or archived';
+
+  @override
+  String get transportCategory => 'Transport category';
+
+  @override
+  String get transportCategoryBody =>
+      'Lets you pick bus, metro and other modes when adding';
+
+  @override
+  String get budgetsEnabled => 'Budgets';
+
+  @override
+  String get budgetsEnabledBody =>
+      'Show the Budgets tab, the Home card and alerts';
+
+  @override
+  String get budgetsHidden => 'Budgets hidden. Your data is kept.';
+
+  @override
+  String get pressBackAgainToExit => 'Press back again to exit';
+
+  @override
+  String get reportTransport => 'Transport';
+
+  @override
+  String get reportByMode => 'By mode';
+
+  @override
+  String get reportTopRoutes => 'Top routes';
+
+  @override
+  String get timeOfDay => 'Time of day';
+
+  @override
+  String get timeFrom => 'Start time';
+
+  @override
+  String get timeTo => 'End time';
+
+  @override
+  String backupImagesSkipped(int n) {
+    String _temp0 = intl.Intl.pluralLogic(
+      n,
+      locale: localeName,
+      other: '$n card photos are over 1 MB and were left out of the backup',
+      one: '1 card photo is over 1 MB and was left out of the backup',
+    );
+    return '$_temp0';
+  }
+
+  @override
+  String accountCardSemantics(String type, String name, String balance) {
+    return '$type, $name, $balance';
+  }
+
+  @override
+  String get exportColTransportMode => 'Transport mode';
 }

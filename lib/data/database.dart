@@ -19,6 +19,7 @@ part 'database.g.dart';
     BudgetAlerts,
     Holdings,
     HoldingEntries,
+    TransportFares,
   ],
 )
 class AppDatabase extends _$AppDatabase {
@@ -26,7 +27,7 @@ class AppDatabase extends _$AppDatabase {
       : super(executor ?? driftDatabase(name: 'gelir_cixar'));
 
   @override
-  int get schemaVersion => 3;
+  int get schemaVersion => 4;
 
   /// Seeded defaults; a v2 rate that differs from these was typed by the user.
   static const Map<String, double> defaultRates = <String, double>{
@@ -53,7 +54,9 @@ class AppDatabase extends _$AppDatabase {
             'CREATE INDEX IF NOT EXISTS idx_tx_category ON transactions (category_id)',
           );
           await _createV3Indexes();
+          await _createV4Indexes();
           await _seed();
+          await _seedV4();
         },
         // drift does not wrap onUpgrade in a transaction and only bumps
         // user_version after it returns. So the whole upgrade runs in one
@@ -91,6 +94,7 @@ class AppDatabase extends _$AppDatabase {
                 }
                 await _createV3Indexes();
               }
+              if (from < 4) await _migrateV4(m);
             }),
         beforeOpen: (OpeningDetails details) async {
           await customStatement('PRAGMA foreign_keys = ON');
@@ -110,6 +114,127 @@ class AppDatabase extends _$AppDatabase {
     await customStatement(
       'CREATE INDEX IF NOT EXISTS idx_holding_entry ON holding_entries (holding_id, date)',
     );
+  }
+
+  /// Card design a pre-v1.2 account gets, by type (mirrors
+  /// `AccountTypeStyle.defaultDesignId` in core/theme.dart).
+  static const Map<String, String> defaultDesignByType = <String, String>{
+    'cash': 'forest',
+    'card': 'ocean',
+    'bank': 'midnight',
+    'savings': 'teal',
+    'bonus': 'gold',
+  };
+
+  /// Seeded name of the expense category that records bonus-transfer losses.
+  static const String bonusLossNameAz = 'Bonus itkisi';
+  static const String bonusLossNameEn = 'Bonus loss';
+
+  /// Seeded name of the transport category (id 2 on a fresh install).
+  static const String transportNameAz = 'Nəqliyyat';
+  static const int transportSeedId = 2;
+
+  /// v3 -> v4 (v1.2): card design / photo / last4 / bonus rate on accounts,
+  /// specialKind on categories, transport + link fields on transactions,
+  /// the transport_fares table and the "Bonus itkisi" system category.
+  /// Runs inside the onUpgrade transaction; every step is idempotent.
+  Future<void> _migrateV4(Migrator m) async {
+    final Set<String> accCols = await _columns('accounts');
+    for (final GeneratedColumn<Object> c in <GeneratedColumn<Object>>[
+      accounts.cardDesignId,
+      accounts.cardImagePath,
+      accounts.cardLast4,
+      accounts.bonusRatePercent,
+    ]) {
+      if (!accCols.contains(c.name)) await m.addColumn(accounts, c);
+    }
+    if (!accCols.contains(accounts.cardDesignId.name)) {
+      // Only when the column is new: an existing value was the user's pick.
+      for (final MapEntry<String, String> e in defaultDesignByType.entries) {
+        await customStatement(
+          'UPDATE accounts SET card_design_id = ? WHERE type = ?',
+          <Object>[e.value, e.key],
+        );
+      }
+    }
+    final Set<String> catCols = await _columns('categories');
+    if (!catCols.contains(categories.specialKind.name)) {
+      await m.addColumn(categories, categories.specialKind);
+    }
+    final Set<String> txCols = await _columns('transactions');
+    for (final GeneratedColumn<Object> c in <GeneratedColumn<Object>>[
+      transactions.updatedAt,
+      transactions.transportMode,
+      transactions.routeCode,
+      transactions.trips,
+      transactions.linkGroupId,
+    ]) {
+      if (!txCols.contains(c.name)) await m.addColumn(transactions, c);
+    }
+    await m.createTable(transportFares);
+    // The seeded Nəqliyyat becomes the transport category: by seed id when
+    // it still has its seeded name, else by name. Only if none is marked yet.
+    final QueryRow marked = await customSelect(
+      "SELECT COUNT(*) AS n FROM categories WHERE special_kind = 'transport'",
+    ).getSingle();
+    if (marked.read<int>('n') == 0) {
+      await customStatement(
+        "UPDATE categories SET special_kind = 'transport' "
+        "WHERE id = (SELECT id FROM categories WHERE type = 'expense' AND special_kind = 'none' "
+        'AND (id = ? OR name_az = ?) ORDER BY (id = ? AND name_az = ?) DESC, id LIMIT 1)',
+        <Object>[transportSeedId, transportNameAz, transportSeedId, transportNameAz],
+      );
+    }
+    await _createV4Indexes();
+    await ensureBonusLossCategory();
+  }
+
+  Future<void> _createV4Indexes() async {
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_tx_link ON transactions (link_group_id)',
+    );
+    await customStatement(
+      'CREATE INDEX IF NOT EXISTS idx_tx_transport ON transactions (transport_mode, route_code)',
+    );
+  }
+
+  /// Fresh install: Nəqliyyat (id 2) is the transport category, plus the
+  /// bonus-loss system category.
+  Future<void> _seedV4() async {
+    await (update(categories)..where((c) => c.id.equals(transportSeedId)))
+        .write(const CategoriesCompanion(specialKind: Value(CategorySpecialKind.transport)));
+    await ensureBonusLossCategory();
+  }
+
+  /// Id of the "Bonus itkisi" system category, created when missing (also
+  /// after restoring a pre-v1.2 backup). Raw SQL, so it also works inside
+  /// the migration before drift's generated table matches the file.
+  Future<int> ensureBonusLossCategory() async {
+    final QueryRow? row = await customSelect(
+      "SELECT id FROM categories WHERE special_kind = 'bonusLoss' ORDER BY id LIMIT 1",
+    ).getSingleOrNull();
+    if (row != null) {
+      // A system category is never archived.
+      await customStatement(
+        'UPDATE categories SET is_archived = 0 WHERE id = ?',
+        <Object>[row.read<int>('id')],
+      );
+      return row.read<int>('id');
+    }
+    final QueryRow maxRow =
+        await customSelect('SELECT COALESCE(MAX(sort_order), 0) AS m FROM categories').getSingle();
+    await customStatement(
+      'INSERT INTO categories (name_az, name_en, icon_code_point, color_index, type, '
+      "is_archived, sort_order, special_kind) VALUES (?, ?, ?, 6, 'expense', 0, ?, 'bonusLoss')",
+      <Object>[
+        bonusLossNameAz,
+        bonusLossNameEn,
+        Icons.trending_down.codePoint,
+        maxRow.read<int>('m') + 1,
+      ],
+    );
+    final QueryRow id = await customSelect('SELECT last_insert_rowid() AS id').getSingle();
+    return id.read<int>('id');
   }
 
   Future<void> _seed() async {

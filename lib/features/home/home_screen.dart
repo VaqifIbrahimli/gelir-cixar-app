@@ -16,9 +16,10 @@ import '../settings/exchange_rates_screen.dart';
 import '../settings/rate_sync_controller.dart';
 import '../settings/settings_controller.dart';
 import '../transactions/widgets/tx_tile.dart';
-import 'widgets/account_strip.dart';
-import 'widgets/balance_card.dart';
+import '../transactions/widgets/tx_detail_sheet.dart';
+import 'widgets/card_carousel.dart';
 import 'widgets/home_cards.dart';
+import 'widgets/totals_card.dart';
 
 const TxFilter _recentFilter = TxFilter(limit: 5);
 
@@ -144,9 +145,14 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
             ),
-            section(const BalanceCard(), 0),
+            const SliverPadding(
+              padding: EdgeInsets.only(bottom: AppSpacing.sm),
+              sliver: SliverToBoxAdapter(child: StaggerIn(index: 0, child: HomeCardCarousel())),
+            ),
+            section(const MonthStrip(), 1),
             section(const WeekCard(), 1),
-            section(const BudgetSummaryCard(), 2),
+            // Budgets switched off: the card goes and the rest moves up.
+            if (ref.watch(settingsProvider).budgetsEnabled) section(const BudgetSummaryCard(), 2),
             SliverToBoxAdapter(
               child: StaggerIn(
                 index: 3,
@@ -167,7 +173,6 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 ),
               ),
             ),
-            const SliverToBoxAdapter(child: AccountStrip()),
             SliverToBoxAdapter(
               child: SectionHeader(
                 l.recentTransactions,
@@ -192,15 +197,13 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                     ]
                   : <Widget>[
                       AnimatedDiffSliverList<TxDetails>(
-                        items: items,
+                        items: groupBonusPairs(items),
                         keyOf: (TxDetails t) => t.tx.id,
                         itemBuilder:
                             (BuildContext context, TxDetails t, int i) =>
                                 TxTile(
                                   item: t,
-                                  onTap: () => context.push(
-                                    Routes.editTransaction(t.tx.id),
-                                  ),
+                                  onTap: () => showTxDetailSheet(context, t),
                                 ),
                       ),
                     ],
@@ -216,8 +219,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
                 SliverToBoxAdapter(child: Center(child: Text(l.genericError))),
               ],
             ),
-            // Room for the FAB.
-            const SliverToBoxAdapter(child: SizedBox(height: 96)),
+            // Room for the floating navigation.
+            SliverToBoxAdapter(child: SizedBox(height: AppNav.contentInset(context))),
           ],
         ),
       ),

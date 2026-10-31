@@ -69,6 +69,12 @@ GROUP BY b.id, a.currency
     required int limitAmount,
   }) =>
       _db.transaction(() async {
+        // The bonus-loss system category is never budgeted (DESIGN.md §18.6.3).
+        final TxCategory? cat =
+            await (_db.select(_db.categories)..where((c) => c.id.equals(categoryId))).getSingleOrNull();
+        if (cat?.specialKind == CategorySpecialKind.bonusLoss) {
+          throw ArgumentError('the system category cannot have a budget');
+        }
         final Budget? existing = await (_db.select(_db.budgets)
               ..where((b) => b.categoryId.equals(categoryId) & b.month.equals(month)))
             .getSingleOrNull();
@@ -105,7 +111,8 @@ GROUP BY b.id, a.currency
             .map((Budget b) => b.categoryId)
             .toSet();
         final Set<int> archived = (await (_db.select(_db.categories)
-                  ..where((c) => c.isArchived.equals(true)))
+                  ..where((c) =>
+                      c.isArchived.equals(true) | c.specialKind.equalsValue(CategorySpecialKind.bonusLoss)))
                 .get())
             .map((TxCategory c) => c.id)
             .toSet();

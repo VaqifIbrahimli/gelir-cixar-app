@@ -109,6 +109,64 @@ class $AccountsTable extends Accounts with TableInfo<$AccountsTable, Account> {
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _cardDesignIdMeta = const VerificationMeta(
+    'cardDesignId',
+  );
+  @override
+  late final GeneratedColumn<String> cardDesignId = GeneratedColumn<String>(
+    'card_design_id',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 20,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant('teal'),
+  );
+  static const VerificationMeta _cardImagePathMeta = const VerificationMeta(
+    'cardImagePath',
+  );
+  @override
+  late final GeneratedColumn<String> cardImagePath = GeneratedColumn<String>(
+    'card_image_path',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 80,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _cardLast4Meta = const VerificationMeta(
+    'cardLast4',
+  );
+  @override
+  late final GeneratedColumn<String> cardLast4 = GeneratedColumn<String>(
+    'card_last4',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 4,
+      maxTextLength: 4,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _bonusRatePercentMeta = const VerificationMeta(
+    'bonusRatePercent',
+  );
+  @override
+  late final GeneratedColumn<int> bonusRatePercent = GeneratedColumn<int>(
+    'bonus_rate_percent',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(50),
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -119,6 +177,10 @@ class $AccountsTable extends Accounts with TableInfo<$AccountsTable, Account> {
     colorIndex,
     isArchived,
     createdAt,
+    cardDesignId,
+    cardImagePath,
+    cardLast4,
+    bonusRatePercent,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -178,6 +240,39 @@ class $AccountsTable extends Accounts with TableInfo<$AccountsTable, Account> {
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
     }
+    if (data.containsKey('card_design_id')) {
+      context.handle(
+        _cardDesignIdMeta,
+        cardDesignId.isAcceptableOrUnknown(
+          data['card_design_id']!,
+          _cardDesignIdMeta,
+        ),
+      );
+    }
+    if (data.containsKey('card_image_path')) {
+      context.handle(
+        _cardImagePathMeta,
+        cardImagePath.isAcceptableOrUnknown(
+          data['card_image_path']!,
+          _cardImagePathMeta,
+        ),
+      );
+    }
+    if (data.containsKey('card_last4')) {
+      context.handle(
+        _cardLast4Meta,
+        cardLast4.isAcceptableOrUnknown(data['card_last4']!, _cardLast4Meta),
+      );
+    }
+    if (data.containsKey('bonus_rate_percent')) {
+      context.handle(
+        _bonusRatePercentMeta,
+        bonusRatePercent.isAcceptableOrUnknown(
+          data['bonus_rate_percent']!,
+          _bonusRatePercentMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -221,6 +316,22 @@ class $AccountsTable extends Accounts with TableInfo<$AccountsTable, Account> {
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      cardDesignId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}card_design_id'],
+      )!,
+      cardImagePath: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}card_image_path'],
+      ),
+      cardLast4: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}card_last4'],
+      ),
+      bonusRatePercent: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}bonus_rate_percent'],
+      )!,
     );
   }
 
@@ -244,6 +355,19 @@ class Account extends DataClass implements Insertable<Account> {
   final int colorIndex;
   final bool isArchived;
   final DateTime createdAt;
+
+  /// v1.2: `AppCardDesigns` preset id, or 'photo' (see [cardImagePath]).
+  final String cardDesignId;
+
+  /// v1.2: file name (not a path) inside `<app documents>/card_images/`.
+  final String? cardImagePath;
+
+  /// v1.2: the user's own label, exactly 4 digits. Never a full card number.
+  final String? cardLast4;
+
+  /// v1.2, bonus accounts only: the percentage that arrives when money is
+  /// moved out to another account (1..100).
+  final int bonusRatePercent;
   const Account({
     required this.id,
     required this.name,
@@ -253,6 +377,10 @@ class Account extends DataClass implements Insertable<Account> {
     required this.colorIndex,
     required this.isArchived,
     required this.createdAt,
+    required this.cardDesignId,
+    this.cardImagePath,
+    this.cardLast4,
+    required this.bonusRatePercent,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -267,6 +395,14 @@ class Account extends DataClass implements Insertable<Account> {
     map['color_index'] = Variable<int>(colorIndex);
     map['is_archived'] = Variable<bool>(isArchived);
     map['created_at'] = Variable<DateTime>(createdAt);
+    map['card_design_id'] = Variable<String>(cardDesignId);
+    if (!nullToAbsent || cardImagePath != null) {
+      map['card_image_path'] = Variable<String>(cardImagePath);
+    }
+    if (!nullToAbsent || cardLast4 != null) {
+      map['card_last4'] = Variable<String>(cardLast4);
+    }
+    map['bonus_rate_percent'] = Variable<int>(bonusRatePercent);
     return map;
   }
 
@@ -280,6 +416,14 @@ class Account extends DataClass implements Insertable<Account> {
       colorIndex: Value(colorIndex),
       isArchived: Value(isArchived),
       createdAt: Value(createdAt),
+      cardDesignId: Value(cardDesignId),
+      cardImagePath: cardImagePath == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cardImagePath),
+      cardLast4: cardLast4 == null && nullToAbsent
+          ? const Value.absent()
+          : Value(cardLast4),
+      bonusRatePercent: Value(bonusRatePercent),
     );
   }
 
@@ -299,6 +443,10 @@ class Account extends DataClass implements Insertable<Account> {
       colorIndex: serializer.fromJson<int>(json['colorIndex']),
       isArchived: serializer.fromJson<bool>(json['isArchived']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      cardDesignId: serializer.fromJson<String>(json['cardDesignId']),
+      cardImagePath: serializer.fromJson<String?>(json['cardImagePath']),
+      cardLast4: serializer.fromJson<String?>(json['cardLast4']),
+      bonusRatePercent: serializer.fromJson<int>(json['bonusRatePercent']),
     );
   }
   @override
@@ -315,6 +463,10 @@ class Account extends DataClass implements Insertable<Account> {
       'colorIndex': serializer.toJson<int>(colorIndex),
       'isArchived': serializer.toJson<bool>(isArchived),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'cardDesignId': serializer.toJson<String>(cardDesignId),
+      'cardImagePath': serializer.toJson<String?>(cardImagePath),
+      'cardLast4': serializer.toJson<String?>(cardLast4),
+      'bonusRatePercent': serializer.toJson<int>(bonusRatePercent),
     };
   }
 
@@ -327,6 +479,10 @@ class Account extends DataClass implements Insertable<Account> {
     int? colorIndex,
     bool? isArchived,
     DateTime? createdAt,
+    String? cardDesignId,
+    Value<String?> cardImagePath = const Value.absent(),
+    Value<String?> cardLast4 = const Value.absent(),
+    int? bonusRatePercent,
   }) => Account(
     id: id ?? this.id,
     name: name ?? this.name,
@@ -336,6 +492,12 @@ class Account extends DataClass implements Insertable<Account> {
     colorIndex: colorIndex ?? this.colorIndex,
     isArchived: isArchived ?? this.isArchived,
     createdAt: createdAt ?? this.createdAt,
+    cardDesignId: cardDesignId ?? this.cardDesignId,
+    cardImagePath: cardImagePath.present
+        ? cardImagePath.value
+        : this.cardImagePath,
+    cardLast4: cardLast4.present ? cardLast4.value : this.cardLast4,
+    bonusRatePercent: bonusRatePercent ?? this.bonusRatePercent,
   );
   Account copyWithCompanion(AccountsCompanion data) {
     return Account(
@@ -353,6 +515,16 @@ class Account extends DataClass implements Insertable<Account> {
           ? data.isArchived.value
           : this.isArchived,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      cardDesignId: data.cardDesignId.present
+          ? data.cardDesignId.value
+          : this.cardDesignId,
+      cardImagePath: data.cardImagePath.present
+          ? data.cardImagePath.value
+          : this.cardImagePath,
+      cardLast4: data.cardLast4.present ? data.cardLast4.value : this.cardLast4,
+      bonusRatePercent: data.bonusRatePercent.present
+          ? data.bonusRatePercent.value
+          : this.bonusRatePercent,
     );
   }
 
@@ -366,7 +538,11 @@ class Account extends DataClass implements Insertable<Account> {
           ..write('initialBalance: $initialBalance, ')
           ..write('colorIndex: $colorIndex, ')
           ..write('isArchived: $isArchived, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('cardDesignId: $cardDesignId, ')
+          ..write('cardImagePath: $cardImagePath, ')
+          ..write('cardLast4: $cardLast4, ')
+          ..write('bonusRatePercent: $bonusRatePercent')
           ..write(')'))
         .toString();
   }
@@ -381,6 +557,10 @@ class Account extends DataClass implements Insertable<Account> {
     colorIndex,
     isArchived,
     createdAt,
+    cardDesignId,
+    cardImagePath,
+    cardLast4,
+    bonusRatePercent,
   );
   @override
   bool operator ==(Object other) =>
@@ -393,7 +573,11 @@ class Account extends DataClass implements Insertable<Account> {
           other.initialBalance == this.initialBalance &&
           other.colorIndex == this.colorIndex &&
           other.isArchived == this.isArchived &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.cardDesignId == this.cardDesignId &&
+          other.cardImagePath == this.cardImagePath &&
+          other.cardLast4 == this.cardLast4 &&
+          other.bonusRatePercent == this.bonusRatePercent);
 }
 
 class AccountsCompanion extends UpdateCompanion<Account> {
@@ -405,6 +589,10 @@ class AccountsCompanion extends UpdateCompanion<Account> {
   final Value<int> colorIndex;
   final Value<bool> isArchived;
   final Value<DateTime> createdAt;
+  final Value<String> cardDesignId;
+  final Value<String?> cardImagePath;
+  final Value<String?> cardLast4;
+  final Value<int> bonusRatePercent;
   const AccountsCompanion({
     this.id = const Value.absent(),
     this.name = const Value.absent(),
@@ -414,6 +602,10 @@ class AccountsCompanion extends UpdateCompanion<Account> {
     this.colorIndex = const Value.absent(),
     this.isArchived = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.cardDesignId = const Value.absent(),
+    this.cardImagePath = const Value.absent(),
+    this.cardLast4 = const Value.absent(),
+    this.bonusRatePercent = const Value.absent(),
   });
   AccountsCompanion.insert({
     this.id = const Value.absent(),
@@ -424,6 +616,10 @@ class AccountsCompanion extends UpdateCompanion<Account> {
     this.colorIndex = const Value.absent(),
     this.isArchived = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.cardDesignId = const Value.absent(),
+    this.cardImagePath = const Value.absent(),
+    this.cardLast4 = const Value.absent(),
+    this.bonusRatePercent = const Value.absent(),
   }) : name = Value(name),
        type = Value(type),
        currency = Value(currency);
@@ -436,6 +632,10 @@ class AccountsCompanion extends UpdateCompanion<Account> {
     Expression<int>? colorIndex,
     Expression<bool>? isArchived,
     Expression<DateTime>? createdAt,
+    Expression<String>? cardDesignId,
+    Expression<String>? cardImagePath,
+    Expression<String>? cardLast4,
+    Expression<int>? bonusRatePercent,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -446,6 +646,10 @@ class AccountsCompanion extends UpdateCompanion<Account> {
       if (colorIndex != null) 'color_index': colorIndex,
       if (isArchived != null) 'is_archived': isArchived,
       if (createdAt != null) 'created_at': createdAt,
+      if (cardDesignId != null) 'card_design_id': cardDesignId,
+      if (cardImagePath != null) 'card_image_path': cardImagePath,
+      if (cardLast4 != null) 'card_last4': cardLast4,
+      if (bonusRatePercent != null) 'bonus_rate_percent': bonusRatePercent,
     });
   }
 
@@ -458,6 +662,10 @@ class AccountsCompanion extends UpdateCompanion<Account> {
     Value<int>? colorIndex,
     Value<bool>? isArchived,
     Value<DateTime>? createdAt,
+    Value<String>? cardDesignId,
+    Value<String?>? cardImagePath,
+    Value<String?>? cardLast4,
+    Value<int>? bonusRatePercent,
   }) {
     return AccountsCompanion(
       id: id ?? this.id,
@@ -468,6 +676,10 @@ class AccountsCompanion extends UpdateCompanion<Account> {
       colorIndex: colorIndex ?? this.colorIndex,
       isArchived: isArchived ?? this.isArchived,
       createdAt: createdAt ?? this.createdAt,
+      cardDesignId: cardDesignId ?? this.cardDesignId,
+      cardImagePath: cardImagePath ?? this.cardImagePath,
+      cardLast4: cardLast4 ?? this.cardLast4,
+      bonusRatePercent: bonusRatePercent ?? this.bonusRatePercent,
     );
   }
 
@@ -500,6 +712,18 @@ class AccountsCompanion extends UpdateCompanion<Account> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (cardDesignId.present) {
+      map['card_design_id'] = Variable<String>(cardDesignId.value);
+    }
+    if (cardImagePath.present) {
+      map['card_image_path'] = Variable<String>(cardImagePath.value);
+    }
+    if (cardLast4.present) {
+      map['card_last4'] = Variable<String>(cardLast4.value);
+    }
+    if (bonusRatePercent.present) {
+      map['bonus_rate_percent'] = Variable<int>(bonusRatePercent.value);
+    }
     return map;
   }
 
@@ -513,7 +737,11 @@ class AccountsCompanion extends UpdateCompanion<Account> {
           ..write('initialBalance: $initialBalance, ')
           ..write('colorIndex: $colorIndex, ')
           ..write('isArchived: $isArchived, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('cardDesignId: $cardDesignId, ')
+          ..write('cardImagePath: $cardImagePath, ')
+          ..write('cardLast4: $cardLast4, ')
+          ..write('bonusRatePercent: $bonusRatePercent')
           ..write(')'))
         .toString();
   }
@@ -624,6 +852,16 @@ class $CategoriesTable extends Categories
     defaultValue: const Constant(0),
   );
   @override
+  late final GeneratedColumnWithTypeConverter<CategorySpecialKind, String>
+  specialKind = GeneratedColumn<String>(
+    'special_kind',
+    aliasedName,
+    false,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: Constant(CategorySpecialKind.none.name),
+  ).withConverter<CategorySpecialKind>($CategoriesTable.$converterspecialKind);
+  @override
   List<GeneratedColumn> get $columns => [
     id,
     nameAz,
@@ -633,6 +871,7 @@ class $CategoriesTable extends Categories
     type,
     isArchived,
     sortOrder,
+    specialKind,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -737,6 +976,12 @@ class $CategoriesTable extends Categories
         DriftSqlType.int,
         data['${effectivePrefix}sort_order'],
       )!,
+      specialKind: $CategoriesTable.$converterspecialKind.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}special_kind'],
+        )!,
+      ),
     );
   }
 
@@ -747,6 +992,10 @@ class $CategoriesTable extends Categories
 
   static JsonTypeConverter2<CategoryType, String, String> $convertertype =
       const EnumNameConverter<CategoryType>(CategoryType.values);
+  static JsonTypeConverter2<CategorySpecialKind, String, String>
+  $converterspecialKind = const EnumNameConverter<CategorySpecialKind>(
+    CategorySpecialKind.values,
+  );
 }
 
 class TxCategory extends DataClass implements Insertable<TxCategory> {
@@ -762,6 +1011,9 @@ class TxCategory extends DataClass implements Insertable<TxCategory> {
   final CategoryType type;
   final bool isArchived;
   final int sortOrder;
+
+  /// v1.2: transport picker / bonus-loss system category.
+  final CategorySpecialKind specialKind;
   const TxCategory({
     required this.id,
     required this.nameAz,
@@ -771,6 +1023,7 @@ class TxCategory extends DataClass implements Insertable<TxCategory> {
     required this.type,
     required this.isArchived,
     required this.sortOrder,
+    required this.specialKind,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -787,6 +1040,11 @@ class TxCategory extends DataClass implements Insertable<TxCategory> {
     }
     map['is_archived'] = Variable<bool>(isArchived);
     map['sort_order'] = Variable<int>(sortOrder);
+    {
+      map['special_kind'] = Variable<String>(
+        $CategoriesTable.$converterspecialKind.toSql(specialKind),
+      );
+    }
     return map;
   }
 
@@ -800,6 +1058,7 @@ class TxCategory extends DataClass implements Insertable<TxCategory> {
       type: Value(type),
       isArchived: Value(isArchived),
       sortOrder: Value(sortOrder),
+      specialKind: Value(specialKind),
     );
   }
 
@@ -819,6 +1078,9 @@ class TxCategory extends DataClass implements Insertable<TxCategory> {
       ),
       isArchived: serializer.fromJson<bool>(json['isArchived']),
       sortOrder: serializer.fromJson<int>(json['sortOrder']),
+      specialKind: $CategoriesTable.$converterspecialKind.fromJson(
+        serializer.fromJson<String>(json['specialKind']),
+      ),
     );
   }
   @override
@@ -835,6 +1097,9 @@ class TxCategory extends DataClass implements Insertable<TxCategory> {
       ),
       'isArchived': serializer.toJson<bool>(isArchived),
       'sortOrder': serializer.toJson<int>(sortOrder),
+      'specialKind': serializer.toJson<String>(
+        $CategoriesTable.$converterspecialKind.toJson(specialKind),
+      ),
     };
   }
 
@@ -847,6 +1112,7 @@ class TxCategory extends DataClass implements Insertable<TxCategory> {
     CategoryType? type,
     bool? isArchived,
     int? sortOrder,
+    CategorySpecialKind? specialKind,
   }) => TxCategory(
     id: id ?? this.id,
     nameAz: nameAz ?? this.nameAz,
@@ -856,6 +1122,7 @@ class TxCategory extends DataClass implements Insertable<TxCategory> {
     type: type ?? this.type,
     isArchived: isArchived ?? this.isArchived,
     sortOrder: sortOrder ?? this.sortOrder,
+    specialKind: specialKind ?? this.specialKind,
   );
   TxCategory copyWithCompanion(CategoriesCompanion data) {
     return TxCategory(
@@ -873,6 +1140,9 @@ class TxCategory extends DataClass implements Insertable<TxCategory> {
           ? data.isArchived.value
           : this.isArchived,
       sortOrder: data.sortOrder.present ? data.sortOrder.value : this.sortOrder,
+      specialKind: data.specialKind.present
+          ? data.specialKind.value
+          : this.specialKind,
     );
   }
 
@@ -886,7 +1156,8 @@ class TxCategory extends DataClass implements Insertable<TxCategory> {
           ..write('colorIndex: $colorIndex, ')
           ..write('type: $type, ')
           ..write('isArchived: $isArchived, ')
-          ..write('sortOrder: $sortOrder')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('specialKind: $specialKind')
           ..write(')'))
         .toString();
   }
@@ -901,6 +1172,7 @@ class TxCategory extends DataClass implements Insertable<TxCategory> {
     type,
     isArchived,
     sortOrder,
+    specialKind,
   );
   @override
   bool operator ==(Object other) =>
@@ -913,7 +1185,8 @@ class TxCategory extends DataClass implements Insertable<TxCategory> {
           other.colorIndex == this.colorIndex &&
           other.type == this.type &&
           other.isArchived == this.isArchived &&
-          other.sortOrder == this.sortOrder);
+          other.sortOrder == this.sortOrder &&
+          other.specialKind == this.specialKind);
 }
 
 class CategoriesCompanion extends UpdateCompanion<TxCategory> {
@@ -925,6 +1198,7 @@ class CategoriesCompanion extends UpdateCompanion<TxCategory> {
   final Value<CategoryType> type;
   final Value<bool> isArchived;
   final Value<int> sortOrder;
+  final Value<CategorySpecialKind> specialKind;
   const CategoriesCompanion({
     this.id = const Value.absent(),
     this.nameAz = const Value.absent(),
@@ -934,6 +1208,7 @@ class CategoriesCompanion extends UpdateCompanion<TxCategory> {
     this.type = const Value.absent(),
     this.isArchived = const Value.absent(),
     this.sortOrder = const Value.absent(),
+    this.specialKind = const Value.absent(),
   });
   CategoriesCompanion.insert({
     this.id = const Value.absent(),
@@ -944,6 +1219,7 @@ class CategoriesCompanion extends UpdateCompanion<TxCategory> {
     required CategoryType type,
     this.isArchived = const Value.absent(),
     this.sortOrder = const Value.absent(),
+    this.specialKind = const Value.absent(),
   }) : nameAz = Value(nameAz),
        nameEn = Value(nameEn),
        iconCodePoint = Value(iconCodePoint),
@@ -957,6 +1233,7 @@ class CategoriesCompanion extends UpdateCompanion<TxCategory> {
     Expression<String>? type,
     Expression<bool>? isArchived,
     Expression<int>? sortOrder,
+    Expression<String>? specialKind,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -967,6 +1244,7 @@ class CategoriesCompanion extends UpdateCompanion<TxCategory> {
       if (type != null) 'type': type,
       if (isArchived != null) 'is_archived': isArchived,
       if (sortOrder != null) 'sort_order': sortOrder,
+      if (specialKind != null) 'special_kind': specialKind,
     });
   }
 
@@ -979,6 +1257,7 @@ class CategoriesCompanion extends UpdateCompanion<TxCategory> {
     Value<CategoryType>? type,
     Value<bool>? isArchived,
     Value<int>? sortOrder,
+    Value<CategorySpecialKind>? specialKind,
   }) {
     return CategoriesCompanion(
       id: id ?? this.id,
@@ -989,6 +1268,7 @@ class CategoriesCompanion extends UpdateCompanion<TxCategory> {
       type: type ?? this.type,
       isArchived: isArchived ?? this.isArchived,
       sortOrder: sortOrder ?? this.sortOrder,
+      specialKind: specialKind ?? this.specialKind,
     );
   }
 
@@ -1021,6 +1301,11 @@ class CategoriesCompanion extends UpdateCompanion<TxCategory> {
     if (sortOrder.present) {
       map['sort_order'] = Variable<int>(sortOrder.value);
     }
+    if (specialKind.present) {
+      map['special_kind'] = Variable<String>(
+        $CategoriesTable.$converterspecialKind.toSql(specialKind.value),
+      );
+    }
     return map;
   }
 
@@ -1034,7 +1319,8 @@ class CategoriesCompanion extends UpdateCompanion<TxCategory> {
           ..write('colorIndex: $colorIndex, ')
           ..write('type: $type, ')
           ..write('isArchived: $isArchived, ')
-          ..write('sortOrder: $sortOrder')
+          ..write('sortOrder: $sortOrder, ')
+          ..write('specialKind: $specialKind')
           ..write(')'))
         .toString();
   }
@@ -1841,6 +2127,66 @@ class $TransactionsTable extends Transactions
     requiredDuringInsert: false,
     defaultValue: currentDateAndTime,
   );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    true,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+  );
+  @override
+  late final GeneratedColumnWithTypeConverter<TransportMode?, String>
+  transportMode = GeneratedColumn<String>(
+    'transport_mode',
+    aliasedName,
+    true,
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  ).withConverter<TransportMode?>($TransactionsTable.$convertertransportModen);
+  static const VerificationMeta _routeCodeMeta = const VerificationMeta(
+    'routeCode',
+  );
+  @override
+  late final GeneratedColumn<String> routeCode = GeneratedColumn<String>(
+    'route_code',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 60,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
+  static const VerificationMeta _tripsMeta = const VerificationMeta('trips');
+  @override
+  late final GeneratedColumn<int> trips = GeneratedColumn<int>(
+    'trips',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(1),
+  );
+  static const VerificationMeta _linkGroupIdMeta = const VerificationMeta(
+    'linkGroupId',
+  );
+  @override
+  late final GeneratedColumn<String> linkGroupId = GeneratedColumn<String>(
+    'link_group_id',
+    aliasedName,
+    true,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 1,
+      maxTextLength: 64,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+  );
   @override
   List<GeneratedColumn> get $columns => [
     id,
@@ -1854,6 +2200,11 @@ class $TransactionsTable extends Transactions
     date,
     note,
     createdAt,
+    updatedAt,
+    transportMode,
+    routeCode,
+    trips,
+    linkGroupId,
   ];
   @override
   String get aliasedName => _alias ?? actualTableName;
@@ -1933,6 +2284,33 @@ class $TransactionsTable extends Transactions
         createdAt.isAcceptableOrUnknown(data['created_at']!, _createdAtMeta),
       );
     }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    if (data.containsKey('route_code')) {
+      context.handle(
+        _routeCodeMeta,
+        routeCode.isAcceptableOrUnknown(data['route_code']!, _routeCodeMeta),
+      );
+    }
+    if (data.containsKey('trips')) {
+      context.handle(
+        _tripsMeta,
+        trips.isAcceptableOrUnknown(data['trips']!, _tripsMeta),
+      );
+    }
+    if (data.containsKey('link_group_id')) {
+      context.handle(
+        _linkGroupIdMeta,
+        linkGroupId.isAcceptableOrUnknown(
+          data['link_group_id']!,
+          _linkGroupIdMeta,
+        ),
+      );
+    }
     return context;
   }
 
@@ -1988,6 +2366,28 @@ class $TransactionsTable extends Transactions
         DriftSqlType.dateTime,
         data['${effectivePrefix}created_at'],
       )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      ),
+      transportMode: $TransactionsTable.$convertertransportModen.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}transport_mode'],
+        ),
+      ),
+      routeCode: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}route_code'],
+      ),
+      trips: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}trips'],
+      )!,
+      linkGroupId: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}link_group_id'],
+      ),
     );
   }
 
@@ -1998,6 +2398,14 @@ class $TransactionsTable extends Transactions
 
   static JsonTypeConverter2<TxType, String, String> $convertertype =
       const EnumNameConverter<TxType>(TxType.values);
+  static JsonTypeConverter2<TransportMode, String, String>
+  $convertertransportMode = const EnumNameConverter<TransportMode>(
+    TransportMode.values,
+  );
+  static JsonTypeConverter2<TransportMode?, String?, String?>
+  $convertertransportModen = JsonTypeConverter2.asNullable(
+    $convertertransportMode,
+  );
 }
 
 class MoneyTx extends DataClass implements Insertable<MoneyTx> {
@@ -2023,6 +2431,22 @@ class MoneyTx extends DataClass implements Insertable<MoneyTx> {
   final DateTime date;
   final String note;
   final DateTime createdAt;
+
+  /// v1.2: last edit (null = never edited).
+  final DateTime? updatedAt;
+
+  /// v1.2: transport sub-mode of an expense in a transport category.
+  final TransportMode? transportMode;
+
+  /// v1.2: bus route code ("65", "7A"), or the metro station name.
+  final String? routeCode;
+
+  /// v1.2: number of trips (bus / metro / train); 1 otherwise.
+  final int trips;
+
+  /// v1.2: rows written together (a bonus transfer and its loss) share this
+  /// id; they are deleted, restored and edited as one.
+  final String? linkGroupId;
   const MoneyTx({
     required this.id,
     required this.type,
@@ -2035,6 +2459,11 @@ class MoneyTx extends DataClass implements Insertable<MoneyTx> {
     required this.date,
     required this.note,
     required this.createdAt,
+    this.updatedAt,
+    this.transportMode,
+    this.routeCode,
+    required this.trips,
+    this.linkGroupId,
   });
   @override
   Map<String, Expression> toColumns(bool nullToAbsent) {
@@ -2062,6 +2491,21 @@ class MoneyTx extends DataClass implements Insertable<MoneyTx> {
     map['date'] = Variable<DateTime>(date);
     map['note'] = Variable<String>(note);
     map['created_at'] = Variable<DateTime>(createdAt);
+    if (!nullToAbsent || updatedAt != null) {
+      map['updated_at'] = Variable<DateTime>(updatedAt);
+    }
+    if (!nullToAbsent || transportMode != null) {
+      map['transport_mode'] = Variable<String>(
+        $TransactionsTable.$convertertransportModen.toSql(transportMode),
+      );
+    }
+    if (!nullToAbsent || routeCode != null) {
+      map['route_code'] = Variable<String>(routeCode);
+    }
+    map['trips'] = Variable<int>(trips);
+    if (!nullToAbsent || linkGroupId != null) {
+      map['link_group_id'] = Variable<String>(linkGroupId);
+    }
     return map;
   }
 
@@ -2086,6 +2530,19 @@ class MoneyTx extends DataClass implements Insertable<MoneyTx> {
       date: Value(date),
       note: Value(note),
       createdAt: Value(createdAt),
+      updatedAt: updatedAt == null && nullToAbsent
+          ? const Value.absent()
+          : Value(updatedAt),
+      transportMode: transportMode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(transportMode),
+      routeCode: routeCode == null && nullToAbsent
+          ? const Value.absent()
+          : Value(routeCode),
+      trips: Value(trips),
+      linkGroupId: linkGroupId == null && nullToAbsent
+          ? const Value.absent()
+          : Value(linkGroupId),
     );
   }
 
@@ -2108,6 +2565,13 @@ class MoneyTx extends DataClass implements Insertable<MoneyTx> {
       date: serializer.fromJson<DateTime>(json['date']),
       note: serializer.fromJson<String>(json['note']),
       createdAt: serializer.fromJson<DateTime>(json['createdAt']),
+      updatedAt: serializer.fromJson<DateTime?>(json['updatedAt']),
+      transportMode: $TransactionsTable.$convertertransportModen.fromJson(
+        serializer.fromJson<String?>(json['transportMode']),
+      ),
+      routeCode: serializer.fromJson<String?>(json['routeCode']),
+      trips: serializer.fromJson<int>(json['trips']),
+      linkGroupId: serializer.fromJson<String?>(json['linkGroupId']),
     );
   }
   @override
@@ -2127,6 +2591,13 @@ class MoneyTx extends DataClass implements Insertable<MoneyTx> {
       'date': serializer.toJson<DateTime>(date),
       'note': serializer.toJson<String>(note),
       'createdAt': serializer.toJson<DateTime>(createdAt),
+      'updatedAt': serializer.toJson<DateTime?>(updatedAt),
+      'transportMode': serializer.toJson<String?>(
+        $TransactionsTable.$convertertransportModen.toJson(transportMode),
+      ),
+      'routeCode': serializer.toJson<String?>(routeCode),
+      'trips': serializer.toJson<int>(trips),
+      'linkGroupId': serializer.toJson<String?>(linkGroupId),
     };
   }
 
@@ -2142,6 +2613,11 @@ class MoneyTx extends DataClass implements Insertable<MoneyTx> {
     DateTime? date,
     String? note,
     DateTime? createdAt,
+    Value<DateTime?> updatedAt = const Value.absent(),
+    Value<TransportMode?> transportMode = const Value.absent(),
+    Value<String?> routeCode = const Value.absent(),
+    int? trips,
+    Value<String?> linkGroupId = const Value.absent(),
   }) => MoneyTx(
     id: id ?? this.id,
     type: type ?? this.type,
@@ -2154,6 +2630,13 @@ class MoneyTx extends DataClass implements Insertable<MoneyTx> {
     date: date ?? this.date,
     note: note ?? this.note,
     createdAt: createdAt ?? this.createdAt,
+    updatedAt: updatedAt.present ? updatedAt.value : this.updatedAt,
+    transportMode: transportMode.present
+        ? transportMode.value
+        : this.transportMode,
+    routeCode: routeCode.present ? routeCode.value : this.routeCode,
+    trips: trips ?? this.trips,
+    linkGroupId: linkGroupId.present ? linkGroupId.value : this.linkGroupId,
   );
   MoneyTx copyWithCompanion(TransactionsCompanion data) {
     return MoneyTx(
@@ -2172,6 +2655,15 @@ class MoneyTx extends DataClass implements Insertable<MoneyTx> {
       date: data.date.present ? data.date.value : this.date,
       note: data.note.present ? data.note.value : this.note,
       createdAt: data.createdAt.present ? data.createdAt.value : this.createdAt,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+      transportMode: data.transportMode.present
+          ? data.transportMode.value
+          : this.transportMode,
+      routeCode: data.routeCode.present ? data.routeCode.value : this.routeCode,
+      trips: data.trips.present ? data.trips.value : this.trips,
+      linkGroupId: data.linkGroupId.present
+          ? data.linkGroupId.value
+          : this.linkGroupId,
     );
   }
 
@@ -2188,7 +2680,12 @@ class MoneyTx extends DataClass implements Insertable<MoneyTx> {
           ..write('holdingId: $holdingId, ')
           ..write('date: $date, ')
           ..write('note: $note, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('transportMode: $transportMode, ')
+          ..write('routeCode: $routeCode, ')
+          ..write('trips: $trips, ')
+          ..write('linkGroupId: $linkGroupId')
           ..write(')'))
         .toString();
   }
@@ -2206,6 +2703,11 @@ class MoneyTx extends DataClass implements Insertable<MoneyTx> {
     date,
     note,
     createdAt,
+    updatedAt,
+    transportMode,
+    routeCode,
+    trips,
+    linkGroupId,
   );
   @override
   bool operator ==(Object other) =>
@@ -2221,7 +2723,12 @@ class MoneyTx extends DataClass implements Insertable<MoneyTx> {
           other.holdingId == this.holdingId &&
           other.date == this.date &&
           other.note == this.note &&
-          other.createdAt == this.createdAt);
+          other.createdAt == this.createdAt &&
+          other.updatedAt == this.updatedAt &&
+          other.transportMode == this.transportMode &&
+          other.routeCode == this.routeCode &&
+          other.trips == this.trips &&
+          other.linkGroupId == this.linkGroupId);
 }
 
 class TransactionsCompanion extends UpdateCompanion<MoneyTx> {
@@ -2236,6 +2743,11 @@ class TransactionsCompanion extends UpdateCompanion<MoneyTx> {
   final Value<DateTime> date;
   final Value<String> note;
   final Value<DateTime> createdAt;
+  final Value<DateTime?> updatedAt;
+  final Value<TransportMode?> transportMode;
+  final Value<String?> routeCode;
+  final Value<int> trips;
+  final Value<String?> linkGroupId;
   const TransactionsCompanion({
     this.id = const Value.absent(),
     this.type = const Value.absent(),
@@ -2248,6 +2760,11 @@ class TransactionsCompanion extends UpdateCompanion<MoneyTx> {
     this.date = const Value.absent(),
     this.note = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.transportMode = const Value.absent(),
+    this.routeCode = const Value.absent(),
+    this.trips = const Value.absent(),
+    this.linkGroupId = const Value.absent(),
   });
   TransactionsCompanion.insert({
     this.id = const Value.absent(),
@@ -2261,6 +2778,11 @@ class TransactionsCompanion extends UpdateCompanion<MoneyTx> {
     required DateTime date,
     this.note = const Value.absent(),
     this.createdAt = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.transportMode = const Value.absent(),
+    this.routeCode = const Value.absent(),
+    this.trips = const Value.absent(),
+    this.linkGroupId = const Value.absent(),
   }) : type = Value(type),
        accountId = Value(accountId),
        amount = Value(amount),
@@ -2277,6 +2799,11 @@ class TransactionsCompanion extends UpdateCompanion<MoneyTx> {
     Expression<DateTime>? date,
     Expression<String>? note,
     Expression<DateTime>? createdAt,
+    Expression<DateTime>? updatedAt,
+    Expression<String>? transportMode,
+    Expression<String>? routeCode,
+    Expression<int>? trips,
+    Expression<String>? linkGroupId,
   }) {
     return RawValuesInsertable({
       if (id != null) 'id': id,
@@ -2290,6 +2817,11 @@ class TransactionsCompanion extends UpdateCompanion<MoneyTx> {
       if (date != null) 'date': date,
       if (note != null) 'note': note,
       if (createdAt != null) 'created_at': createdAt,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (transportMode != null) 'transport_mode': transportMode,
+      if (routeCode != null) 'route_code': routeCode,
+      if (trips != null) 'trips': trips,
+      if (linkGroupId != null) 'link_group_id': linkGroupId,
     });
   }
 
@@ -2305,6 +2837,11 @@ class TransactionsCompanion extends UpdateCompanion<MoneyTx> {
     Value<DateTime>? date,
     Value<String>? note,
     Value<DateTime>? createdAt,
+    Value<DateTime?>? updatedAt,
+    Value<TransportMode?>? transportMode,
+    Value<String?>? routeCode,
+    Value<int>? trips,
+    Value<String?>? linkGroupId,
   }) {
     return TransactionsCompanion(
       id: id ?? this.id,
@@ -2318,6 +2855,11 @@ class TransactionsCompanion extends UpdateCompanion<MoneyTx> {
       date: date ?? this.date,
       note: note ?? this.note,
       createdAt: createdAt ?? this.createdAt,
+      updatedAt: updatedAt ?? this.updatedAt,
+      transportMode: transportMode ?? this.transportMode,
+      routeCode: routeCode ?? this.routeCode,
+      trips: trips ?? this.trips,
+      linkGroupId: linkGroupId ?? this.linkGroupId,
     );
   }
 
@@ -2359,6 +2901,23 @@ class TransactionsCompanion extends UpdateCompanion<MoneyTx> {
     if (createdAt.present) {
       map['created_at'] = Variable<DateTime>(createdAt.value);
     }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (transportMode.present) {
+      map['transport_mode'] = Variable<String>(
+        $TransactionsTable.$convertertransportModen.toSql(transportMode.value),
+      );
+    }
+    if (routeCode.present) {
+      map['route_code'] = Variable<String>(routeCode.value);
+    }
+    if (trips.present) {
+      map['trips'] = Variable<int>(trips.value);
+    }
+    if (linkGroupId.present) {
+      map['link_group_id'] = Variable<String>(linkGroupId.value);
+    }
     return map;
   }
 
@@ -2375,7 +2934,12 @@ class TransactionsCompanion extends UpdateCompanion<MoneyTx> {
           ..write('holdingId: $holdingId, ')
           ..write('date: $date, ')
           ..write('note: $note, ')
-          ..write('createdAt: $createdAt')
+          ..write('createdAt: $createdAt, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('transportMode: $transportMode, ')
+          ..write('routeCode: $routeCode, ')
+          ..write('trips: $trips, ')
+          ..write('linkGroupId: $linkGroupId')
           ..write(')'))
         .toString();
   }
@@ -3980,6 +4544,476 @@ class HoldingEntriesCompanion extends UpdateCompanion<HoldingEntry> {
   }
 }
 
+class $TransportFaresTable extends TransportFares
+    with TableInfo<$TransportFaresTable, TransportFare> {
+  @override
+  final GeneratedDatabase attachedDatabase;
+  final String? _alias;
+  $TransportFaresTable(this.attachedDatabase, [this._alias]);
+  @override
+  late final GeneratedColumnWithTypeConverter<TransportMode, String> mode =
+      GeneratedColumn<String>(
+        'mode',
+        aliasedName,
+        false,
+        type: DriftSqlType.string,
+        requiredDuringInsert: true,
+      ).withConverter<TransportMode>($TransportFaresTable.$convertermode);
+  static const VerificationMeta _codeMeta = const VerificationMeta('code');
+  @override
+  late final GeneratedColumn<String> code = GeneratedColumn<String>(
+    'code',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 0,
+      maxTextLength: 6,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _fromNameMeta = const VerificationMeta(
+    'fromName',
+  );
+  @override
+  late final GeneratedColumn<String> fromName = GeneratedColumn<String>(
+    'from_name',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 0,
+      maxTextLength: 60,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _toNameMeta = const VerificationMeta('toName');
+  @override
+  late final GeneratedColumn<String> toName = GeneratedColumn<String>(
+    'to_name',
+    aliasedName,
+    false,
+    additionalChecks: GeneratedColumn.checkTextLength(
+      minTextLength: 0,
+      maxTextLength: 60,
+    ),
+    type: DriftSqlType.string,
+    requiredDuringInsert: false,
+    defaultValue: const Constant(''),
+  );
+  static const VerificationMeta _fareMeta = const VerificationMeta('fare');
+  @override
+  late final GeneratedColumn<int> fare = GeneratedColumn<int>(
+    'fare',
+    aliasedName,
+    false,
+    type: DriftSqlType.int,
+    requiredDuringInsert: true,
+  );
+  static const VerificationMeta _isCustomMeta = const VerificationMeta(
+    'isCustom',
+  );
+  @override
+  late final GeneratedColumn<bool> isCustom = GeneratedColumn<bool>(
+    'is_custom',
+    aliasedName,
+    false,
+    type: DriftSqlType.bool,
+    requiredDuringInsert: false,
+    defaultConstraints: GeneratedColumn.constraintIsAlways(
+      'CHECK ("is_custom" IN (0, 1))',
+    ),
+    defaultValue: const Constant(false),
+  );
+  static const VerificationMeta _updatedAtMeta = const VerificationMeta(
+    'updatedAt',
+  );
+  @override
+  late final GeneratedColumn<DateTime> updatedAt = GeneratedColumn<DateTime>(
+    'updated_at',
+    aliasedName,
+    false,
+    type: DriftSqlType.dateTime,
+    requiredDuringInsert: false,
+    defaultValue: currentDateAndTime,
+  );
+  @override
+  List<GeneratedColumn> get $columns => [
+    mode,
+    code,
+    fromName,
+    toName,
+    fare,
+    isCustom,
+    updatedAt,
+  ];
+  @override
+  String get aliasedName => _alias ?? actualTableName;
+  @override
+  String get actualTableName => $name;
+  static const String $name = 'transport_fares';
+  @override
+  VerificationContext validateIntegrity(
+    Insertable<TransportFare> instance, {
+    bool isInserting = false,
+  }) {
+    final context = VerificationContext();
+    final data = instance.toColumns(true);
+    if (data.containsKey('code')) {
+      context.handle(
+        _codeMeta,
+        code.isAcceptableOrUnknown(data['code']!, _codeMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_codeMeta);
+    }
+    if (data.containsKey('from_name')) {
+      context.handle(
+        _fromNameMeta,
+        fromName.isAcceptableOrUnknown(data['from_name']!, _fromNameMeta),
+      );
+    }
+    if (data.containsKey('to_name')) {
+      context.handle(
+        _toNameMeta,
+        toName.isAcceptableOrUnknown(data['to_name']!, _toNameMeta),
+      );
+    }
+    if (data.containsKey('fare')) {
+      context.handle(
+        _fareMeta,
+        fare.isAcceptableOrUnknown(data['fare']!, _fareMeta),
+      );
+    } else if (isInserting) {
+      context.missing(_fareMeta);
+    }
+    if (data.containsKey('is_custom')) {
+      context.handle(
+        _isCustomMeta,
+        isCustom.isAcceptableOrUnknown(data['is_custom']!, _isCustomMeta),
+      );
+    }
+    if (data.containsKey('updated_at')) {
+      context.handle(
+        _updatedAtMeta,
+        updatedAt.isAcceptableOrUnknown(data['updated_at']!, _updatedAtMeta),
+      );
+    }
+    return context;
+  }
+
+  @override
+  Set<GeneratedColumn> get $primaryKey => {mode, code};
+  @override
+  TransportFare map(Map<String, dynamic> data, {String? tablePrefix}) {
+    final effectivePrefix = tablePrefix != null ? '$tablePrefix.' : '';
+    return TransportFare(
+      mode: $TransportFaresTable.$convertermode.fromSql(
+        attachedDatabase.typeMapping.read(
+          DriftSqlType.string,
+          data['${effectivePrefix}mode'],
+        )!,
+      ),
+      code: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}code'],
+      )!,
+      fromName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}from_name'],
+      )!,
+      toName: attachedDatabase.typeMapping.read(
+        DriftSqlType.string,
+        data['${effectivePrefix}to_name'],
+      )!,
+      fare: attachedDatabase.typeMapping.read(
+        DriftSqlType.int,
+        data['${effectivePrefix}fare'],
+      )!,
+      isCustom: attachedDatabase.typeMapping.read(
+        DriftSqlType.bool,
+        data['${effectivePrefix}is_custom'],
+      )!,
+      updatedAt: attachedDatabase.typeMapping.read(
+        DriftSqlType.dateTime,
+        data['${effectivePrefix}updated_at'],
+      )!,
+    );
+  }
+
+  @override
+  $TransportFaresTable createAlias(String alias) {
+    return $TransportFaresTable(attachedDatabase, alias);
+  }
+
+  static JsonTypeConverter2<TransportMode, String, String> $convertermode =
+      const EnumNameConverter<TransportMode>(TransportMode.values);
+}
+
+class TransportFare extends DataClass implements Insertable<TransportFare> {
+  final TransportMode mode;
+  final String code;
+  final String fromName;
+  final String toName;
+
+  /// AZN minor units.
+  final int fare;
+  final bool isCustom;
+  final DateTime updatedAt;
+  const TransportFare({
+    required this.mode,
+    required this.code,
+    required this.fromName,
+    required this.toName,
+    required this.fare,
+    required this.isCustom,
+    required this.updatedAt,
+  });
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    {
+      map['mode'] = Variable<String>(
+        $TransportFaresTable.$convertermode.toSql(mode),
+      );
+    }
+    map['code'] = Variable<String>(code);
+    map['from_name'] = Variable<String>(fromName);
+    map['to_name'] = Variable<String>(toName);
+    map['fare'] = Variable<int>(fare);
+    map['is_custom'] = Variable<bool>(isCustom);
+    map['updated_at'] = Variable<DateTime>(updatedAt);
+    return map;
+  }
+
+  TransportFaresCompanion toCompanion(bool nullToAbsent) {
+    return TransportFaresCompanion(
+      mode: Value(mode),
+      code: Value(code),
+      fromName: Value(fromName),
+      toName: Value(toName),
+      fare: Value(fare),
+      isCustom: Value(isCustom),
+      updatedAt: Value(updatedAt),
+    );
+  }
+
+  factory TransportFare.fromJson(
+    Map<String, dynamic> json, {
+    ValueSerializer? serializer,
+  }) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return TransportFare(
+      mode: $TransportFaresTable.$convertermode.fromJson(
+        serializer.fromJson<String>(json['mode']),
+      ),
+      code: serializer.fromJson<String>(json['code']),
+      fromName: serializer.fromJson<String>(json['fromName']),
+      toName: serializer.fromJson<String>(json['toName']),
+      fare: serializer.fromJson<int>(json['fare']),
+      isCustom: serializer.fromJson<bool>(json['isCustom']),
+      updatedAt: serializer.fromJson<DateTime>(json['updatedAt']),
+    );
+  }
+  @override
+  Map<String, dynamic> toJson({ValueSerializer? serializer}) {
+    serializer ??= driftRuntimeOptions.defaultSerializer;
+    return <String, dynamic>{
+      'mode': serializer.toJson<String>(
+        $TransportFaresTable.$convertermode.toJson(mode),
+      ),
+      'code': serializer.toJson<String>(code),
+      'fromName': serializer.toJson<String>(fromName),
+      'toName': serializer.toJson<String>(toName),
+      'fare': serializer.toJson<int>(fare),
+      'isCustom': serializer.toJson<bool>(isCustom),
+      'updatedAt': serializer.toJson<DateTime>(updatedAt),
+    };
+  }
+
+  TransportFare copyWith({
+    TransportMode? mode,
+    String? code,
+    String? fromName,
+    String? toName,
+    int? fare,
+    bool? isCustom,
+    DateTime? updatedAt,
+  }) => TransportFare(
+    mode: mode ?? this.mode,
+    code: code ?? this.code,
+    fromName: fromName ?? this.fromName,
+    toName: toName ?? this.toName,
+    fare: fare ?? this.fare,
+    isCustom: isCustom ?? this.isCustom,
+    updatedAt: updatedAt ?? this.updatedAt,
+  );
+  TransportFare copyWithCompanion(TransportFaresCompanion data) {
+    return TransportFare(
+      mode: data.mode.present ? data.mode.value : this.mode,
+      code: data.code.present ? data.code.value : this.code,
+      fromName: data.fromName.present ? data.fromName.value : this.fromName,
+      toName: data.toName.present ? data.toName.value : this.toName,
+      fare: data.fare.present ? data.fare.value : this.fare,
+      isCustom: data.isCustom.present ? data.isCustom.value : this.isCustom,
+      updatedAt: data.updatedAt.present ? data.updatedAt.value : this.updatedAt,
+    );
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TransportFare(')
+          ..write('mode: $mode, ')
+          ..write('code: $code, ')
+          ..write('fromName: $fromName, ')
+          ..write('toName: $toName, ')
+          ..write('fare: $fare, ')
+          ..write('isCustom: $isCustom, ')
+          ..write('updatedAt: $updatedAt')
+          ..write(')'))
+        .toString();
+  }
+
+  @override
+  int get hashCode =>
+      Object.hash(mode, code, fromName, toName, fare, isCustom, updatedAt);
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      (other is TransportFare &&
+          other.mode == this.mode &&
+          other.code == this.code &&
+          other.fromName == this.fromName &&
+          other.toName == this.toName &&
+          other.fare == this.fare &&
+          other.isCustom == this.isCustom &&
+          other.updatedAt == this.updatedAt);
+}
+
+class TransportFaresCompanion extends UpdateCompanion<TransportFare> {
+  final Value<TransportMode> mode;
+  final Value<String> code;
+  final Value<String> fromName;
+  final Value<String> toName;
+  final Value<int> fare;
+  final Value<bool> isCustom;
+  final Value<DateTime> updatedAt;
+  final Value<int> rowid;
+  const TransportFaresCompanion({
+    this.mode = const Value.absent(),
+    this.code = const Value.absent(),
+    this.fromName = const Value.absent(),
+    this.toName = const Value.absent(),
+    this.fare = const Value.absent(),
+    this.isCustom = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  });
+  TransportFaresCompanion.insert({
+    required TransportMode mode,
+    required String code,
+    this.fromName = const Value.absent(),
+    this.toName = const Value.absent(),
+    required int fare,
+    this.isCustom = const Value.absent(),
+    this.updatedAt = const Value.absent(),
+    this.rowid = const Value.absent(),
+  }) : mode = Value(mode),
+       code = Value(code),
+       fare = Value(fare);
+  static Insertable<TransportFare> custom({
+    Expression<String>? mode,
+    Expression<String>? code,
+    Expression<String>? fromName,
+    Expression<String>? toName,
+    Expression<int>? fare,
+    Expression<bool>? isCustom,
+    Expression<DateTime>? updatedAt,
+    Expression<int>? rowid,
+  }) {
+    return RawValuesInsertable({
+      if (mode != null) 'mode': mode,
+      if (code != null) 'code': code,
+      if (fromName != null) 'from_name': fromName,
+      if (toName != null) 'to_name': toName,
+      if (fare != null) 'fare': fare,
+      if (isCustom != null) 'is_custom': isCustom,
+      if (updatedAt != null) 'updated_at': updatedAt,
+      if (rowid != null) 'rowid': rowid,
+    });
+  }
+
+  TransportFaresCompanion copyWith({
+    Value<TransportMode>? mode,
+    Value<String>? code,
+    Value<String>? fromName,
+    Value<String>? toName,
+    Value<int>? fare,
+    Value<bool>? isCustom,
+    Value<DateTime>? updatedAt,
+    Value<int>? rowid,
+  }) {
+    return TransportFaresCompanion(
+      mode: mode ?? this.mode,
+      code: code ?? this.code,
+      fromName: fromName ?? this.fromName,
+      toName: toName ?? this.toName,
+      fare: fare ?? this.fare,
+      isCustom: isCustom ?? this.isCustom,
+      updatedAt: updatedAt ?? this.updatedAt,
+      rowid: rowid ?? this.rowid,
+    );
+  }
+
+  @override
+  Map<String, Expression> toColumns(bool nullToAbsent) {
+    final map = <String, Expression>{};
+    if (mode.present) {
+      map['mode'] = Variable<String>(
+        $TransportFaresTable.$convertermode.toSql(mode.value),
+      );
+    }
+    if (code.present) {
+      map['code'] = Variable<String>(code.value);
+    }
+    if (fromName.present) {
+      map['from_name'] = Variable<String>(fromName.value);
+    }
+    if (toName.present) {
+      map['to_name'] = Variable<String>(toName.value);
+    }
+    if (fare.present) {
+      map['fare'] = Variable<int>(fare.value);
+    }
+    if (isCustom.present) {
+      map['is_custom'] = Variable<bool>(isCustom.value);
+    }
+    if (updatedAt.present) {
+      map['updated_at'] = Variable<DateTime>(updatedAt.value);
+    }
+    if (rowid.present) {
+      map['rowid'] = Variable<int>(rowid.value);
+    }
+    return map;
+  }
+
+  @override
+  String toString() {
+    return (StringBuffer('TransportFaresCompanion(')
+          ..write('mode: $mode, ')
+          ..write('code: $code, ')
+          ..write('fromName: $fromName, ')
+          ..write('toName: $toName, ')
+          ..write('fare: $fare, ')
+          ..write('isCustom: $isCustom, ')
+          ..write('updatedAt: $updatedAt, ')
+          ..write('rowid: $rowid')
+          ..write(')'))
+        .toString();
+  }
+}
+
 abstract class _$AppDatabase extends GeneratedDatabase {
   _$AppDatabase(QueryExecutor e) : super(e);
   $AppDatabaseManager get managers => $AppDatabaseManager(this);
@@ -3991,6 +5025,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
   late final $ExchangeRatesTable exchangeRates = $ExchangeRatesTable(this);
   late final $BudgetAlertsTable budgetAlerts = $BudgetAlertsTable(this);
   late final $HoldingEntriesTable holdingEntries = $HoldingEntriesTable(this);
+  late final $TransportFaresTable transportFares = $TransportFaresTable(this);
   @override
   Iterable<TableInfo<Table, Object?>> get allTables =>
       allSchemaEntities.whereType<TableInfo<Table, Object?>>();
@@ -4004,6 +5039,7 @@ abstract class _$AppDatabase extends GeneratedDatabase {
     exchangeRates,
     budgetAlerts,
     holdingEntries,
+    transportFares,
   ];
   @override
   StreamQueryUpdateRules get streamUpdateRules => const StreamQueryUpdateRules([
@@ -4040,6 +5076,10 @@ typedef $$AccountsTableCreateCompanionBuilder = AccountsCompanion Function({
   Value<int> colorIndex,
   Value<bool> isArchived,
   Value<DateTime> createdAt,
+  Value<String> cardDesignId,
+  Value<String?> cardImagePath,
+  Value<String?> cardLast4,
+  Value<int> bonusRatePercent,
 });
 typedef $$AccountsTableUpdateCompanionBuilder = AccountsCompanion Function({
   Value<int> id,
@@ -4050,6 +5090,10 @@ typedef $$AccountsTableUpdateCompanionBuilder = AccountsCompanion Function({
   Value<int> colorIndex,
   Value<bool> isArchived,
   Value<DateTime> createdAt,
+  Value<String> cardDesignId,
+  Value<String?> cardImagePath,
+  Value<String?> cardLast4,
+  Value<int> bonusRatePercent,
 });
 
 final class $$AccountsTableReferences
@@ -4144,6 +5188,26 @@ class $$AccountsTableFilterComposer
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get cardDesignId => $composableBuilder(
+    column: $table.cardDesignId,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get cardImagePath => $composableBuilder(
+    column: $table.cardImagePath,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get cardLast4 => $composableBuilder(
+    column: $table.cardLast4,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get bonusRatePercent => $composableBuilder(
+    column: $table.bonusRatePercent,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -4246,6 +5310,26 @@ class $$AccountsTableOrderingComposer
     column: $table.createdAt,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get cardDesignId => $composableBuilder(
+    column: $table.cardDesignId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get cardImagePath => $composableBuilder(
+    column: $table.cardImagePath,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get cardLast4 => $composableBuilder(
+    column: $table.cardLast4,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get bonusRatePercent => $composableBuilder(
+    column: $table.bonusRatePercent,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$AccountsTableAnnotationComposer
@@ -4286,6 +5370,24 @@ class $$AccountsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<String> get cardDesignId => $composableBuilder(
+    column: $table.cardDesignId,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get cardImagePath => $composableBuilder(
+    column: $table.cardImagePath,
+    builder: (column) => column,
+  );
+
+  GeneratedColumn<String> get cardLast4 =>
+      $composableBuilder(column: $table.cardLast4, builder: (column) => column);
+
+  GeneratedColumn<int> get bonusRatePercent => $composableBuilder(
+    column: $table.bonusRatePercent,
+    builder: (column) => column,
+  );
 
   Expression<T> outgoingTransactions<T extends Object>(
     Expression<T> Function($$TransactionsTableAnnotationComposer a) f,
@@ -4377,6 +5479,10 @@ class $$AccountsTableTableManager
                 Value<int> colorIndex = const Value.absent(),
                 Value<bool> isArchived = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<String> cardDesignId = const Value.absent(),
+                Value<String?> cardImagePath = const Value.absent(),
+                Value<String?> cardLast4 = const Value.absent(),
+                Value<int> bonusRatePercent = const Value.absent(),
               }) => AccountsCompanion(
                 id: id,
                 name: name,
@@ -4386,6 +5492,10 @@ class $$AccountsTableTableManager
                 colorIndex: colorIndex,
                 isArchived: isArchived,
                 createdAt: createdAt,
+                cardDesignId: cardDesignId,
+                cardImagePath: cardImagePath,
+                cardLast4: cardLast4,
+                bonusRatePercent: bonusRatePercent,
               ),
           createCompanionCallback:
               ({
@@ -4397,6 +5507,10 @@ class $$AccountsTableTableManager
                 Value<int> colorIndex = const Value.absent(),
                 Value<bool> isArchived = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<String> cardDesignId = const Value.absent(),
+                Value<String?> cardImagePath = const Value.absent(),
+                Value<String?> cardLast4 = const Value.absent(),
+                Value<int> bonusRatePercent = const Value.absent(),
               }) => AccountsCompanion.insert(
                 id: id,
                 name: name,
@@ -4406,6 +5520,10 @@ class $$AccountsTableTableManager
                 colorIndex: colorIndex,
                 isArchived: isArchived,
                 createdAt: createdAt,
+                cardDesignId: cardDesignId,
+                cardImagePath: cardImagePath,
+                cardLast4: cardLast4,
+                bonusRatePercent: bonusRatePercent,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -4500,6 +5618,7 @@ typedef $$CategoriesTableCreateCompanionBuilder = CategoriesCompanion Function({
   required CategoryType type,
   Value<bool> isArchived,
   Value<int> sortOrder,
+  Value<CategorySpecialKind> specialKind,
 });
 typedef $$CategoriesTableUpdateCompanionBuilder = CategoriesCompanion Function({
   Value<int> id,
@@ -4510,6 +5629,7 @@ typedef $$CategoriesTableUpdateCompanionBuilder = CategoriesCompanion Function({
   Value<CategoryType> type,
   Value<bool> isArchived,
   Value<int> sortOrder,
+  Value<CategorySpecialKind> specialKind,
 });
 
 final class $$CategoriesTableReferences
@@ -4602,6 +5722,16 @@ class $$CategoriesTableFilterComposer
   ColumnFilters<int> get sortOrder => $composableBuilder(
     column: $table.sortOrder,
     builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<
+    CategorySpecialKind,
+    CategorySpecialKind,
+    String
+  >
+  get specialKind => $composableBuilder(
+    column: $table.specialKind,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
   );
 
   Expression<bool> transactionsRefs(
@@ -4703,6 +5833,11 @@ class $$CategoriesTableOrderingComposer
     column: $table.sortOrder,
     builder: (column) => ColumnOrderings(column),
   );
+
+  ColumnOrderings<String> get specialKind => $composableBuilder(
+    column: $table.specialKind,
+    builder: (column) => ColumnOrderings(column),
+  );
 }
 
 class $$CategoriesTableAnnotationComposer
@@ -4743,6 +5878,12 @@ class $$CategoriesTableAnnotationComposer
 
   GeneratedColumn<int> get sortOrder =>
       $composableBuilder(column: $table.sortOrder, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<CategorySpecialKind, String>
+  get specialKind => $composableBuilder(
+    column: $table.specialKind,
+    builder: (column) => column,
+  );
 
   Expression<T> transactionsRefs<T extends Object>(
     Expression<T> Function($$TransactionsTableAnnotationComposer a) f,
@@ -4831,6 +5972,7 @@ class $$CategoriesTableTableManager
                 Value<CategoryType> type = const Value.absent(),
                 Value<bool> isArchived = const Value.absent(),
                 Value<int> sortOrder = const Value.absent(),
+                Value<CategorySpecialKind> specialKind = const Value.absent(),
               }) => CategoriesCompanion(
                 id: id,
                 nameAz: nameAz,
@@ -4840,6 +5982,7 @@ class $$CategoriesTableTableManager
                 type: type,
                 isArchived: isArchived,
                 sortOrder: sortOrder,
+                specialKind: specialKind,
               ),
           createCompanionCallback:
               ({
@@ -4851,6 +5994,7 @@ class $$CategoriesTableTableManager
                 required CategoryType type,
                 Value<bool> isArchived = const Value.absent(),
                 Value<int> sortOrder = const Value.absent(),
+                Value<CategorySpecialKind> specialKind = const Value.absent(),
               }) => CategoriesCompanion.insert(
                 id: id,
                 nameAz: nameAz,
@@ -4860,6 +6004,7 @@ class $$CategoriesTableTableManager
                 type: type,
                 isArchived: isArchived,
                 sortOrder: sortOrder,
+                specialKind: specialKind,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -5467,6 +6612,11 @@ typedef $$TransactionsTableCreateCompanionBuilder =
       required DateTime date,
       Value<String> note,
       Value<DateTime> createdAt,
+      Value<DateTime?> updatedAt,
+      Value<TransportMode?> transportMode,
+      Value<String?> routeCode,
+      Value<int> trips,
+      Value<String?> linkGroupId,
     });
 typedef $$TransactionsTableUpdateCompanionBuilder =
     TransactionsCompanion Function({
@@ -5481,6 +6631,11 @@ typedef $$TransactionsTableUpdateCompanionBuilder =
       Value<DateTime> date,
       Value<String> note,
       Value<DateTime> createdAt,
+      Value<DateTime?> updatedAt,
+      Value<TransportMode?> transportMode,
+      Value<String?> routeCode,
+      Value<int> trips,
+      Value<String?> linkGroupId,
     });
 
 final class $$TransactionsTableReferences
@@ -5616,6 +6771,32 @@ class $$TransactionsTableFilterComposer
 
   ColumnFilters<DateTime> get createdAt => $composableBuilder(
     column: $table.createdAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnWithTypeConverterFilters<TransportMode?, TransportMode, String>
+  get transportMode => $composableBuilder(
+    column: $table.transportMode,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<String> get routeCode => $composableBuilder(
+    column: $table.routeCode,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get trips => $composableBuilder(
+    column: $table.trips,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get linkGroupId => $composableBuilder(
+    column: $table.linkGroupId,
     builder: (column) => ColumnFilters(column),
   );
 
@@ -5781,6 +6962,31 @@ class $$TransactionsTableOrderingComposer
     builder: (column) => ColumnOrderings(column),
   );
 
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get transportMode => $composableBuilder(
+    column: $table.transportMode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get routeCode => $composableBuilder(
+    column: $table.routeCode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get trips => $composableBuilder(
+    column: $table.trips,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get linkGroupId => $composableBuilder(
+    column: $table.linkGroupId,
+    builder: (column) => ColumnOrderings(column),
+  );
+
   $$AccountsTableOrderingComposer get accountId {
     final $$AccountsTableOrderingComposer composer = $composerBuilder(
       composer: this,
@@ -5903,6 +7109,26 @@ class $$TransactionsTableAnnotationComposer
 
   GeneratedColumn<DateTime> get createdAt =>
       $composableBuilder(column: $table.createdAt, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+
+  GeneratedColumnWithTypeConverter<TransportMode?, String> get transportMode =>
+      $composableBuilder(
+        column: $table.transportMode,
+        builder: (column) => column,
+      );
+
+  GeneratedColumn<String> get routeCode =>
+      $composableBuilder(column: $table.routeCode, builder: (column) => column);
+
+  GeneratedColumn<int> get trips =>
+      $composableBuilder(column: $table.trips, builder: (column) => column);
+
+  GeneratedColumn<String> get linkGroupId => $composableBuilder(
+    column: $table.linkGroupId,
+    builder: (column) => column,
+  );
 
   $$AccountsTableAnnotationComposer get accountId {
     final $$AccountsTableAnnotationComposer composer = $composerBuilder(
@@ -6067,6 +7293,11 @@ class $$TransactionsTableTableManager
                 Value<DateTime> date = const Value.absent(),
                 Value<String> note = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+                Value<TransportMode?> transportMode = const Value.absent(),
+                Value<String?> routeCode = const Value.absent(),
+                Value<int> trips = const Value.absent(),
+                Value<String?> linkGroupId = const Value.absent(),
               }) => TransactionsCompanion(
                 id: id,
                 type: type,
@@ -6079,6 +7310,11 @@ class $$TransactionsTableTableManager
                 date: date,
                 note: note,
                 createdAt: createdAt,
+                updatedAt: updatedAt,
+                transportMode: transportMode,
+                routeCode: routeCode,
+                trips: trips,
+                linkGroupId: linkGroupId,
               ),
           createCompanionCallback:
               ({
@@ -6093,6 +7329,11 @@ class $$TransactionsTableTableManager
                 required DateTime date,
                 Value<String> note = const Value.absent(),
                 Value<DateTime> createdAt = const Value.absent(),
+                Value<DateTime?> updatedAt = const Value.absent(),
+                Value<TransportMode?> transportMode = const Value.absent(),
+                Value<String?> routeCode = const Value.absent(),
+                Value<int> trips = const Value.absent(),
+                Value<String?> linkGroupId = const Value.absent(),
               }) => TransactionsCompanion.insert(
                 id: id,
                 type: type,
@@ -6105,6 +7346,11 @@ class $$TransactionsTableTableManager
                 date: date,
                 note: note,
                 createdAt: createdAt,
+                updatedAt: updatedAt,
+                transportMode: transportMode,
+                routeCode: routeCode,
+                trips: trips,
+                linkGroupId: linkGroupId,
               ),
           withReferenceMapper: (p0) => p0
               .map(
@@ -7605,6 +8851,256 @@ typedef $$HoldingEntriesTableProcessedTableManager =
       HoldingEntry,
       PrefetchHooks Function({bool holdingId, bool transactionId})
     >;
+typedef $$TransportFaresTableCreateCompanionBuilder =
+    TransportFaresCompanion Function({
+      required TransportMode mode,
+      required String code,
+      Value<String> fromName,
+      Value<String> toName,
+      required int fare,
+      Value<bool> isCustom,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+typedef $$TransportFaresTableUpdateCompanionBuilder =
+    TransportFaresCompanion Function({
+      Value<TransportMode> mode,
+      Value<String> code,
+      Value<String> fromName,
+      Value<String> toName,
+      Value<int> fare,
+      Value<bool> isCustom,
+      Value<DateTime> updatedAt,
+      Value<int> rowid,
+    });
+
+class $$TransportFaresTableFilterComposer
+    extends Composer<_$AppDatabase, $TransportFaresTable> {
+  $$TransportFaresTableFilterComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnWithTypeConverterFilters<TransportMode, TransportMode, String>
+  get mode => $composableBuilder(
+    column: $table.mode,
+    builder: (column) => ColumnWithTypeConverterFilters(column),
+  );
+
+  ColumnFilters<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get fromName => $composableBuilder(
+    column: $table.fromName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<String> get toName => $composableBuilder(
+    column: $table.toName,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<int> get fare => $composableBuilder(
+    column: $table.fare,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<bool> get isCustom => $composableBuilder(
+    column: $table.isCustom,
+    builder: (column) => ColumnFilters(column),
+  );
+
+  ColumnFilters<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnFilters(column),
+  );
+}
+
+class $$TransportFaresTableOrderingComposer
+    extends Composer<_$AppDatabase, $TransportFaresTable> {
+  $$TransportFaresTableOrderingComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  ColumnOrderings<String> get mode => $composableBuilder(
+    column: $table.mode,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get code => $composableBuilder(
+    column: $table.code,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get fromName => $composableBuilder(
+    column: $table.fromName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<String> get toName => $composableBuilder(
+    column: $table.toName,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<int> get fare => $composableBuilder(
+    column: $table.fare,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<bool> get isCustom => $composableBuilder(
+    column: $table.isCustom,
+    builder: (column) => ColumnOrderings(column),
+  );
+
+  ColumnOrderings<DateTime> get updatedAt => $composableBuilder(
+    column: $table.updatedAt,
+    builder: (column) => ColumnOrderings(column),
+  );
+}
+
+class $$TransportFaresTableAnnotationComposer
+    extends Composer<_$AppDatabase, $TransportFaresTable> {
+  $$TransportFaresTableAnnotationComposer({
+    required super.$db,
+    required super.$table,
+    super.joinBuilder,
+    super.$addJoinBuilderToRootComposer,
+    super.$removeJoinBuilderFromRootComposer,
+  });
+  GeneratedColumnWithTypeConverter<TransportMode, String> get mode =>
+      $composableBuilder(column: $table.mode, builder: (column) => column);
+
+  GeneratedColumn<String> get code =>
+      $composableBuilder(column: $table.code, builder: (column) => column);
+
+  GeneratedColumn<String> get fromName =>
+      $composableBuilder(column: $table.fromName, builder: (column) => column);
+
+  GeneratedColumn<String> get toName =>
+      $composableBuilder(column: $table.toName, builder: (column) => column);
+
+  GeneratedColumn<int> get fare =>
+      $composableBuilder(column: $table.fare, builder: (column) => column);
+
+  GeneratedColumn<bool> get isCustom =>
+      $composableBuilder(column: $table.isCustom, builder: (column) => column);
+
+  GeneratedColumn<DateTime> get updatedAt =>
+      $composableBuilder(column: $table.updatedAt, builder: (column) => column);
+}
+
+class $$TransportFaresTableTableManager
+    extends
+        RootTableManager<
+          _$AppDatabase,
+          $TransportFaresTable,
+          TransportFare,
+          $$TransportFaresTableFilterComposer,
+          $$TransportFaresTableOrderingComposer,
+          $$TransportFaresTableAnnotationComposer,
+          $$TransportFaresTableCreateCompanionBuilder,
+          $$TransportFaresTableUpdateCompanionBuilder,
+          (
+            TransportFare,
+            BaseReferences<_$AppDatabase, $TransportFaresTable, TransportFare>,
+          ),
+          TransportFare,
+          PrefetchHooks Function()
+        > {
+  $$TransportFaresTableTableManager(
+    _$AppDatabase db,
+    $TransportFaresTable table,
+  ) : super(
+        TableManagerState(
+          db: db,
+          table: table,
+          createFilteringComposer: () =>
+              $$TransportFaresTableFilterComposer($db: db, $table: table),
+          createOrderingComposer: () =>
+              $$TransportFaresTableOrderingComposer($db: db, $table: table),
+          createComputedFieldComposer: () =>
+              $$TransportFaresTableAnnotationComposer($db: db, $table: table),
+          updateCompanionCallback:
+              ({
+                Value<TransportMode> mode = const Value.absent(),
+                Value<String> code = const Value.absent(),
+                Value<String> fromName = const Value.absent(),
+                Value<String> toName = const Value.absent(),
+                Value<int> fare = const Value.absent(),
+                Value<bool> isCustom = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TransportFaresCompanion(
+                mode: mode,
+                code: code,
+                fromName: fromName,
+                toName: toName,
+                fare: fare,
+                isCustom: isCustom,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          createCompanionCallback:
+              ({
+                required TransportMode mode,
+                required String code,
+                Value<String> fromName = const Value.absent(),
+                Value<String> toName = const Value.absent(),
+                required int fare,
+                Value<bool> isCustom = const Value.absent(),
+                Value<DateTime> updatedAt = const Value.absent(),
+                Value<int> rowid = const Value.absent(),
+              }) => TransportFaresCompanion.insert(
+                mode: mode,
+                code: code,
+                fromName: fromName,
+                toName: toName,
+                fare: fare,
+                isCustom: isCustom,
+                updatedAt: updatedAt,
+                rowid: rowid,
+              ),
+          withReferenceMapper: (p0) => p0
+              .map(
+                (e) => (
+                  e.readTable<$TransportFaresTable, TransportFare>(table),
+                  BaseReferences<
+                    _$AppDatabase,
+                    $TransportFaresTable,
+                    TransportFare
+                  >(db, table, e),
+                ),
+              )
+              .toList(),
+          prefetchHooksCallback: null,
+        ),
+      );
+}
+
+typedef $$TransportFaresTableProcessedTableManager =
+    ProcessedTableManager<
+      _$AppDatabase,
+      $TransportFaresTable,
+      TransportFare,
+      $$TransportFaresTableFilterComposer,
+      $$TransportFaresTableOrderingComposer,
+      $$TransportFaresTableAnnotationComposer,
+      $$TransportFaresTableCreateCompanionBuilder,
+      $$TransportFaresTableUpdateCompanionBuilder,
+      (
+        TransportFare,
+        BaseReferences<_$AppDatabase, $TransportFaresTable, TransportFare>,
+      ),
+      TransportFare,
+      PrefetchHooks Function()
+    >;
 
 class $AppDatabaseManager {
   final _$AppDatabase _db;
@@ -7625,4 +9121,6 @@ class $AppDatabaseManager {
       $$BudgetAlertsTableTableManager(_db, _db.budgetAlerts);
   $$HoldingEntriesTableTableManager get holdingEntries =>
       $$HoldingEntriesTableTableManager(_db, _db.holdingEntries);
+  $$TransportFaresTableTableManager get transportFares =>
+      $$TransportFaresTableTableManager(_db, _db.transportFares);
 }

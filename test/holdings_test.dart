@@ -345,7 +345,7 @@ void main() {
     test('round-trips holdings, entries, moves and rate flags', () async {
       final String json = await backup.exportJson(appVersion: 'test');
       final Map<String, dynamic> parsed = jsonDecode(json) as Map<String, dynamic>;
-      expect(parsed['schemaVersion'], 3);
+      expect(parsed['schemaVersion'], 4);
 
       await HoldingRepository(db).addEntry(
         holdingId: 1,

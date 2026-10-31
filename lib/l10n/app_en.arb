@@ -392,5 +392,273 @@
   "rateJumpTitle": "Big exchange rate change",
   "rateJumpBody": "These CBAR rates differ from the previous ones by more than 50%. Apply them?",
   "rateJumpKeep": "Keep previous",
-  "rateJumpApply": "Apply"
+  "rateJumpApply": "Apply",
+  "lockTimeoutTitle": "Auto-lock",
+  "lockTimeoutHint": "How long the app can stay in the background before the PIN is required.",
+  "lockTimeoutImmediately": "Immediately",
+  "lockTimeoutSeconds": "After {seconds} seconds",
+  "@lockTimeoutSeconds": {
+    "placeholders": {
+      "seconds": {
+        "type": "int"
+      }
+    }
+  },
+  "lockTimeoutMinutes": "{minutes, plural, =1{After 1 minute} other{After {minutes} minutes}}",
+  "@lockTimeoutMinutes": {
+    "placeholders": {
+      "minutes": {
+        "type": "int"
+      }
+    }
+  },
+  "lockTimeoutHours": "{hours, plural, =1{After 1 hour} other{After {hours} hours}}",
+  "@lockTimeoutHours": {
+    "placeholders": {
+      "hours": {
+        "type": "int"
+      }
+    }
+  },
+  "lockTimeoutReauthReason": "Confirm to change the auto-lock time",
+  "lockBiometricEnrollmentChanged": "A new fingerprint was added to this phone. For your security, enter your PIN.",
+  "lockRecoveryTitle": "PIN data was lost",
+  "lockRecoveryBody": "The phone's secure storage was reset, so the app PIN was deleted. Your data is still here. To continue, confirm with the phone's own lock (PIN, pattern or fingerprint), then set a new PIN.",
+  "lockRecoveryConfirmButton": "Confirm with phone lock",
+  "lockRecoveryReason": "Confirm to restore access to Gəlir-Çıxar",
+  "lockRecoveryAuthFailed": "Not confirmed. Try again.",
+  "lockRecoveryInsecureBody": "This phone has no screen lock (PIN, pattern or password), so your identity can't be confirmed through the phone. You can restore access by setting a new PIN.",
+  "lockRecoveryRestoreButton": "Restore access to my data",
+  "lockRecoveryWarningTitle": "Warning",
+  "lockRecoveryWarningBody": "Anyone holding this phone can use this step to set a new PIN and see your data. Only continue if this is your phone. Setting up a screen lock on the phone is recommended.",
+  "lockRecoveryWarningConfirm": "Restore",
+  "thisMonthShort": "This month",
+  "cardPosition": "Card {n} of {total}",
+  "@cardPosition": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      },
+      "total": {
+        "type": "int"
+      }
+    }
+  },
+  "cardEndingIn": "ending in {last4}",
+  "@cardEndingIn": {
+    "placeholders": {
+      "last4": {
+        "type": "String"
+      }
+    }
+  },
+  "bonusBadge": "Bonus {pct}%",
+  "@bonusBadge": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "negativeShort": "Negative",
+  "cardDesign": "Card design",
+  "cardChangeDesign": "Change card design",
+  "cardDesignPhoto": "Photo",
+  "cardChoosePhoto": "Choose photo",
+  "cardChangePhoto": "Change photo",
+  "cardRemovePhoto": "Remove photo",
+  "cardPhotoMissing": "Photo not found",
+  "cardPhotoFailed": "Couldn't open the photo",
+  "cardLast4Label": "Last 4 digits of the card",
+  "cardLast4Helper": "Only the last 4 digits. Never enter the full card number.",
+  "cardLast4Invalid": "Enter exactly 4 digits",
+  "selectedItem": "{name}, selected",
+  "@selectedItem": {
+    "placeholders": {
+      "name": {
+        "type": "String"
+      }
+    }
+  },
+  "accountTypeBonus": "Bonus",
+  "bonusRate": "Transfer rate (%)",
+  "bonusRateHelper": "Share that arrives when you move bonus to another account",
+  "bonusRateInvalid": "A whole number from 1 to 100",
+  "makeTransfer": "Make a transfer",
+  "time": "Time",
+  "addedAt": "Added {dt}",
+  "@addedAt": {
+    "placeholders": {
+      "dt": {
+        "type": "String"
+      }
+    }
+  },
+  "editedAt": "Edited {dt}",
+  "@editedAt": {
+    "placeholders": {
+      "dt": {
+        "type": "String"
+      }
+    }
+  },
+  "duplicate": "Duplicate",
+  "transportMode": "Mode",
+  "transportBus": "Bus",
+  "transportMetro": "Metro",
+  "transportTaxi": "Taxi",
+  "transportTrain": "Commuter train",
+  "transportFuel": "Fuel",
+  "transportParking": "Parking",
+  "transportBakuCard": "BakıKart top-up",
+  "busRoute": "Route",
+  "chooseRoute": "Choose a route",
+  "searchRoutes": "Search routes: number or stop",
+  "recentRoutes": "Recent",
+  "allRoutes": "All routes",
+  "noRouteFound": "No route found",
+  "trips": "Trips",
+  "tripsCount": "{n, plural, one{1 trip} other{{n} trips}}",
+  "@tripsCount": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "fareHint": "Fare: {fare} × {n}",
+  "@fareHint": {
+    "placeholders": {
+      "fare": {
+        "type": "String"
+      },
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "fareManual": "Amount edited by hand",
+  "resetToFare": "Use the fare",
+  "fareUncertain": "fare may be out of date",
+  "metroStation": "Station (optional)",
+  "chooseStation": "Choose a station",
+  "bakuCardDoubleCountHint": "If you log top-ups as spending, don't also log trips: the cost would count twice.",
+  "transportFares": "Transport fares",
+  "transportFaresSubtitle": "Bus, metro and train fares",
+  "addOwnRoute": "Add my own route",
+  "editOwnRoute": "Edit route",
+  "routeCode": "Route number",
+  "routeFrom": "From",
+  "routeTo": "To",
+  "fare": "Fare",
+  "routeCodeExists": "This number already exists",
+  "routeCodeInvalid": "1–6 characters: letters, digits or \"-\"",
+  "fieldRequired": "Required",
+  "fareInvalid": "From 0.01 to 99.99",
+  "fareNotSet": "Not set",
+  "myRoute": "Mine",
+  "fareEdited": "Edited",
+  "resetFare": "Reset to standard fare",
+  "faresVerifiedAt": "Fares checked on {date}. If they have changed, edit them here.",
+  "@faresVerifiedAt": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "faresVerifiedShort": "Checked: {date}",
+  "@faresVerifiedShort": {
+    "placeholders": {
+      "date": {
+        "type": "String"
+      }
+    }
+  },
+  "faresSources": "Sources",
+  "metroAndTrain": "Metro and train",
+  "transferSent": "Sent {a}",
+  "@transferSent": {
+    "placeholders": {
+      "a": {
+        "type": "String"
+      }
+    }
+  },
+  "transferArrives": "Arrives {a} ({pct}%)",
+  "@transferArrives": {
+    "placeholders": {
+      "a": {
+        "type": "String"
+      },
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "bonusLoss": "Bonus loss: {a}",
+  "@bonusLoss": {
+    "placeholders": {
+      "a": {
+        "type": "String"
+      }
+    }
+  },
+  "bonusLossLabel": "Bonus loss",
+  "bonusLossExplain": "Only {pct}% of the amount arrives when you move money out of a bonus account.",
+  "@bonusLossExplain": {
+    "placeholders": {
+      "pct": {
+        "type": "int"
+      }
+    }
+  },
+  "bonusReceivedEdit": "Amount that arrives",
+  "bonusReceivedTooBig": "The amount that arrives can't be more than the amount sent",
+  "bonusSameCurrencyOnly": "Money can only move from a bonus account to an account in the same currency",
+  "sentSubtitle": "{a} sent",
+  "@sentSubtitle": {
+    "placeholders": {
+      "a": {
+        "type": "String"
+      }
+    }
+  },
+  "pairDeleted": "Transfer and bonus loss deleted together",
+  "systemCategoryLocked": "System category: it can't be deleted or archived",
+  "transportCategory": "Transport category",
+  "transportCategoryBody": "Lets you pick bus, metro and other modes when adding",
+  "budgetsEnabled": "Budgets",
+  "budgetsEnabledBody": "Show the Budgets tab, the Home card and alerts",
+  "budgetsHidden": "Budgets hidden. Your data is kept.",
+  "pressBackAgainToExit": "Press back again to exit",
+  "reportTransport": "Transport",
+  "reportByMode": "By mode",
+  "reportTopRoutes": "Top routes",
+  "timeOfDay": "Time of day",
+  "timeFrom": "Start time",
+  "timeTo": "End time",
+  "backupImagesSkipped": "{n, plural, one{1 card photo is over 1 MB and was left out of the backup} other{{n} card photos are over 1 MB and were left out of the backup}}",
+  "@backupImagesSkipped": {
+    "placeholders": {
+      "n": {
+        "type": "int"
+      }
+    }
+  },
+  "accountCardSemantics": "{type}, {name}, {balance}",
+  "@accountCardSemantics": {
+    "placeholders": {
+      "type": {
+        "type": "String"
+      },
+      "name": {
+        "type": "String"
+      },
+      "balance": {
+        "type": "String"
+      }
+    }
+  },
+  "exportColTransportMode": "Transport mode"
 }

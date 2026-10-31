@@ -9,7 +9,7 @@ import 'package:pdf/widgets.dart' as pw;
 
 import '../../core/format.dart';
 import '../../core/share_files.dart';
-import '../../core/widgets.dart' show holdingPlaceLabel;
+import '../../core/widgets.dart' show holdingPlaceLabel, transportModeLabel;
 import '../../data/models.dart';
 import '../../l10n/app_localizations.dart';
 
@@ -91,6 +91,20 @@ class ExportInput {
 
   /// "To" column: the destination account, or the holding of a move.
   String counterpart(TxDetails t) => t.toAccount?.name ?? t.holding?.name ?? '';
+
+  /// 24-hour local time of the transaction.
+  String time(TxDetails t) => Fmt.time(t.tx.date, lang);
+
+  /// Transport mode name, or '' (v1.2).
+  String transportMode(TxDetails t) =>
+      t.tx.transportMode == null ? '' : transportModeLabel(l, t.tx.transportMode!);
+
+  /// Bus route code / metro station, with " ×n" for several trips.
+  String route(TxDetails t) {
+    final String code = t.tx.routeCode ?? '';
+    if (t.tx.transportMode == null) return '';
+    return t.tx.trips > 1 ? '$code ×${t.tx.trips}'.trim() : code;
+  }
 }
 
 /// Writes export files into the app's private cache (no storage permission
@@ -141,6 +155,11 @@ class ExportService {
         i.l.exportColAmountAzn,
         i.l.toAccount,
         i.l.exportColToAmount,
+        // v1.2 columns go before the note, so the earlier columns keep
+        // their positions and the free-text note stays last.
+        i.l.time,
+        i.l.exportColTransportMode,
+        i.l.busRoute,
         i.l.note,
       ];
 
@@ -171,6 +190,10 @@ class ExportService {
           csvField(_plain(i.azn(t))),
           csvText(i.counterpart(t)),
           csvField(t.tx.toAmount == null ? '' : _plain(t.tx.toAmount!)),
+          csvField(i.time(t)),
+          csvText(i.transportMode(t)),
+          // Own route codes and station names are user text.
+          csvText(i.route(t)),
           csvText(t.tx.note),
         ].join(','))
         ..write('\r\n');
@@ -221,6 +244,9 @@ class ExportService {
         xl.DoubleCellValue(i.azn(t) / 100),
         xl.TextCellValue(i.counterpart(t)),
         t.tx.toAmount == null ? null : xl.DoubleCellValue(t.tx.toAmount! / 100),
+        xl.TextCellValue(i.time(t)),
+        xl.TextCellValue(i.transportMode(t)),
+        xl.TextCellValue(i.route(t)),
         xl.TextCellValue(t.tx.note),
       ]);
     }
@@ -387,9 +413,13 @@ class ExportService {
           data: <List<String>>[
             for (final TxDetails t in i.items)
               <String>[
-                Fmt.date(t.tx.date, i.lang),
+                '${Fmt.date(t.tx.date, i.lang)}\n${i.time(t)}',
                 i.typeLabel(t.tx.type),
-                t.tx.type.isMove ? i.categoryLabel(t) : '${i.categoryLabel(t)} · ${t.account.name}',
+                <String>[
+                  i.categoryLabel(t),
+                  if (!t.tx.type.isMove) t.account.name,
+                  if (t.tx.transportMode != null) '${i.transportMode(t)} ${i.route(t)}'.trim(),
+                ].join(' · '),
                 t.tx.note,
                 Fmt.signed(t.tx.amount, t.account.currency, t.tx.type, i.lang),
               ],

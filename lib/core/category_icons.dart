@@ -35,6 +35,7 @@ abstract final class CategoryIcons {
     Icons.redeem,
     Icons.card_giftcard,
     Icons.trending_up,
+    Icons.trending_down,
     Icons.attach_money,
     Icons.savings,
     Icons.more_horiz,

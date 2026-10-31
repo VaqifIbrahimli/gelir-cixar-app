@@ -144,18 +144,14 @@ class SectionHeader extends StatelessWidget {
 }
 
 /// Icons for account types.
-IconData accountTypeIcon(AccountType t) => switch (t) {
-      AccountType.cash => Icons.payments_outlined,
-      AccountType.card => Icons.credit_card,
-      AccountType.bank => Icons.account_balance_outlined,
-      AccountType.savings => Icons.savings_outlined,
-    };
+IconData accountTypeIcon(AccountType t) => AccountTypeStyle.forType(t).icon;
 
 String accountTypeLabel(AppLocalizations l, AccountType t) => switch (t) {
       AccountType.cash => l.accountTypeCash,
       AccountType.card => l.accountTypeCard,
       AccountType.bank => l.accountTypeBank,
       AccountType.savings => l.accountTypeSavings,
+      AccountType.bonus => l.accountTypeBonus,
     };
 
 /// Icons and labels for "Kənar yerlər" place types.
@@ -357,4 +353,73 @@ int? daysToMaturity(DateTime? maturity, [DateTime? now]) {
   final DateTime today = DateTime(n.year, n.month, n.day);
   final DateTime m = DateTime(maturity.year, maturity.month, maturity.day);
   return m.difference(today).inDays;
+}
+
+/// Localised name of a transport sub-mode.
+String transportModeLabel(AppLocalizations l, TransportMode m) => switch (m) {
+      TransportMode.bus => l.transportBus,
+      TransportMode.metro => l.transportMetro,
+      TransportMode.taxi => l.transportTaxi,
+      TransportMode.train => l.transportTrain,
+      TransportMode.fuel => l.transportFuel,
+      TransportMode.parking => l.transportParking,
+      TransportMode.bakuCard => l.transportBakuCard,
+    };
+
+/// Text of the route chip on a transaction (DESIGN.md §18.5.5): the bus
+/// route code, the metro station (or "Metro"), else the mode name; with
+/// " ×n" when there was more than one trip.
+String transportChipText(AppLocalizations l, TransportMode m, String? route, int trips) {
+  final String base = switch (m) {
+    TransportMode.bus => route ?? l.transportBus,
+    TransportMode.metro => route ?? l.transportMetro,
+    _ => transportModeLabel(l, m),
+  };
+  return trips > 1 ? '$base ×$trips' : base;
+}
+
+/// Small route chip: 20 high, radius 6, mode icon + tabular label.
+class TransportChip extends StatelessWidget {
+  const TransportChip({super.key, required this.mode, this.route, this.trips = 1});
+
+  final TransportMode mode;
+  final String? route;
+  final int trips;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l = AppLocalizations.of(context);
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
+    final String text = transportChipText(l, mode, route, trips);
+    return Semantics(
+      label: '${transportModeLabel(l, mode)} ${route ?? ''}, ${l.tripsCount(trips)}',
+      excludeSemantics: true,
+      child: Container(
+        height: 20,
+        padding: const EdgeInsets.symmetric(horizontal: 6),
+        decoration: BoxDecoration(
+          color: cs.secondaryContainer,
+          borderRadius: const BorderRadius.all(Radius.circular(6)),
+        ),
+        child: Row(
+          mainAxisSize: MainAxisSize.min,
+          children: <Widget>[
+            Icon(TransportModeStyle.forMode(mode).icon, size: 14, color: cs.onSecondaryContainer),
+            const SizedBox(width: 2),
+            Flexible(
+              child: Text(
+                text,
+                maxLines: 1,
+                overflow: TextOverflow.ellipsis,
+                style: theme.textTheme.labelSmall
+                    ?.copyWith(color: cs.onSecondaryContainer)
+                    .merge(AppTextStyles.tabular),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
 }

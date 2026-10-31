@@ -16,6 +16,7 @@ import '../holdings/holding_sheets.dart' show holdingErrorText;
 import '../settings/settings_controller.dart';
 import 'amount_calc.dart';
 import 'widgets/amount_keypad.dart';
+import 'widgets/route_sheets.dart';
 
 /// Add / edit a transaction (DESIGN.md §6.5, §7.4).
 class TransactionEditScreen extends ConsumerStatefulWidget {
@@ -23,10 +24,18 @@ class TransactionEditScreen extends ConsumerStatefulWidget {
     super.key,
     this.transactionId,
     this.initialType = TxType.expense,
+    this.initialAccountId,
+    this.duplicateOf,
   });
 
   final int? transactionId;
   final TxType initialType;
+
+  /// Account preselected (card long-press actions).
+  final int? initialAccountId;
+
+  /// "Təkrarla": a new transaction with every field of this one, dated now.
+  final int? duplicateOf;
 
   bool get isEdit => transactionId != null;
 
@@ -43,11 +52,18 @@ class _TransactionEditScreenState extends ConsumerState<TransactionEditScreen>
 
   /// Keypad writes into [_toAmount] when true.
   bool _editingTo = false;
-  int? _accountId;
+  late int? _accountId = widget.initialAccountId;
   int? _toAccountId;
   int? _categoryId;
+
+  /// Taken when the screen opens; it does not keep ticking (§18.4.1).
   DateTime _date = DateTime.now();
   String _note = '';
+
+  // ---- transport (§18.5) ----
+  TransportMode? _mode;
+  String? _routeCode;
+  FareAutoFill _fill = const FareAutoFill();
 
   MoneyTx? _original;
   bool _loading = false;
@@ -66,7 +82,7 @@ class _TransactionEditScreenState extends ConsumerState<TransactionEditScreen>
   @override
   void initState() {
     super.initState();
-    if (widget.isEdit) {
+    if (widget.isEdit || widget.duplicateOf != null) {
       _loading = true;
       _load();
     }
@@ -79,9 +95,36 @@ class _TransactionEditScreenState extends ConsumerState<TransactionEditScreen>
   }
 
   Future<void> _load() async {
-    final MoneyTx? tx =
-        await ref.read(transactionRepositoryProvider).byId(widget.transactionId!);
+    final TransactionRepository repo = ref.read(transactionRepositoryProvider);
+    MoneyTx? tx = await repo.byId(widget.transactionId ?? widget.duplicateOf!);
+    // A bonus pair is edited as one: the loss row opens its transfer, and
+    // the transfer's sent amount is arrived + loss (§18.6).
+    int? sent;
+    if (tx != null && tx.linkGroupId != null) {
+      final List<MoneyTx> partners = await repo.linkedOf(tx);
+      final MoneyTx? transfer = tx.type == TxType.transfer
+          ? tx
+          : partners.where((MoneyTx p) => p.type == TxType.transfer).firstOrNull;
+      if (transfer != null) {
+        final MoneyTx? loss = <MoneyTx>[tx, ...partners]
+            .where((MoneyTx p) => p.type == TxType.expense)
+            .firstOrNull;
+        tx = transfer;
+        sent = transfer.amount + (loss?.amount ?? 0);
+      }
+    }
+    // Fares only decide whether the stored amount still equals fare × trips;
+    // never hold the editor up for them.
+    ResolvedFares? fares = ref.read(resolvedFaresProvider).value;
+    if (fares == null && tx?.transportMode != null) {
+      try {
+        fares = await ref.read(resolvedFaresProvider.future).timeout(const Duration(seconds: 2));
+      } on Object {
+        fares = null;
+      }
+    }
     if (!mounted) return;
+    final bool duplicate = widget.duplicateOf != null;
     setState(() {
       _loading = false;
       if (tx == null) {
@@ -92,17 +135,114 @@ class _TransactionEditScreenState extends ConsumerState<TransactionEditScreen>
         _holdingMoveOf = tx.holdingId;
         return;
       }
-      _original = tx;
+      _original = duplicate ? null : tx;
       _type = tx.type;
-      _amount = AmountCalc.fromMinor(tx.amount);
-      _toAmount =
-          tx.toAmount == null ? AmountCalc() : AmountCalc.fromMinor(tx.toAmount!);
+      if (sent != null) {
+        // Bonus transfer: the keypad holds the sent amount, the received
+        // field the arrived one.
+        _amount = AmountCalc.fromMinor(sent);
+        _toAmount = AmountCalc.fromMinor(tx.amount);
+      } else {
+        _amount = AmountCalc.fromMinor(tx.amount);
+        _toAmount = tx.toAmount == null ? AmountCalc() : AmountCalc.fromMinor(tx.toAmount!);
+      }
       _accountId = tx.accountId;
       _toAccountId = tx.toAccountId;
       _categoryId = tx.categoryId;
-      _date = tx.date;
+      _date = duplicate ? DateTime.now() : tx.date;
       _note = tx.note;
+      _mode = tx.transportMode;
+      _routeCode = tx.routeCode;
+      final int? fare = _mode == null ? null : fares?.fareOf(_mode!, routeCode: _routeCode);
+      _fill = FareAutoFill(fare: fare, trips: tx.trips, manual: fare == null || fare * tx.trips != tx.amount);
     });
+  }
+
+  // ---- transport -------------------------------------------------------------
+
+  ResolvedFares? get _fares => ref.read(resolvedFaresProvider).value;
+
+  bool get _showTransport => _type == TxType.expense && (_categoryById(_categoryId)?.isTransport ?? false);
+
+  /// Writes fare × trips into the keypad unless the amount was typed.
+  void _applyFill(FareAutoFill f) {
+    _fill = f;
+    final int? a = f.amount;
+    if (a != null) {
+      _amount = AmountCalc.fromMinor(a);
+      _editingTo = false;
+      _error = null;
+    }
+  }
+
+  void _setMode(TransportMode m) {
+    AppHaptics.key();
+    setState(() {
+      // A route / station belongs to one mode.
+      if (m != _mode) _routeCode = null;
+      _mode = m;
+      final int? fare = _fares?.fareOf(m, routeCode: _routeCode);
+      _applyFill(FareAutoFill(fare: fare, trips: TransportModeStyle.forMode(m).hasTrips ? _fill.trips : 1));
+    });
+  }
+
+  void _setTrips(int n) {
+    AppHaptics.key();
+    setState(() => _applyFill(_fill.withTrips(n)));
+  }
+
+  Future<void> _pickRoute() async {
+    final String? code = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (BuildContext ctx) => BusRouteSheet(selected: _routeCode),
+    );
+    if (code == null || !mounted) return;
+    // The own-route form may just have saved it: wait for the fares.
+    final ResolvedFares fares = await ref.read(resolvedFaresProvider.future);
+    if (!mounted) return;
+    setState(() {
+      _routeCode = code;
+      _applyFill(_fill.withFare(fares.busRoute(code)?.fare ?? _fares?.busRoute(code)?.fare));
+    });
+  }
+
+  Future<void> _pickStation() async {
+    final String? s = await showModalBottomSheet<String>(
+      context: context,
+      isScrollControlled: true,
+      showDragHandle: true,
+      builder: (BuildContext ctx) => MetroStationSheet(selected: _routeCode),
+    );
+    if (s == null || !mounted) return;
+    setState(() {
+      _routeCode = s.isEmpty ? null : s;
+      _applyFill(_fill.withFare(_fares?.metroFare));
+    });
+  }
+
+  /// A transport category was chosen for a new row: preselect the mode used
+  /// last (§18.5.2).
+  Future<void> _preselectMode() async {
+    if (_mode != null) return;
+    final TransportMode? last = await ref.read(transactionRepositoryProvider).lastTransportMode();
+    if (!mounted || _mode != null || !_showTransport) return;
+    if (last != null) _setMode(last);
+  }
+
+  // ---- bonus (§18.6) ---------------------------------------------------------
+
+  /// Source is a bonus account: the keypad amount is what leaves it.
+  bool get _bonus => _type == TxType.transfer && _account(_effectiveAccountId)?.type == AccountType.bonus;
+
+  int get _bonusRate => _account(_effectiveAccountId)?.bonusRatePercent ?? 100;
+
+  /// Received amount: typed, or sent × rate.
+  int? get _bonusReceived {
+    final int? sent = _amount.evaluate();
+    if (sent == null || sent <= 0) return null;
+    return _toAmount.isEmpty ? bonusReceived(sent, _bonusRate) : _toAmount.evaluate();
   }
 
   // ---- derived -------------------------------------------------------------
@@ -145,6 +285,8 @@ class _TransactionEditScreenState extends ConsumerState<TransactionEditScreen>
     setState(() {
       f(_target);
       _error = null;
+      // Typing makes a transport amount manual (§18.5.2).
+      if (!_editingTo && _fill.fare != null) _fill = _fill.typed();
     });
   }
 
@@ -187,6 +329,7 @@ class _TransactionEditScreenState extends ConsumerState<TransactionEditScreen>
       if (_toAccountId == null) return _fail(l.selectToAccount);
       if (_toAccountId == accountId) return _fail(l.sameAccountError);
       toAccountId = _toAccountId;
+      if (_bonus) return _saveBonus(l, accountId, _toAccountId!, amount);
       if (_crossCurrency) {
         toAmount = _toAmount.isEmpty ? _suggestedToAmount : _toAmount.evaluate();
         if (toAmount == null || toAmount <= 0) {
@@ -198,6 +341,13 @@ class _TransactionEditScreenState extends ConsumerState<TransactionEditScreen>
       categoryId = _categoryId;
       if (categoryId == null) return _fail(l.selectCategory);
     }
+
+    // Transport fields only while a transport category is chosen; a
+    // category change drops them (§18.5.1).
+    final TransportMode? mode = _showTransport ? _mode : null;
+    final String? route =
+        mode == TransportMode.bus || mode == TransportMode.metro ? _routeCode : null;
+    final int trips = mode != null && TransportModeStyle.forMode(mode).hasTrips ? _fill.trips : 1;
 
     _saving = true;
     final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
@@ -214,6 +364,9 @@ class _TransactionEditScreenState extends ConsumerState<TransactionEditScreen>
           toAmount: Value<int?>(toAmount),
           date: _date,
           note: Value<String>(note),
+          transportMode: Value<TransportMode?>(mode),
+          routeCode: Value<String?>(route),
+          trips: Value<int>(trips),
         ));
       } else {
         await repo.update(_original!.copyWith(
@@ -225,6 +378,9 @@ class _TransactionEditScreenState extends ConsumerState<TransactionEditScreen>
           toAmount: Value<int?>(toAmount),
           date: _date,
           note: note,
+          transportMode: Value<TransportMode?>(mode),
+          routeCode: Value<String?>(route),
+          trips: trips,
         ));
       }
     } finally {
@@ -244,6 +400,38 @@ class _TransactionEditScreenState extends ConsumerState<TransactionEditScreen>
     if (mounted) context.pop();
   }
 
+  /// Bonus source: transfer of the arrived amount + bonus-loss expense,
+  /// written together (TransactionRepository.saveBonusTransfer).
+  Future<void> _saveBonus(AppLocalizations l, int fromId, int toId, int sent) async {
+    final Account? to = _account(toId);
+    if (to == null || to.currency != _account(fromId)?.currency) return _fail(l.bonusSameCurrencyOnly);
+    final int? received = _bonusReceived;
+    if (received == null || received <= 0) {
+      setState(() => _editingTo = true);
+      return _fail(l.enterReceivedAmount);
+    }
+    if (received > sent) {
+      setState(() => _editingTo = true);
+      return _fail(l.bonusReceivedTooBig);
+    }
+    _saving = true;
+    try {
+      await ref.read(transactionRepositoryProvider).saveBonusTransfer(
+            transferId: _original?.id,
+            fromId: fromId,
+            toId: toId,
+            sent: sent,
+            received: received,
+            date: _date,
+            note: _note.trim(),
+          );
+    } finally {
+      _saving = false;
+    }
+    AppHaptics.confirm();
+    if (mounted) context.pop();
+  }
+
   Future<void> _delete() async {
     final AppLocalizations l = AppLocalizations.of(context);
     final MoneyTx? tx = _original;
@@ -258,9 +446,10 @@ class _TransactionEditScreenState extends ConsumerState<TransactionEditScreen>
     if (!ok || !mounted) return;
     final ScaffoldMessengerState messenger = ScaffoldMessenger.of(context);
     final TransactionRepository repo = ref.read(transactionRepositoryProvider);
-    final List<HoldingEntry> linked;
+    final DeletedTransactions deleted;
     try {
-      linked = await repo.delete(tx.id);
+      // A bonus transfer takes its loss row with it.
+      deleted = await repo.deleteWithLinked(tx.id);
     } on HoldingAmountException catch (e) {
       messenger.showSnackBar(SnackBar(content: Text(holdingErrorText(l, e.reason))));
       return;
@@ -268,12 +457,12 @@ class _TransactionEditScreenState extends ConsumerState<TransactionEditScreen>
     if (!mounted) return;
     context.pop();
     messenger.showSnackBar(SnackBar(
-      content: Text(l.transactionDeleted),
+      content: Text(deleted.isPair ? l.pairDeleted : l.transactionDeleted),
       action: SnackBarAction(
         label: l.undo,
         onPressed: () async {
           try {
-            await repo.restore(tx, entries: linked);
+            await repo.restoreDeleted(deleted);
           } on HoldingAmountException catch (e) {
             messenger.showSnackBar(SnackBar(content: Text(holdingErrorText(l, e.reason))));
           }
@@ -351,7 +540,27 @@ class _TransactionEditScreenState extends ConsumerState<TransactionEditScreen>
         _categoryId = id;
         _error = null;
       });
+      if (_showTransport) {
+        await _preselectMode();
+      } else if (_fill.fare != null) {
+        // Leaving a transport category: its values are not saved.
+        setState(() => _fill = const FareAutoFill());
+      }
     }
+  }
+
+  Future<void> _pickTime() async {
+    final TimeOfDay? t = await showTimePicker(
+      context: context,
+      initialTime: TimeOfDay.fromDateTime(_date),
+      initialEntryMode: TimePickerEntryMode.dial,
+      builder: (BuildContext ctx, Widget? child) => MediaQuery(
+        data: MediaQuery.of(ctx).copyWith(alwaysUse24HourFormat: true),
+        child: child!,
+      ),
+    );
+    if (t == null || !mounted) return;
+    setState(() => _date = DateTime(_date.year, _date.month, _date.day, t.hour, t.minute));
   }
 
   Future<void> _pickDate() async {
@@ -444,7 +653,16 @@ class _TransactionEditScreenState extends ConsumerState<TransactionEditScreen>
     final TxCategory? category =
         allCats.where((TxCategory c) => c.id == _categoryId).firstOrNull;
     final String sep = Fmt.decimalSeparator(lang);
-    final bool cross = _crossCurrency;
+    final bool bonus = _bonus;
+    final bool cross = _crossCurrency && !bonus;
+    final bool transport = _showTransport;
+    final ResolvedFares? fares = ref.watch(resolvedFaresProvider).value;
+    final DateTime now = DateTime.now();
+    final String dateLabel = Fmt.sameDay(_date, now)
+        ? l.today
+        : Fmt.sameDay(_date, now.subtract(const Duration(days: 1)))
+            ? l.yesterday
+            : Fmt.shortDate(_date, lang, now);
 
     return Scaffold(
       appBar: AppBar(
@@ -525,6 +743,12 @@ class _TransactionEditScreenState extends ConsumerState<TransactionEditScreen>
                         onTap: () => setState(() => _editingTo = true),
                         semanticsLabel: '${l.amountReceived} ${_toAmount.display(sep)} ${to?.currency ?? ''}',
                       ),
+                    if (transport && _fill.fare != null)
+                      _FareHint(
+                        fill: _fill,
+                        fareText: Fmt.money(_fill.fare!, Currency.azn.code, lang),
+                        onReset: () => setState(() => _applyFill(_fill.resetToFare())),
+                      ),
                     SizedBox(
                       height: 24,
                       child: _error == null
@@ -585,21 +809,68 @@ class _TransactionEditScreenState extends ConsumerState<TransactionEditScreen>
                           ),
                         ],
                       ),
+                    AnimatedSize(
+                      duration: AppMotion.of(context, AppMotion.reveal),
+                      curve: AppMotion.standard,
+                      child: bonus
+                          ? _BonusBox(
+                              sent: _amount.evaluate() ?? 0,
+                              received: _bonusReceived ?? 0,
+                              rate: _bonusRate,
+                              currency: from?.currency ?? Currency.base.code,
+                              lang: lang,
+                              sameCurrency: to == null || to.currency == from?.currency,
+                              editing: _editingTo,
+                              onEditReceived: () => setState(() => _editingTo = !_editingTo),
+                              receivedTyped: !_toAmount.isEmpty,
+                              receivedText: _toAmount.display(sep),
+                            )
+                          : const SizedBox(width: double.infinity),
+                    ),
+                    AnimatedSize(
+                      duration: AppMotion.of(context, AppMotion.reveal),
+                      curve: AppMotion.standard,
+                      child: transport
+                          ? _TransportPanel(
+                              mode: _mode,
+                              routeCode: _routeCode,
+                              route: fares?.busRoute(_routeCode),
+                              trips: _fill.trips,
+                              lang: lang,
+                              onMode: _setMode,
+                              onTrips: _setTrips,
+                              onPickRoute: _pickRoute,
+                              onPickStation: _pickStation,
+                            )
+                          : const SizedBox(width: double.infinity),
+                    ),
                     const SizedBox(height: AppSpacing.sm),
                     Wrap(
                       spacing: AppSpacing.sm,
                       runSpacing: AppSpacing.xs,
                       alignment: WrapAlignment.center,
                       children: <Widget>[
-                        ActionChip(
-                          avatar: const Icon(Icons.calendar_today_outlined, size: 18),
-                          label: Text(
-                            Fmt.sameDay(_date, DateTime.now())
-                                ? l.today
-                                : Fmt.date(_date, lang),
+                        Semantics(
+                          label: '${l.date}: $dateLabel',
+                          button: true,
+                          excludeSemantics: true,
+                          child: ActionChip(
+                            avatar: const Icon(Icons.calendar_today_outlined, size: 18),
+                            label: Text(dateLabel),
+                            tooltip: l.date,
+                            onPressed: _pickDate,
                           ),
-                          tooltip: l.date,
-                          onPressed: _pickDate,
+                        ),
+                        Semantics(
+                          label: '${l.time}: ${Fmt.time(_date, lang)}',
+                          button: true,
+                          excludeSemantics: true,
+                          child: ActionChip(
+                            avatar: const Icon(Icons.schedule, size: 18),
+                            label: Text(Fmt.time(_date, lang), style: AppTextStyles.tabular),
+                            tooltip: l.time,
+                            onPressed: _pickTime,
+                          ),
                         ),
                         ActionChip(
                           avatar: const Icon(Icons.edit_note, size: 18),
@@ -644,6 +915,282 @@ class _TransactionEditScreenState extends ConsumerState<TransactionEditScreen>
       return lang == 'en' ? '₼$body' : '$body ₼';
     }
     return '$body $code';
+  }
+}
+
+/// "Tarif: 0,60 ₼ × 2", or "Məbləğ əl ilə dəyişdirilib · Tarifə qaytar".
+class _FareHint extends StatelessWidget {
+  const _FareHint({required this.fill, required this.fareText, required this.onReset});
+
+  final FareAutoFill fill;
+  final String fareText;
+  final VoidCallback onReset;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l = AppLocalizations.of(context);
+    final ThemeData theme = Theme.of(context);
+    final TextStyle? style = theme.textTheme.bodySmall?.copyWith(color: theme.colorScheme.onSurfaceVariant);
+    if (!fill.manual) return Text(l.fareHint(fareText, fill.trips), style: style?.merge(AppTextStyles.tabular));
+    return Wrap(
+      crossAxisAlignment: WrapCrossAlignment.center,
+      alignment: WrapAlignment.center,
+      children: <Widget>[
+        Text('${l.fareManual} · ', style: style),
+        TextButton(
+          style: TextButton.styleFrom(minimumSize: const Size(48, 48)),
+          onPressed: onReset,
+          child: Text(l.resetToFare),
+        ),
+      ],
+    );
+  }
+}
+
+/// Sent / arrived / loss box of a transfer out of a bonus account.
+class _BonusBox extends StatelessWidget {
+  const _BonusBox({
+    required this.sent,
+    required this.received,
+    required this.rate,
+    required this.currency,
+    required this.lang,
+    required this.sameCurrency,
+    required this.editing,
+    required this.onEditReceived,
+    required this.receivedTyped,
+    required this.receivedText,
+  });
+
+  final int sent;
+  final int received;
+  final int rate;
+  final String currency;
+  final String lang;
+  final bool sameCurrency;
+  final bool editing;
+  final VoidCallback onEditReceived;
+  final bool receivedTyped;
+  final String receivedText;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l = AppLocalizations.of(context);
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
+    final AppColors c = AppColors.of(context);
+    final TextStyle? amountStyle = theme.textTheme.labelLarge?.merge(AppTextStyles.tabular);
+    final int loss = sent - received;
+    if (!sameCurrency) {
+      return Padding(
+        padding: const EdgeInsets.only(top: AppSpacing.sm),
+        child: Text(l.bonusSameCurrencyOnly,
+            textAlign: TextAlign.center, style: theme.textTheme.bodySmall?.copyWith(color: cs.error)),
+      );
+    }
+    return Container(
+      margin: const EdgeInsets.only(top: AppSpacing.sm),
+      decoration: BoxDecoration(color: cs.surfaceContainerLow, borderRadius: AppRadius.brMd),
+      clipBehavior: Clip.antiAlias,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: <Widget>[
+          InkWell(
+            onTap: onEditReceived,
+            child: Padding(
+              padding: const EdgeInsets.all(AppSpacing.md),
+              child: Wrap(
+                crossAxisAlignment: WrapCrossAlignment.center,
+                spacing: AppSpacing.sm,
+                children: <Widget>[
+                  Text(l.transferSent(Fmt.money(sent, currency, lang)), style: amountStyle),
+                  const Icon(Icons.arrow_forward, size: 16),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: AppSpacing.xs),
+                    decoration: editing
+                        ? BoxDecoration(border: Border.all(color: cs.primary, width: 2), borderRadius: AppRadius.brSm)
+                        : null,
+                    child: Text(
+                      l.transferArrives(
+                        receivedTyped ? receivedText : Fmt.money(received, currency, lang),
+                        rate,
+                      ),
+                      style: amountStyle?.copyWith(color: c.transfer),
+                    ),
+                  ),
+                  Icon(Icons.edit_outlined, size: 16, color: cs.onSurfaceVariant, semanticLabel: l.bonusReceivedEdit),
+                ],
+              ),
+            ),
+          ),
+          if (loss > 0)
+            Container(
+              color: c.warningContainer,
+              padding: const EdgeInsets.symmetric(horizontal: AppSpacing.md, vertical: AppSpacing.sm),
+              child: Row(
+                children: <Widget>[
+                  Icon(Icons.trending_down, size: 18, color: c.onWarningContainer),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Text(
+                      l.bonusLoss(Fmt.money(loss, currency, lang)),
+                      style: theme.textTheme.bodyMedium?.copyWith(color: c.onWarningContainer),
+                    ),
+                  ),
+                  Tooltip(
+                    message: l.bonusLossExplain(rate),
+                    triggerMode: TooltipTriggerMode.tap,
+                    child: Icon(Icons.info_outline, size: 18, color: c.onWarningContainer),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
+  }
+}
+
+/// Transport sub-picker under the selectors (DESIGN.md §18.5.2).
+class _TransportPanel extends StatelessWidget {
+  const _TransportPanel({
+    required this.mode,
+    required this.routeCode,
+    required this.route,
+    required this.trips,
+    required this.lang,
+    required this.onMode,
+    required this.onTrips,
+    required this.onPickRoute,
+    required this.onPickStation,
+  });
+
+  final TransportMode? mode;
+  final String? routeCode;
+  final BusRoute? route;
+  final int trips;
+  final String lang;
+  final ValueChanged<TransportMode> onMode;
+  final ValueChanged<int> onTrips;
+  final VoidCallback onPickRoute;
+  final VoidCallback onPickStation;
+
+  @override
+  Widget build(BuildContext context) {
+    final AppLocalizations l = AppLocalizations.of(context);
+    final ThemeData theme = Theme.of(context);
+    final ColorScheme cs = theme.colorScheme;
+    final TransportModeStyle? style = mode == null ? null : TransportModeStyle.forMode(mode!);
+    return Padding(
+      padding: const EdgeInsets.only(top: AppSpacing.md),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: <Widget>[
+          Text(l.transportMode, style: theme.textTheme.titleSmall),
+          const SizedBox(height: AppSpacing.xs),
+          SingleChildScrollView(
+            scrollDirection: Axis.horizontal,
+            child: Row(
+              children: <Widget>[
+                for (final TransportMode m in TransportMode.values)
+                  Padding(
+                    padding: const EdgeInsets.only(right: AppSpacing.sm),
+                    child: ChoiceChip(
+                      avatar: Icon(TransportModeStyle.forMode(m).icon, size: 18),
+                      label: Text(transportModeLabel(l, m)),
+                      selected: mode == m,
+                      showCheckmark: false,
+                      onSelected: (_) => onMode(m),
+                    ),
+                  ),
+              ],
+            ),
+          ),
+          if (style != null && style.hasRoutes)
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.sm),
+              child: Material(
+                color: cs.surfaceContainerLow,
+                borderRadius: AppRadius.brMd,
+                clipBehavior: Clip.antiAlias,
+                child: ListTile(
+                  minTileHeight: 56,
+                  leading: routeCode == null
+                      ? const Icon(Icons.directions_bus_outlined)
+                      : RouteBadge(code: routeCode!, custom: route?.isCustom ?? false),
+                  title: Text(routeCode == null ? l.chooseRoute : (route?.label.isNotEmpty ?? false) ? route!.label : routeCode!),
+                  subtitle: route?.uncertain ?? false
+                      ? Text(l.fareUncertain, style: theme.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant))
+                      : Text(l.busRoute),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: onPickRoute,
+                ),
+              ),
+            ),
+          if (style != null && style.hasStations)
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.sm),
+              child: Material(
+                color: cs.surfaceContainerLow,
+                borderRadius: AppRadius.brMd,
+                clipBehavior: Clip.antiAlias,
+                child: ListTile(
+                  minTileHeight: 56,
+                  leading: const Icon(Icons.subway_outlined),
+                  title: Text(routeCode ?? l.metroStation),
+                  trailing: const Icon(Icons.chevron_right),
+                  onTap: onPickStation,
+                ),
+              ),
+            ),
+          if (style != null && style.hasTrips)
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.sm),
+              child: Row(
+                children: <Widget>[
+                  Expanded(child: Text(l.trips, style: theme.textTheme.bodyLarge)),
+                  IconButton.outlined(
+                    tooltip: '−',
+                    icon: const Icon(Icons.remove),
+                    onPressed: trips > 1 ? () => onTrips(trips - 1) : null,
+                  ),
+                  SizedBox(
+                    width: 48,
+                    child: Text(
+                      '×$trips',
+                      textAlign: TextAlign.center,
+                      style: theme.textTheme.titleMedium?.merge(AppTextStyles.tabular),
+                      semanticsLabel: l.tripsCount(trips),
+                    ),
+                  ),
+                  IconButton.outlined(
+                    tooltip: '+',
+                    icon: const Icon(Icons.add),
+                    onPressed: trips < FareAutoFill.maxTrips ? () => onTrips(trips + 1) : null,
+                  ),
+                ],
+              ),
+            ),
+          if (mode == TransportMode.bakuCard)
+            Padding(
+              padding: const EdgeInsets.only(top: AppSpacing.sm),
+              child: Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
+                children: <Widget>[
+                  Icon(Icons.info_outline, size: 18, color: cs.onSurfaceVariant),
+                  const SizedBox(width: AppSpacing.sm),
+                  Expanded(
+                    child: Text(
+                      l.bakuCardDoubleCountHint,
+                      style: theme.textTheme.bodySmall?.copyWith(color: cs.onSurfaceVariant),
+                    ),
+                  ),
+                ],
+              ),
+            ),
+        ],
+      ),
+    );
   }
 }
 
@@ -868,10 +1415,13 @@ class _CategorySheet extends ConsumerWidget {
     final AppLocalizations l = AppLocalizations.of(context);
     final String lang = ref.watch(languageProvider);
     final ThemeData theme = Theme.of(context);
-    final List<TxCategory> cats = ref
-            .watch(categoriesProvider((type: type, includeArchived: false)))
-            .value ??
-        const <TxCategory>[];
+    // The bonus-loss system category is written by bonus transfers only.
+    final List<TxCategory> cats = (ref
+                .watch(categoriesProvider((type: type, includeArchived: false)))
+                .value ??
+            const <TxCategory>[])
+        .where((TxCategory c) => !c.isSystem)
+        .toList();
 
     Widget cell({
       required Widget avatar,

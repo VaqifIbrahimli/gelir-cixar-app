@@ -99,6 +99,50 @@ GROUP BY ym, a.currency, t.type
     });
   }
 
+  /// Transport spending in [window] (DESIGN.md §18.10): AZN per mode, and
+  /// bus routes / metro stations by trips, then amount.
+  Stream<TransportReport> watchTransport(DateWindow window, Rates rates, {int topRoutes = 5}) {
+    return _db
+        .customSelect(
+          '''
+SELECT t.transport_mode AS mode, t.route_code AS code, a.currency AS currency,
+       SUM(t.amount) AS total, SUM(t.trips) AS trips
+FROM transactions t JOIN accounts a ON a.id = t.account_id
+WHERE t.type = 'expense' AND t.transport_mode IS NOT NULL AND t.date >= ? AND t.date < ?
+GROUP BY t.transport_mode, t.route_code, a.currency
+''',
+          variables: <Variable<Object>>[Variable<DateTime>(window.start), Variable<DateTime>(window.end)],
+          readsFrom: _tables,
+        )
+        .watch()
+        .map((List<QueryRow> rows) {
+      final Map<TransportMode, int> byMode = <TransportMode, int>{};
+      final Map<(TransportMode, String), (int, int)> routes = <(TransportMode, String), (int, int)>{};
+      for (final QueryRow r in rows) {
+        final TransportMode? mode =
+            TransportMode.values.where((TransportMode m) => m.name == r.read<String>('mode')).firstOrNull;
+        if (mode == null) continue;
+        final int v = rates.toBase(r.read<int>('total'), r.read<String>('currency'));
+        byMode[mode] = (byMode[mode] ?? 0) + v;
+        final String? code = r.readNullable<String>('code');
+        if (code != null && (mode == TransportMode.bus || mode == TransportMode.metro)) {
+          final (int trips, int amount) = routes[(mode, code)] ?? (0, 0);
+          routes[(mode, code)] = (trips + r.read<int>('trips'), amount + v);
+        }
+      }
+      byMode.removeWhere((TransportMode _, int v) => v <= 0);
+      final List<RouteUsage> list = <RouteUsage>[
+        for (final MapEntry<(TransportMode, String), (int, int)> e in routes.entries)
+          if (e.value.$1 >= 1)
+            RouteUsage(mode: e.key.$1, code: e.key.$2, trips: e.value.$1, amount: e.value.$2),
+      ]..sort((RouteUsage a, RouteUsage b) {
+          final int c = b.trips.compareTo(a.trips);
+          return c != 0 ? c : b.amount.compareTo(a.amount);
+        });
+      return TransportReport(byMode: byMode, routes: list.take(topRoutes).toList(growable: false));
+    });
+  }
+
   /// Expense per local day for the [days] days ending with [today]
   /// (oldest first), in AZN. Moves and transfers are not expenses.
   Stream<List<int>> watchDailyExpenses(DateTime today, int days, Rates rates) {

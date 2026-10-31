@@ -1,6 +1,12 @@
-import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'dart:io';
 
+import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:path_provider/path_provider.dart';
+
+import 'card_images.dart';
 import 'database.dart';
+import 'repositories/transport_fare_repository.dart';
+import 'transport/transport_catalog.dart';
 import 'models.dart';
 import 'backup.dart';
 import 'repositories/account_repository.dart';
@@ -25,6 +31,9 @@ export 'repositories/holding_repository.dart';
 export 'repositories/rate_repository.dart';
 export 'repositories/report_repository.dart';
 export 'repositories/transaction_repository.dart';
+export 'repositories/transport_fare_repository.dart';
+export 'transport/transport_catalog.dart';
+export 'card_images.dart';
 
 final Provider<AppDatabase> databaseProvider = Provider<AppDatabase>((Ref ref) {
   final AppDatabase db = AppDatabase();
@@ -129,8 +138,49 @@ final Provider<ReportRepository> reportRepositoryProvider = Provider<ReportRepos
 );
 
 final Provider<BackupService> backupServiceProvider = Provider<BackupService>(
-  (Ref ref) => BackupService(ref.watch(databaseProvider)),
+  (Ref ref) => BackupService(ref.watch(databaseProvider), images: ref.watch(cardImageStoreProvider)),
 );
+
+/// Card photos in `<app documents>/card_images/`. Tests override it with a
+/// temporary directory.
+final Provider<CardImageStore> cardImageStoreProvider = Provider<CardImageStore>(
+  (Ref ref) => CardImageStore(() async {
+    final Directory docs = await getApplicationDocumentsDirectory();
+    return Directory('${docs.path}${Platform.pathSeparator}card_images');
+  }),
+);
+
+// ---------------------------------------------------------------------------
+// v1.2 transport
+// ---------------------------------------------------------------------------
+
+final Provider<TransportFareRepository> transportFareRepositoryProvider =
+    Provider<TransportFareRepository>(
+  (Ref ref) => TransportFareRepository(ref.watch(databaseProvider)),
+);
+
+/// The bundled Baku data, loaded from the asset bundle once.
+final FutureProvider<TransportCatalog> transportCatalogProvider =
+    FutureProvider<TransportCatalog>((Ref ref) => TransportCatalog.load());
+
+/// Bundled fares with the user's edits and own routes.
+final StreamProvider<ResolvedFares> resolvedFaresProvider = StreamProvider<ResolvedFares>((Ref ref) async* {
+  final TransportCatalog catalog = await ref.watch(transportCatalogProvider.future);
+  yield* ref
+      .watch(transportFareRepositoryProvider)
+      .watchAll()
+      .map((List<TransportFare> rows) => ResolvedFares.merge(catalog, rows));
+});
+
+final recentRoutesProvider = StreamProvider.family<List<String>, TransportMode>(
+  (Ref ref, TransportMode m) => ref.watch(transactionRepositoryProvider).watchRecentRoutes(m),
+);
+
+/// Reports "Nəqliyyat" card data.
+final transportReportProvider = StreamProvider.family<TransportReport, DateWindow>((Ref ref, DateWindow w) {
+  final Rates rates = ref.watch(ratesProvider).value ?? Rates.defaults;
+  return ref.watch(reportRepositoryProvider).watchTransport(w, rates);
+});
 
 /// Budgets of a `yyyy-MM` month with spending in AZN.
 final budgetProgressProvider =
